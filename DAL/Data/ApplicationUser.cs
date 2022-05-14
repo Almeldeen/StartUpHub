@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DAL.Models;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,15 +13,13 @@ namespace DAL.Data
     {
         [Required, MaxLength(50)]
         public string FirstName { get; set; }
-
         [Required, MaxLength(50)]
-        public string LastName { get; set; }
-        [Required]
-        public string Description { get; set; }
-        [Required]
-        public string Location { get; set; }
-        [Required]
+        public string LastName { get; set; } 
+        public string Description { get; set; }   
+        public string Location { get; set; }      
         public string Image { get; set; }
         public bool AccountVerification { get; set; }
+        //public List<RefreshToken>? RefreshTokens { get; set; }
+
     }
 }

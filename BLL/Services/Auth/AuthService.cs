@@ -1,6 +1,8 @@
 ﻿using BLL.Helper;
 using DAL.Data;
+using DAL.Models;
 using DAL.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -9,6 +11,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,11 +23,15 @@ namespace BLL.Services.Auth
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
+        private readonly IOptions<JWT> jwt;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly JWT _jwt;
-        public AuthService(UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt)
+        public AuthService(UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt, IHttpContextAccessor httpContextAccessor)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
+            this.jwt = jwt;
+            this.httpContextAccessor = httpContextAccessor;
             _jwt = jwt.Value;
         }
         public async Task<AuthModel> RegisterAsync(RegisterModel model)
@@ -81,24 +88,47 @@ namespace BLL.Services.Auth
         public async Task<AuthModel> LoginAsync(LoginVM model)
         {
             var authModel = new AuthModel();
-
-            var user = await userManager.FindByEmailAsync(model.Email);
-
-            if (user is null || !await userManager.CheckPasswordAsync(user, model.Password))
+            try
             {
-                authModel.Message = "Email or Password is incorrect!";
-                return authModel;
+                var user = await userManager.FindByEmailAsync(model.Email);
+
+                if (user is null || !await userManager.CheckPasswordAsync(user, model.Password))
+                {
+                    authModel.Message = "Email or Password is incorrect!";
+                    return authModel;
+                }
+
+                var jwtSecurityToken = await CreateJwtToken(user);
+                var rolesList = await userManager.GetRolesAsync(user);
+
+                authModel.IsAuthenticated = true;
+                authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+                authModel.Email = user.Email;
+                authModel.Username = user.UserName;
+                authModel.ExpiresOn = jwtSecurityToken.ValidTo;
+                authModel.IsConfirmed = user.EmailConfirmed;
+                authModel.Roles = rolesList.ToList();
+                //if (user.RefreshTokens.Any(t => t.IsActive))
+                //{
+                //    var activeRefreshToken = user.RefreshTokens.FirstOrDefault(t => t.IsActive);
+                //    authModel.RefreshToken = activeRefreshToken.Token;
+                //    authModel.RefreshTokenExpiration = activeRefreshToken.ExpiresOn;
+                //}
+                //else
+                //{
+                //    var refreshToken = GenerateRefreshToken();
+                //    authModel.RefreshToken = refreshToken.Token;
+                //    authModel.RefreshTokenExpiration = refreshToken.ExpiresOn;
+                //    user.RefreshTokens.Add(refreshToken);
+                //    await userManager.UpdateAsync(user);
+                //}
             }
-
-            var jwtSecurityToken = await CreateJwtToken(user);
-            var rolesList = await userManager.GetRolesAsync(user);
-
-            authModel.IsAuthenticated = true;
-            authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-            authModel.Email = user.Email;
-            authModel.Username = user.UserName;
-            authModel.IsConfirmed = user.EmailConfirmed;
-            authModel.Roles = rolesList.ToList();
+            catch (Exception ex)
+            {
+                authModel.Message = ex.Message;
+                authModel.IsAuthenticated = true;
+            }
+        
 
             return authModel;
         }
@@ -128,9 +158,30 @@ namespace BLL.Services.Auth
                 issuer: _jwt.Issuer,
                 audience: _jwt.Audience,
                 claims: claims,
+                  expires: DateTime.UtcNow.AddSeconds(60),
                 signingCredentials: signingCredentials);
 
             return jwtSecurityToken;
+        }
+        //private RefreshToken GenerateRefreshToken()
+        //{
+        //    var randomNumber = new byte[32];
+
+        //    using var generator = new RNGCryptoServiceProvider();
+
+        //    generator.GetBytes(randomNumber);
+
+        //    return new RefreshToken
+        //    {
+        //        Token = Convert.ToBase64String(randomNumber),
+        //        ExpiresOn = DateTime.UtcNow.AddDays(10),
+        //        CreatedOn = DateTime.UtcNow
+        //    };
+        //}
+        public async Task<bool> IsloggedAsync()
+        {
+            bool isloged = httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
+            return isloged;
         }
     }
 }

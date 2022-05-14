@@ -2,6 +2,7 @@
 using BLL.Services.Auth;
 using DAL.Data;
 using DAL.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,6 +15,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -54,6 +56,7 @@ namespace API.Controllers
 
         }
         [HttpPost("Login")]
+        [AllowAnonymous]
         public async Task<IActionResult> LoginAsync([FromBody] LoginVM model)
         {
             if (!ModelState.IsValid)
@@ -76,7 +79,19 @@ namespace API.Controllers
             var result = await userManager.ConfirmEmailAsync(user, token);
             return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
         }
-
-
+        [HttpGet("Islogged")]
+        
+        public async Task<IActionResult> IsloggedAsync()
+        {
+           
+            if (await _authService.IsloggedAsync())
+            {
+                return Ok();
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
     }
 }
