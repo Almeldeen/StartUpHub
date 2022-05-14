@@ -79,19 +79,7 @@ namespace API.Controllers
             var result = await userManager.ConfirmEmailAsync(user, token);
             return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
         }
-        [HttpGet("Islogged")]
-        
-        public async Task<IActionResult> IsloggedAsync()
-        {
-           
-            if (await _authService.IsloggedAsync())
-            {
-                return Ok();
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
+
+
     }
 }

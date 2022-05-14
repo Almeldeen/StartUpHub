@@ -23,15 +23,11 @@ namespace BLL.Services.Auth
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
-        private readonly IOptions<JWT> jwt;
-        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly JWT _jwt;
-        public AuthService(UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt, IHttpContextAccessor httpContextAccessor)
+        public AuthService(UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
-            this.jwt = jwt;
-            this.httpContextAccessor = httpContextAccessor;
             _jwt = jwt.Value;
         }
         public async Task<AuthModel> RegisterAsync(RegisterModel model)
@@ -83,7 +79,7 @@ namespace BLL.Services.Auth
 
                 throw;
             }
-            
+
         }
         public async Task<AuthModel> LoginAsync(LoginVM model)
         {
@@ -162,26 +158,6 @@ namespace BLL.Services.Auth
                 signingCredentials: signingCredentials);
 
             return jwtSecurityToken;
-        }
-        //private RefreshToken GenerateRefreshToken()
-        //{
-        //    var randomNumber = new byte[32];
-
-        //    using var generator = new RNGCryptoServiceProvider();
-
-        //    generator.GetBytes(randomNumber);
-
-        //    return new RefreshToken
-        //    {
-        //        Token = Convert.ToBase64String(randomNumber),
-        //        ExpiresOn = DateTime.UtcNow.AddDays(10),
-        //        CreatedOn = DateTime.UtcNow
-        //    };
-        //}
-        public async Task<bool> IsloggedAsync()
-        {
-            bool isloged = httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
-            return isloged;
         }
     }
 }
