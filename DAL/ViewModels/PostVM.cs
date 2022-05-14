@@ -13,6 +13,7 @@ namespace DAL.ViewModels
         public int PostId { get; set; }
         public string Content { get; set; }
         [JsonIgnore]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public List<IFormFile> PostImage { get; set; }
         public List<string> PostImagePath { get; set; }
        

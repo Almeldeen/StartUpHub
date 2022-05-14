@@ -1,5 +1,6 @@
 ﻿using BLL.Services.Post;
 using DAL.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,6 +12,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PostsController : ControllerBase
     {
         private readonly IPostService service;
@@ -20,7 +22,7 @@ namespace API.Controllers
             this.service = service;
         }
         [HttpPost("AddPost")]
-        public async Task<IActionResult> AddPostAsync(PostVM post)
+        public async Task<IActionResult> AddPostAsync([FromForm] PostVM post)
         {
             var res = await service.AddPostAsync(post);
             return Ok(res);
