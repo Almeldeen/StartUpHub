@@ -77,6 +77,13 @@ namespace API.Controllers
             return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
+        [HttpGet("Account")]
+        public async Task<IActionResult> Account()
+        {
+            string UserId="";
+            var result = await _authService.AccountAsync(UserId);
+            return Ok(result);
+        }
 
     }
 }

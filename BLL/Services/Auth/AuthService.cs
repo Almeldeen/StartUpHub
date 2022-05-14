@@ -21,7 +21,7 @@ namespace BLL.Services.Auth
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly JWT _jwt;
-        public AuthService(UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt)
+        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
@@ -76,7 +76,7 @@ namespace BLL.Services.Auth
 
                 throw;
             }
-            
+
         }
         public async Task<AuthModel> LoginAsync(LoginVM model)
         {
@@ -131,6 +131,32 @@ namespace BLL.Services.Auth
                 signingCredentials: signingCredentials);
 
             return jwtSecurityToken;
+        }
+
+        public async Task<Account_VM> AccountAsync(string userId)
+        {
+            try
+            {
+                var user = await userManager.FindByIdAsync(userId);
+                var userRole = await userManager.GetRolesAsync(user);
+                var account_VM = new Account_VM()
+                {
+                    id = user.Id,
+                    fullName = $"{user.FirstName} {user.LastName}",
+                    role = userRole.FirstOrDefault(),
+                    email = user.Email,
+                    mobile = user.PhoneNumber,
+                    image = user.Image,
+                    isConfirmed = user.EmailConfirmed,
+                    username = user.UserName
+                };
+                return (account_VM);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
         }
     }
 }
