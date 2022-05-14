@@ -1,6 +1,7 @@
 ﻿using BLL.Helper;
 using DAL.Data;
 using DAL.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -20,11 +21,13 @@ namespace BLL.Services.Auth
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly JWT _jwt;
-        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt)
+        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt,IHttpContextAccessor httpContextAccessor)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
+            this.httpContextAccessor = httpContextAccessor;
             _jwt = jwt.Value;
         }
         public async Task<AuthModel> RegisterAsync(RegisterModel model)
@@ -133,24 +136,30 @@ namespace BLL.Services.Auth
             return jwtSecurityToken;
         }
 
-        public async Task<Account_VM> AccountAsync(string userId)
+        public async Task<Account_VM> AccountAsync()
         {
             try
             {
-                var user = await userManager.FindByIdAsync(userId);
-                var userRole = await userManager.GetRolesAsync(user);
-                var account_VM = new Account_VM()
+                if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
                 {
-                    id = user.Id,
-                    fullName = $"{user.FirstName} {user.LastName}",
-                    role = userRole.FirstOrDefault(),
-                    email = user.Email,
-                    mobile = user.PhoneNumber,
-                    image = user.Image,
-                    isConfirmed = user.EmailConfirmed,
-                    username = user.UserName
-                };
-                return (account_VM);
+                    var userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    var user = await userManager.FindByIdAsync(userId);
+                    var userRole = await userManager.GetRolesAsync(user);
+                    var account_VM = new Account_VM()
+                    {
+                        id = user.Id,
+                        fullName = $"{user.FirstName} {user.LastName}",
+                        role = userRole.FirstOrDefault(),
+                        email = user.Email,
+                        mobile = user.PhoneNumber,
+                        image = user.Image,
+                        isConfirmed = user.EmailConfirmed,
+                        username = user.UserName
+                    };
+                    return (account_VM);
+                }
+
+                return null;
             }
             catch (Exception)
             {

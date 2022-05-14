@@ -11,7 +11,7 @@ namespace BLL.Services.Auth
     {
         Task<AuthModel> RegisterAsync(RegisterModel model);
         Task<AuthModel> LoginAsync(LoginVM model);
-        Task<Account_VM> AccountAsync(string  userId);
+        Task<Account_VM> AccountAsync();
 
     }
 }

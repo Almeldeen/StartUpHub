@@ -2,10 +2,12 @@ using BLL.Helper;
 using BLL.Mapper;
 using BLL.Services.Auth;
 using BLL.Services.Field;
+using BLL.Services.Intern;
 using BLL.Services.Post;
 using BLL.Services.Skills;
 using DAL.Data;
 using DAL.Reproisitry.FieldRepos;
+using DAL.Reproisitry.InternRepos;
 using DAL.Reproisitry.PostRepos;
 using DAL.Reproisitry.SkillsRepos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -64,6 +66,8 @@ namespace API
             services.AddScoped<IPostRepo, PostRepo>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<ISkillsService, SkillsService>();
+            services.AddScoped<IInternRepos, InternRepos>();
+            services.AddScoped<IInternService, InternService>();
 
             services.AddAuthentication(options =>
             {

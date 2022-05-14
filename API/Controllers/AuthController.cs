@@ -80,9 +80,17 @@ namespace API.Controllers
         [HttpGet("Account")]
         public async Task<IActionResult> Account()
         {
-            string UserId="";
-            var result = await _authService.AccountAsync(UserId);
-            return Ok(result);
+           
+            var result = await _authService.AccountAsync();
+            if (result!=null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest();
+            }
+            
         }
 
     }
