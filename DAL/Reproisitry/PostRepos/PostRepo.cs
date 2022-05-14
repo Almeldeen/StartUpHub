@@ -2,10 +2,12 @@
 using DAL.Data;
 using DAL.Models;
 using DAL.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,19 +17,34 @@ namespace DAL.Reproisitry.PostRepos
     {
         private readonly ApplicationDbContext db;
         private readonly IMapper mapper;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public PostRepo( ApplicationDbContext db , IMapper mapper)
+        public PostRepo( ApplicationDbContext db , IMapper mapper,IHttpContextAccessor httpContextAccessor)
         {
             this.db = db;
             this.mapper = mapper;
+            this.httpContextAccessor = httpContextAccessor;
         }
         public async Task<PostVM> AddPostAsync(PostVM post)
         {
             try
             {
                 var data = mapper.Map<Post>(post);
+                data.UserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 await db.Posts.AddAsync(data);
+               
                 var res = await db.SaveChangesAsync();
+                if (res<=0)
+                {
+                    return null;
+                }
+                List<ImagePosts> imagePosts = new List<ImagePosts>();
+                foreach (var item in post.PostImagePath)
+                {
+                    imagePosts.Add(new ImagePosts { ImagePath = item ,PostId=data.PostId});
+                }
+                await db.ImagePosts.AddRangeAsync(imagePosts);
+                res = await db.SaveChangesAsync();
                 if (res > 0)
                 {
                     post.PostId = data.PostId;
@@ -96,13 +113,13 @@ namespace DAL.Reproisitry.PostRepos
         }
         public async Task<List<PostVM>> GetAllPostAsync()
         {
-            var data = await db.Posts.Select(a => new PostVM { PostId = a.PostId, PostImagePath = a.PostImagePath, Content = a.Content, FieldId = a.Field.FieldId, FieldName = a.Field.FieldName, UserId = a.User.Id }).ToListAsync();
+            var data = await db.Posts.Select(a => new PostVM { PostId = a.PostId,  Content = a.Content, FieldId = a.Field.FieldId, FieldName = a.Field.FieldName, UserId = a.User.Id }).ToListAsync();
             return data;
         }
 
         public async Task<PostVM> GetByIdPostAsync(int id)
         {
-            var data = await db.Posts.Where(a =>  a.PostId ==id).Select(a => new PostVM { PostId = a.PostId, PostImagePath = a.PostImagePath, Content = a.Content, FieldId = a.Field.FieldId, FieldName = a.Field.FieldName, UserId = a.User.Id }).FirstOrDefaultAsync();
+            var data = await db.Posts.Where(a =>  a.PostId ==id).Select(a => new PostVM { PostId = a.PostId, Content = a.Content, FieldId = a.Field.FieldId, FieldName = a.Field.FieldName, UserId = a.User.Id }).FirstOrDefaultAsync();
             return data;
         }
     }

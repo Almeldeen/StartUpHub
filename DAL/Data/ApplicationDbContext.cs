@@ -28,6 +28,7 @@ namespace DAL.Data
         public DbSet<InternSkills> InternSkills { get; set; }
         public DbSet<Ratting> Rattings { get; set; }
         public DbSet<InternApplaied> InternApplaieds { get; set; }
+        public DbSet<ImagePosts> ImagePosts { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
 
@@ -41,6 +42,9 @@ namespace DAL.Data
             builder.Entity<InternSkills>()
           .HasKey(b => new { b.InternId, b.SkillsId })
           .HasName("PK_InternSkills");
+            builder.Entity<ImagePosts>()
+         .HasKey(b => new { b.Id, b.PostId })
+         .HasName("PK_ImagePosts");
             base.OnModelCreating(builder);
         }
     }

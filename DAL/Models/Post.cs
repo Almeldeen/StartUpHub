@@ -12,7 +12,7 @@ namespace DAL.Models
     {
         public int PostId { get; set; }
         public string Content { get; set; }
-        public string PostImagePath { get; set; }
+      
         [ForeignKey("FieldId")]
         public  int FieldId { get; set; }
         public virtual Field Field { get; set; }
@@ -21,5 +21,6 @@ namespace DAL.Models
         public ApplicationUser User { get; set; }
         public virtual List<Like> Likes { get; set; }
         public virtual List<Comment> Comments { get; set; }
+        public List<ImagePosts> ImagePosts { get; set; }
     }
 }

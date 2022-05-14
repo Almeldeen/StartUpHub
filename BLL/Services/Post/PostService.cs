@@ -1,4 +1,5 @@
-﻿using DAL.Reproisitry.PostRepos;
+﻿using BLL.Helper;
+using DAL.Reproisitry.PostRepos;
 using DAL.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,13 @@ namespace BLL.Services.Post
         }
          public async Task<PostVM> AddPostAsync(PostVM  Post)
         {
-            return await repo.AddPostAsync( Post);
+            Post.PostImagePath = new List<string>();
+            foreach (var item in Post.PostImage)
+            {
+                string path =await SaveFiles.SaveFileAsync(item,FilePath.ImagePost);
+                Post.PostImagePath.Add(path);
+            }
+            return await repo.AddPostAsync(Post);
         }
 
         public async Task<int> DeletePostAsync(int id)

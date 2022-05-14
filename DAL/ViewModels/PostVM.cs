@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +12,9 @@ namespace DAL.ViewModels
     {
         public int PostId { get; set; }
         public string Content { get; set; }
-        public string PostImagePath { get; set; }
-        public IFormFile PostImage { get; set; }
+        [JsonIgnore]
+        public List<IFormFile> PostImage { get; set; }
+        public List<string> PostImagePath { get; set; }
        
         public int FieldId { get; set; }
         public string FieldName { get; set; }
