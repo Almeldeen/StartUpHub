@@ -12,9 +12,7 @@ namespace DAL.Data
   public  class ApplicationUser : IdentityUser
     {
         [Required, MaxLength(50)]
-        public string FirstName { get; set; }
-        [Required, MaxLength(50)]
-        public string LastName { get; set; } 
+        public string FullName { get; set; }
         public string Description { get; set; }   
         public string Location { get; set; }      
         public string Image { get; set; }

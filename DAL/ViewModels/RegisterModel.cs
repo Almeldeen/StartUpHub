@@ -10,10 +10,10 @@ namespace DAL.ViewModels
   public  class RegisterModel
     {
         [Required, StringLength(100)]
-        public string FirstName { get; set; }
-
-        [Required, StringLength(100)]
-        public string LastName { get; set; }
+        public string fullName { get; set; }
+        public string role { get; set; }
+        public string mobile { get; set; }
+        public string address { get; set; }
 
         [Required, StringLength(50)]
         public string Username { get; set; }

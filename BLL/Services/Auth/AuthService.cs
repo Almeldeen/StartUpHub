@@ -2,6 +2,7 @@
 using DAL.Data;
 using DAL.Models;
 using DAL.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -19,6 +20,7 @@ using static BLL.Helper.Constants;
 
 namespace BLL.Services.Auth
 {
+
     public class AuthService : IAuthService
     {
         private readonly UserManager<ApplicationUser> userManager;
@@ -26,7 +28,7 @@ namespace BLL.Services.Auth
         private readonly IOptions<JWT> jwt;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly JWT _jwt;
-        public AuthService(UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt, IHttpContextAccessor httpContextAccessor)
+        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt, IHttpContextAccessor httpContextAccessor)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
@@ -34,6 +36,7 @@ namespace BLL.Services.Auth
             this.httpContextAccessor = httpContextAccessor;
             _jwt = jwt.Value;
         }
+
         public async Task<AuthModel> RegisterAsync(RegisterModel model)
         {
             try
@@ -48,8 +51,9 @@ namespace BLL.Services.Auth
                 {
                     UserName = model.Username,
                     Email = model.Email,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName
+                    FullName = model.fullName,
+                    Location = model.address,
+                    PhoneNumber = model.mobile
                 };
 
                 var result = await userManager.CreateAsync(user, model.Password);
@@ -63,7 +67,8 @@ namespace BLL.Services.Auth
 
                     return new AuthModel { Message = errors };
                 }
-                await userManager.AddToRoleAsync(user, Roles.Internee.ToString());
+
+                await userManager.AddToRoleAsync(user, model.role);
 
                 var jwtSecurityToken = await CreateJwtToken(user);
 
@@ -72,9 +77,13 @@ namespace BLL.Services.Auth
                     Email = user.Email,
 
                     IsAuthenticated = true,
-                    Roles = new List<string> { Roles.Internee.ToString() },
+                    role = model.role,
                     Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+                    ExpiresOn = jwtSecurityToken.ValidTo,
                     Username = user.UserName,
+                    mobile = user.PhoneNumber,
+                    address = user.Location,
+                    fullName = user.FullName,
 
                 };
             }
@@ -85,6 +94,7 @@ namespace BLL.Services.Auth
             }
 
         }
+
         public async Task<AuthModel> LoginAsync(LoginVM model)
         {
             var authModel = new AuthModel();
@@ -99,7 +109,7 @@ namespace BLL.Services.Auth
                 }
 
                 var jwtSecurityToken = await CreateJwtToken(user);
-                var rolesList = await userManager.GetRolesAsync(user);
+                var role = userManager.GetRolesAsync(user).Result.FirstOrDefault();
 
                 authModel.IsAuthenticated = true;
                 authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
@@ -107,7 +117,10 @@ namespace BLL.Services.Auth
                 authModel.Username = user.UserName;
                 authModel.ExpiresOn = jwtSecurityToken.ValidTo;
                 authModel.IsConfirmed = user.EmailConfirmed;
-                authModel.Roles = rolesList.ToList();
+                authModel.role = role;
+                authModel.mobile = user.PhoneNumber;
+                authModel.address = user.Location;
+                authModel.fullName = user.FullName;
                 //if (user.RefreshTokens.Any(t => t.IsActive))
                 //{
                 //    var activeRefreshToken = user.RefreshTokens.FirstOrDefault(t => t.IsActive);
@@ -128,7 +141,7 @@ namespace BLL.Services.Auth
                 authModel.Message = ex.Message;
                 authModel.IsAuthenticated = true;
             }
-        
+
 
             return authModel;
         }
@@ -158,16 +171,18 @@ namespace BLL.Services.Auth
                 issuer: _jwt.Issuer,
                 audience: _jwt.Audience,
                 claims: claims,
-                  expires: DateTime.UtcNow.AddSeconds(60),
+                  expires: DateTime.UtcNow.AddDays(_jwt.DurationInDays),
                 signingCredentials: signingCredentials);
 
             return jwtSecurityToken;
         }
+
         public async Task<bool> IsloggedAsync()
         {
             bool isloged = httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
             return isloged;
         }
+
         public async Task<Account_VM> AccountAsync()
         {
             try
@@ -180,7 +195,7 @@ namespace BLL.Services.Auth
                     var account_VM = new Account_VM()
                     {
                         id = user.Id,
-                        fullName = $"{user.FirstName} {user.LastName}",
+                        fullName = user.FullName,
                         role = userRole.FirstOrDefault(),
                         email = user.Email,
                         mobile = user.PhoneNumber,

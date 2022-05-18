@@ -15,7 +15,12 @@ namespace DAL.ViewModels
         public bool IsConfirmed { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
-        public List<string> Roles { get; set; }
+        public string fullName { get; set; }
+
+        public string mobile { get; set; }
+        public string address { get; set; }
+        public string image { get; set; }
+        public string role { get; set; }
         public DateTime? ExpiresOn { get; set; }
         public string Token { get; set; }
         //[JsonIgnore]
