@@ -27,6 +27,7 @@ namespace API.Controllers
             this.userManager = userManager;
         }
         [HttpPost("Register")]
+        [AllowAnonymous]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterModel model)
         {
             try
