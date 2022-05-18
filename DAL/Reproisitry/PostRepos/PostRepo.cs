@@ -116,13 +116,19 @@ namespace DAL.Reproisitry.PostRepos
         }
         public async Task<List<PostVM>> GetAllPostAsync()
         {
-            var data = await db.Posts.Select(a => new PostVM { PostId = a.PostId, Content = a.Content, FieldId = a.Field.FieldId, FieldName = a.Field.FieldName, UserId = a.User.Id }).ToListAsync();
+            var data = await db.Posts.Select(a => new PostVM { PostId = a.PostId,
+                Content = a.Content,
+                FieldId = a.Field.FieldId,
+                FieldName = a.Field.FieldName,
+                UserId = a.User.Id,
+                PostImagePath =a.ImagePosts.Select(x=> x.ImagePath).ToList()
+            }).ToListAsync();
             return data;
         }
 
         public async Task<PostVM> GetByIdPostAsync(int id)
         {
-            var data = await db.Posts.Where(a => a.PostId == id).Select(a => new PostVM { PostId = a.PostId, Content = a.Content, FieldId = a.Field.FieldId, FieldName = a.Field.FieldName, UserId = a.User.Id }).FirstOrDefaultAsync();
+            var data = await db.Posts.Where(a => a.PostId == id).Select(a => new PostVM { PostId = a.PostId, Content = a.Content, FieldId = a.Field.FieldId, FieldName = a.Field.FieldName, UserId = a.User.Id, PostImagePath = a.ImagePosts.Select(x => x.ImagePath).ToList() }).FirstOrDefaultAsync();
             return data;
         }
     }
