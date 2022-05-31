@@ -12,5 +12,6 @@ namespace DAL.Models
         public string FieldName { get; set; }
         public virtual List<Post> posts { get; set; }
         public virtual List<Skills> Skills { get; set; }
+        public virtual List<Jop> Jops { get; set; }
     }
 }

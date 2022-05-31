@@ -27,6 +27,8 @@ namespace DAL.Data
         public DbSet<Interen> Interens { get; set; }
         public DbSet<InternSkills> InternSkills { get; set; }
         public DbSet<Ratting> Rattings { get; set; }
+        public DbSet<Jop> Jops { get; set; }
+        public DbSet<JopSkills> JopSkills { get; set; }
         public DbSet<InternApplaied> InternApplaieds { get; set; }
         public DbSet<ImagePosts> ImagePosts { get; set; }
 
@@ -43,6 +45,9 @@ namespace DAL.Data
             builder.Entity<InternSkills>()
           .HasKey(b => new { b.InternId, b.SkillsId })
           .HasName("PK_InternSkills");
+            builder.Entity<JopSkills>()
+         .HasKey(b => new { b.JopId, b.SkillsId })
+         .HasName("PK_JopSkills");
             base.OnModelCreating(builder);
         }
     }
