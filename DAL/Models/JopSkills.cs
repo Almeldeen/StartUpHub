@@ -9,7 +9,8 @@ namespace DAL.Models
 {
     public class JopSkills
     {
-          [ForeignKey("JopId")]
+       
+        [ForeignKey("JopId")]
         public int JopId { get; set; }
         [ForeignKey("SkillsId")]
         public int SkillsId { get; set; }

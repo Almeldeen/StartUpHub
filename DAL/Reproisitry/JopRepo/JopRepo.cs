@@ -40,20 +40,20 @@ namespace DAL.Reproisitry.JopRepo
                     return null;
 
                 }
-                List<JopSkills> jopskills = new List<JopSkills> ();
-                foreach (var item in jop.skills)
-                {
-                    jopskills.Add(new JopSkills { JopId = data.Id, SkillsId = item.SkillsId });
+                //List<JopSkills> jopskills = new List<JopSkills> ();
+                //foreach (var item in jop.skills)
+                //{
+                //    jopskills.Add(new JopSkills { JopId = data.Id, SkillsId = item.SkillsId });
 
-                }
-                await db.JopSkills.AddRangeAsync(jopskills);
-                var result = await db.SaveChangesAsync();
-                if (result > 0)
-                {
-                    jop.id = data.Id;
-                    return jop;
+                //}
+                //await db.JopSkills.AddRangeAsync(jopskills);
+                //var result = await db.SaveChangesAsync();
+                //if (result > 0)
+                //{
+                //    jop.id = data.Id;
+                //    return jop;
                         
-                }
+                //}
                 return null;
 
             }

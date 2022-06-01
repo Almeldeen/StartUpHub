@@ -24,6 +24,7 @@ namespace DAL.Models
         public virtual ApplicationUser User { get; set; }
 
         public virtual List<Skills> Skills { get; set; }
+        public virtual List<JopSkills> JopSkills { get; set; }
 
     }
 }

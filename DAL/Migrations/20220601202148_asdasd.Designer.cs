@@ -4,14 +4,16 @@ using DAL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220601202148_asdasd")]
+    partial class asdasd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -399,21 +401,6 @@ namespace DAL.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Jops");
-                });
-
-            modelBuilder.Entity("DAL.Models.JopSkills", b =>
-                {
-                    b.Property<int>("JopId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SkillsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("JopId", "SkillsId");
-
-                    b.HasIndex("SkillsId");
-
-                    b.ToTable("JopSkills");
                 });
 
             modelBuilder.Entity("DAL.Models.Like", b =>
@@ -830,25 +817,6 @@ namespace DAL.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DAL.Models.JopSkills", b =>
-                {
-                    b.HasOne("DAL.Models.Jop", "Jop")
-                        .WithMany("JopSkills")
-                        .HasForeignKey("JopId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DAL.Models.Skills", "Skills")
-                        .WithMany("JopSkills")
-                        .HasForeignKey("SkillsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Jop");
-
-                    b.Navigation("Skills");
-                });
-
             modelBuilder.Entity("DAL.Models.Like", b =>
                 {
                     b.HasOne("DAL.Models.Post", "Post")
@@ -1002,11 +970,6 @@ namespace DAL.Migrations
                     b.Navigation("Skills");
                 });
 
-            modelBuilder.Entity("DAL.Models.Jop", b =>
-                {
-                    b.Navigation("JopSkills");
-                });
-
             modelBuilder.Entity("DAL.Models.Post", b =>
                 {
                     b.Navigation("Comments");
@@ -1019,8 +982,6 @@ namespace DAL.Migrations
             modelBuilder.Entity("DAL.Models.Skills", b =>
                 {
                     b.Navigation("InternShipSkils");
-
-                    b.Navigation("JopSkills");
                 });
 #pragma warning restore 612, 618
         }

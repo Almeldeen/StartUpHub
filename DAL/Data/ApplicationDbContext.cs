@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DAL.Data
 {
-   public class ApplicationDbContext:IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -35,7 +35,7 @@ namespace DAL.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
 
-        
+
             builder.Entity<InternShipSkils>()
              .HasKey(b => new { b.InternShipId, b.SkillsId })
              .HasName("PK_InternShipSkils");
@@ -45,9 +45,24 @@ namespace DAL.Data
             builder.Entity<InternSkills>()
           .HasKey(b => new { b.InternId, b.SkillsId })
           .HasName("PK_InternSkills");
-            builder.Entity<JopSkills>()
-         .HasKey(b => new { b.JopId, b.SkillsId })
-         .HasName("PK_JopSkills");
+            //   builder.Entity<JopSkills>()
+            //.HasKey(b => new { b.JopId, b.SkillsId })
+            //.HasName("PK_JopSkills");
+            builder.Entity<Jop>()
+                 .HasMany(d => d.Skills)
+                 .WithMany(x => x.Jops)
+                 .UsingEntity<JopSkills>(
+                 j => j
+                 .HasOne(pt => pt.Skills)
+                 .WithMany(t => t.JopSkills)
+                 .HasForeignKey(pt => pt.SkillsId),
+                 j => j
+                 .HasOne(pt => pt.Jop)
+                 .WithMany(t => t.JopSkills)
+                 .HasForeignKey(pt => pt.JopId),
+                 j => j
+                 .HasKey(t => new { t.JopId, t.SkillsId })
+                 );
             base.OnModelCreating(builder);
         }
     }

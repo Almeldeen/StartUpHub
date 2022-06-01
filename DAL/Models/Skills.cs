@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ namespace DAL.Models
 {
    public class Skills
     {
+        [Key]
         public int SkillsId { get; set; }
         public string Name { get; set; }
         [ForeignKey("FieldId")]
@@ -16,6 +18,7 @@ namespace DAL.Models
         public virtual Field Field { get; set; }
         public virtual List<Interen> Interens { get; set; }
         public virtual List<Jop> Jops { get; set; }
+        public virtual List<JopSkills> JopSkills { get; set; }
         public virtual List<InternShipSkils> InternShipSkils { get; set; }
     }
 }
