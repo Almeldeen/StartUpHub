@@ -16,6 +16,7 @@ namespace DAL.Data
         public string Description { get; set; }   
         public string Location { get; set; }      
         public string Image { get; set; }
+        public string jopTitile { get; set; }
         public bool AccountVerification { get; set; }
         //public List<RefreshToken>? RefreshTokens { get; set; }
 

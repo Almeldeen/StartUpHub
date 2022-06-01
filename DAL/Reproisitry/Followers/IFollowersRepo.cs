@@ -9,7 +9,7 @@ namespace DAL.Reproisitry.Followers
 {
     public interface IFollowersRepo
     {
-        public Task<Follower_VM> Followers( );
-        public Task<Follower_VM> Following( );
+        public Task<List<Follower_VM> >Followers( );
+        public Task<List<Follower_VM> >Following( );
     }
 }

@@ -17,6 +17,7 @@ namespace DAL.Models
         public string College { get; set; }
         public DateTime Birthday { get; set; }
         public string Nationality { get; set; }
+      
         public byte Gender { get; set; }
         [ForeignKey("UserId")]
         public string UserId { get; set; }

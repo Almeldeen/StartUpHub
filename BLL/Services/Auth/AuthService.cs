@@ -2,7 +2,7 @@
 using DAL.Data;
 using DAL.Models;
 using DAL.ViewModels;
-using Microsoft.AspNetCore.Authorization;
+//using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;

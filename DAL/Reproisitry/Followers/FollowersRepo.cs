@@ -3,6 +3,7 @@ using DAL.Data;
 using DAL.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,13 +28,14 @@ namespace DAL.Reproisitry.Followers
             this.userManager = userManager;
         }
 
-        public async Task<Follower_VM> Followers( )
+        public async Task<List<Follower_VM>> Followers( )
         {
             if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
             {
                 var userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 var data = db.Follows.Where(x => x.FollowReceiverId == userId).Count();
-                return null;
+                var followers =await db.Follows.Where(x => x.FollowReceiverId == userId).Select(x => new Follower_VM { id = x.FollowReceiverId, img = x.FollowReceiver.Image, name = x.FollowReceiver.UserName, jobTitle = x.FollowReceiver.jopTitile }).ToListAsync();
+                    return followers;
             }
             else
             {
@@ -41,13 +43,14 @@ namespace DAL.Reproisitry.Followers
             }
         }
 
-        public Task<Follower_VM> Following( )
+        public async Task<List<Follower_VM>> Following( )
         {
             if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
             {
                 var userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                var data = db.Follows.Where(x => x.FollowSenderId == userId).Count();
-                return null;
+                //var job =await db.Jops.Where(x => x.UserId == userId);
+                var followering =await db.Follows.Where(x => x.FollowSenderId == userId).Select(x => new Follower_VM { id = x.FollowSenderId, img = x.FollowSender.Image, name = x.FollowSender.UserName, jobTitle = x.FollowSender.jopTitile}).ToListAsync();
+                return followering;
             }
             else
             {

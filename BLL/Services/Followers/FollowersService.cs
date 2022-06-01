@@ -17,12 +17,12 @@ namespace BLL.Services.Followers
             this.repo = repo;
         }
 
-        public Task<Follower_VM> Followers( )
+        public Task<List<Follower_VM>> Followers( )
         {
             return repo.Followers();
         }
 
-        public Task<Follower_VM> Following( )
+        public Task<List<Follower_VM>> Following( )
         {
             return repo.Following();
         }

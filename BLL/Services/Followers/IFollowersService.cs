@@ -9,7 +9,7 @@ namespace BLL.Services.Followers
 {
     public interface IFollowersService
     {
-        public Task<Follower_VM> Followers( );
-        public Task<Follower_VM> Following( );
+        public Task<List<Follower_VM>> Followers( );
+        public Task<List<Follower_VM>> Following( );
     }
 }

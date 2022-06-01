@@ -30,6 +30,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\IMGsPosts\" />
     <Folder Include="wwwroot\IMGsPosts\" />
+    <Folder Include="wwwroot\IMGsPosts\" />
   </ItemGroup>
 
 </Project>
