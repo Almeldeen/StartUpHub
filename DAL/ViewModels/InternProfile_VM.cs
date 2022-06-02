@@ -13,12 +13,12 @@ namespace DAL.ViewModels
         public int followersCount { get; set; }
         public int followingCount { get; set; }
         public string about { get; set; }
-        public List<FieldVM> fields { get; set; }
+        public List<Field> fields { get; set; }
         public DateTime birthdate { get; set; }
-        public List<SkillsVM> skills { get; set; }
+        public List<Skills> skills { get; set; }
         public string jobTitle { get; set; }
         public bool availableToWork { get; set; }
-        public List<Education_VM> education { get; set; }
+        public List<Education> education { get; set; }
         public string address { get; set; }
 
     }

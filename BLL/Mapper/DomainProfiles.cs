@@ -21,7 +21,8 @@ namespace BLL.Mapper
             CreateMap<Post, PostVM>();
             CreateMap<Jop, JopVM>();
             CreateMap<JopVM, Jop>();
-
+            CreateMap<InternApplaied_VM, InternApplaied>();
+            CreateMap<InternApplaied, InternApplaied_VM>()
         }
         
     }
