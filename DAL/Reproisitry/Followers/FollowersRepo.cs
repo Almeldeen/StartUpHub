@@ -48,7 +48,7 @@ namespace DAL.Reproisitry.Followers
             if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
             {
                 var userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                //var job =await db.Jops.Where(x => x.UserId == userId);
+              
                 var followering =await db.Follows.Where(x => x.FollowSenderId == userId).Select(x => new Follower_VM { id = x.FollowSenderId, img = x.FollowSender.Image, name = x.FollowSender.UserName, jobTitle = x.FollowSender.jopTitile}).ToListAsync();
                 return followering;
             }

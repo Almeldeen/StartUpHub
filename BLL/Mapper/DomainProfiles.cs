@@ -22,7 +22,7 @@ namespace BLL.Mapper
             CreateMap<Jop, JopVM>();
             CreateMap<JopVM, Jop>();
             CreateMap<InternApplaied_VM, InternApplaied>();
-            CreateMap<InternApplaied, InternApplaied_VM>()
+            CreateMap<InternApplaied, InternApplaied_VM>();
         }
         
     }

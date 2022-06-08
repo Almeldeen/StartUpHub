@@ -4,6 +4,7 @@ using DAL.Models;
 using DAL.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,20 +41,20 @@ namespace DAL.Reproisitry.JopRepo
                     return null;
 
                 }
-                //List<JopSkills> jopskills = new List<JopSkills> ();
-                //foreach (var item in jop.skills)
-                //{
-                //    jopskills.Add(new JopSkills { JopId = data.Id, SkillsId = item.SkillsId });
+                List<JopSkills> jopskills = new List<JopSkills>();
+                foreach (var item in jop.skills)
+                {
+                    jopskills.Add(new JopSkills { JopId = data.Id, SkillsId = item.SkillsId });
 
-                //}
-                //await db.JopSkills.AddRangeAsync(jopskills);
-                //var result = await db.SaveChangesAsync();
-                //if (result > 0)
-                //{
-                //    jop.id = data.Id;
-                //    return jop;
-                        
-                //}
+                }
+                await db.JopSkills.AddRangeAsync(jopskills);
+                var result = await db.SaveChangesAsync();
+                if (result > 0)
+                {
+                    jop.id = data.Id;
+                    return jop;
+
+                }
                 return null;
 
             }
@@ -91,9 +92,10 @@ namespace DAL.Reproisitry.JopRepo
             
         }
 
-        public Task<List<JopVM>> GetAllJop()
+        public async Task<List<JopVM>> GetAllJop()
         {
-            throw new NotImplementedException();
+            var data = await db.Jops.Select(a => new JopVM { id = a.Id, name = a.Name, startDate = a.StartDate, endDate = a.EndDate, content = a.Content, fieldId = a.Field.FieldId, fieldName = a.Field.FieldName, userId = a.User.Id, skills = a.Skills.Select(a => new SkillsVM { SkillsId = a.SkillsId, Name = a.Name }).ToList() }).ToListAsync();
+            return data;
         }
     }
 }
