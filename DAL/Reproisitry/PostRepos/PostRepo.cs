@@ -5,6 +5,7 @@ using DAL.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.Swagger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,8 @@ namespace DAL.Reproisitry.PostRepos
             try
             {
                 var data = mapper.Map<Post>(post);
-                data.UserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                data.UserId = userMangger.FindByNameAsync(username).Result.Id;
                 await db.Posts.AddAsync(data);
 
                 var res = await db.SaveChangesAsync();
@@ -114,16 +116,89 @@ namespace DAL.Reproisitry.PostRepos
             }
 
         }
-        public async Task<List<PostVM>> GetAllPostAsync()
+        public async Task<ResponseVM<PostVM>> GetAllPostAsync(int pagenum, int pagesize)
         {
-            var data = await db.Posts.Select(a => new PostVM { PostId = a.PostId,
-                Content = a.Content,
-                FieldId = a.Field.FieldId,
-                FieldName = a.Field.FieldName,
-                UserId = a.User.Id,
-                PostImagePath =a.ImagePosts.Select(x=> x.ImagePath).ToList()
-            }).ToListAsync();
-            return data;
+            try
+            {
+                if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                {
+                    var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    var UserId = userMangger.FindByNameAsync(username).Result.Id;
+                    var data = await db.Posts.Skip(pagesize * (pagenum - 1)).Take(pagesize).Select(a => new PostVM
+                    {
+                        PostId = a.PostId,
+                        Content = a.Content,
+                        FieldId = a.Field.FieldId,
+                        FieldName = a.Field.FieldName,
+                        UserId = a.User.Id,
+                        UserImg = a.User.ProfileImage,
+                        UserJobTitle = a.User.jopTitile,
+                        UserName = a.User.UserName,
+                        likes = a.Likes.Select(x => new PostLikesVM
+                        {
+                            userFullName = x.User.UserName,
+                            userId = x.UserId,
+                            userImg = x.User.ProfileImage,
+                            userJobTitle = x.User.jopTitile,
+                        }).ToList(),
+                        PostImagePath = a.ImagePosts.Select(x => x.ImagePath).ToList(),
+                    }).ToListAsync();
+                    ResponseVM<PostVM> response = new ResponseVM<PostVM>();
+                    response.Data = data;
+                    response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.Posts.CountAsync() / pagesize));
+                    response.CurrentPage = pagenum;
+                    return response;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+
+                return null;
+            }
+        }
+        public async Task<ResponseVM<PostVM>> GetUserPostsAsync(int pagenum,int pagesize)
+        {
+            try
+            {
+                if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                {
+                    var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    var UserId = userMangger.FindByNameAsync(username).Result.Id;
+                    var data = await db.Posts.Where(x=> x.UserId==UserId).Skip(pagesize*(pagenum-1)).Take(pagesize).Select(a => new PostVM
+                    {
+                        PostId = a.PostId,
+                        Content = a.Content,
+                        FieldId = a.Field.FieldId,
+                        FieldName = a.Field.FieldName,
+                        UserId = a.User.Id,
+                        UserImg = a.User.ProfileImage,
+                        UserJobTitle = a.User.jopTitile,
+                        UserName = a.User.UserName,
+                        likes = a.Likes.Select(x => new PostLikesVM
+                        {
+                            userFullName = x.User.UserName,
+                            userId = x.UserId,
+                            userImg = x.User.ProfileImage,
+                            userJobTitle = x.User.jopTitile,
+                        }).ToList(),
+                        PostImagePath = a.ImagePosts.Select(x => x.ImagePath).ToList(),
+                    }).ToListAsync();
+                    ResponseVM<PostVM> response = new ResponseVM<PostVM>();
+                    response.Data = data;
+                    response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.Posts.Where(x => x.UserId == UserId).CountAsync() / pagesize));
+                    response.CurrentPage = pagenum;
+                    return response;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+
+                return null;
+            }
+           
+          
         }
 
         public async Task<PostVM> GetByIdPostAsync(int id)

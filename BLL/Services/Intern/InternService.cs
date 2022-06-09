@@ -37,5 +37,9 @@ namespace BLL.Services.Intern
             return await repo.GetProfile();
 
         }
+        public async Task<bool> UpdateProfile(UpdateInternVM updateIntern)
+        {
+            return await repo.UpdateProfile(updateIntern);
+        }
     }
 }

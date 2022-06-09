@@ -12,7 +12,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class PostsController : ControllerBase
     {
         private readonly IPostService service;
@@ -27,6 +27,55 @@ namespace API.Controllers
             var res = await service.AddPostAsync(post);
             return Ok(res);
                 
+        }
+
+        //public async Task<IActionResult> EditPostAsync([FromForm] PostVM post)
+        //{
+
+        //}
+        //public async Task<IActionResult> DeletePostAsync([FromForm] int id)
+        //{
+
+        //}
+        //public async Task<IActionResult> GetByIdPostAsync([FromForm] int id)
+        //{
+
+        //}
+        [HttpGet("get-timeline-articles")]
+        public async Task<IActionResult> GetAllPostAsync(int page, int pageSize)
+        {
+            try
+            {
+                var data = await service.GetAllPostAsync(page, pageSize);
+                if (data!=null)
+                {
+                    return Ok(data);
+                }
+                return BadRequest(data);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("get-user-articles")]
+        public async Task<IActionResult> GetUserPostsAsync(int page, int pageSize)
+        {
+            try
+            {
+                var data = await service.GetUserPostsAsync(page, pageSize);
+                if (data != null)
+                {
+                    return Ok(data);
+                }
+                return BadRequest(data);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

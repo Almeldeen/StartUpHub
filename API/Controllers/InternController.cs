@@ -17,9 +17,9 @@ namespace API.Controllers
     [ApiController]
     public class InternController : ControllerBase
     {
-        private readonly InternService _internService;
+        private readonly IInternService _internService;
 
-        public InternController(InternService internService)
+        public InternController(IInternService internService)
         {
             _internService = internService;
         }
@@ -37,6 +37,28 @@ namespace API.Controllers
             {
                 return BadRequest();
             }
+
+        }
+        [HttpPost("update-profile")]
+        public async Task<IActionResult> UpdateProfile(UpdateInternVM updateIntern)
+        {
+            try
+            {
+                var result = await _internService.UpdateProfile(updateIntern);
+                if (result)
+                {
+                    return Ok(result);
+                }
+
+                return BadRequest(result);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+          
+            
 
         }
         [HttpGet("applyjop")]

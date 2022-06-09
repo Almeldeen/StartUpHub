@@ -46,7 +46,7 @@ namespace DAL.Reproisitry.InternRepos
 
         public async Task<InternApplaied_VM> GetApllaiedJopById(int internShipId)
         {
-            var data = await db.InternApplaieds.Where(x => x.InternShipId == internShipId).Select(x=>new InternApplaied_VM {Id=x.Id,Content=x.Content,InterenId=x.InterenId,InternShipId=x.InternShipId,State=x.State }).FirstOrDefaultAsync();
+            var data = await db.InternApplaieds.Where(x => x.InternShipId == internShipId).Select(x => new InternApplaied_VM { Id = x.Id, Content = x.Content, InterenId = x.InterenId, InternShipId = x.InternShipId, State = x.State }).FirstOrDefaultAsync();
             return data;
         }
 
@@ -57,34 +57,79 @@ namespace DAL.Reproisitry.InternRepos
             return data;
         }
 
-        public async Task<InternProfile_VM> GetProfile( )
+        public async Task<InternProfile_VM> GetProfile()
         {
-            if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+            try
             {
-                var userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                var user = await userManager.FindByIdAsync(userId);
-                var data = db.Interens.Where(x => x.UserId == userId).Select(x => new InternProfile_VM
+                if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
                 {
-                    id = x.UserId,
-                    followersCount = x.Follows.Where(x=>x.FollowReceiverId==userId).Count(),
-                    followingCount = x.Follows.Where(x => x.FollowSenderId == userId).Count(),
-                    about = x.User.Description,
-                    address=x.User.Location,
-                    jobTitle=x.User.jopTitile,
-                    //fields= x.f.Where(x => x. == userId).Count(),
-                    education=x.Educations.ToList(),
-                    skills=x.Skills.ToList(),
-                    //availableToWork=x.,
-                    birthdate = db.Interens.Where(x=>x.UserId==userId).Select(x=>x.Birthday).FirstOrDefault(),
-                    
-                });
+                    var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    var userid = userManager.FindByNameAsync(username).Result.Id;
+                    var data = await db.Interens.Where(x => x.UserId == userid).Select(x => new InternProfile_VM
+                    {
+                        InterenId = x.InterenId,
+                        followersCount = x.Follows.Count(),
+                        followingCount = x.Follows.Count(),
+                        about = x.User.Description,
+                        address = x.User.Location,
+                        jobTitle = x.User.jopTitile,
+                        //fields= x.f.Where(x => x. == userId).Count(),
+                        education = x.Educations.ToList(),
+                        skills = x.Skills.ToList(),
+                        //availableToWork=x.,
+                        birthdate = x.Birthday
+                    }).FirstOrDefaultAsync();
+                    return data;
+                }
                 return null;
             }
-            else
+
+            catch (Exception ex)
             {
-                  return null;   
+
+                return null;
             }
-           
+
+
+        }
+        public async Task<bool> UpdateProfile(UpdateInternVM updateIntern)
+        {
+            try
+            {
+                if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                {
+                    var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    var user = await userManager.FindByNameAsync(username);
+                    user.Email = updateIntern.email;
+                    user.Bio = updateIntern.bio;
+                    var result = await userManager.UpdateAsync(user);
+                    if (!result.Succeeded)
+                    {
+                        return false;
+                    }
+                    var skils = await db.InternSkills.Where(x => x.Intern.UserId == user.Id).ToListAsync();
+                    var internid = skils.Select(x => x.InternId).FirstOrDefault();
+                    db.InternSkills.RemoveRange(skils);
+                    List<InternSkills> internSkills = new List<InternSkills>();
+                    foreach (var item in updateIntern.skills)
+                    {
+                        internSkills.Add(new InternSkills { InternId = internid, SkillsId = item });
+                    }
+                    await db.InternSkills.AddRangeAsync(internSkills);
+                    int res = await db.SaveChangesAsync();
+                    if (res > 0)
+                    {
+                        return true;
+                    }
+
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
         }
     }
 }

@@ -34,7 +34,7 @@ namespace DAL.Reproisitry.Followers
             {
                 var userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 var data = db.Follows.Where(x => x.FollowReceiverId == userId).Count();
-                var followers =await db.Follows.Where(x => x.FollowReceiverId == userId).Select(x => new Follower_VM { id = x.FollowReceiverId, img = x.FollowReceiver.Image, name = x.FollowReceiver.UserName, jobTitle = x.FollowReceiver.jopTitile }).ToListAsync();
+                var followers =await db.Follows.Where(x => x.FollowReceiverId == userId).Select(x => new Follower_VM { id = x.FollowReceiverId, img = x.FollowReceiver.ProfileImage, name = x.FollowReceiver.UserName, jobTitle = x.FollowReceiver.jopTitile }).ToListAsync();
                     return followers;
             }
             else
@@ -49,7 +49,7 @@ namespace DAL.Reproisitry.Followers
             {
                 var userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
               
-                var followering =await db.Follows.Where(x => x.FollowSenderId == userId).Select(x => new Follower_VM { id = x.FollowSenderId, img = x.FollowSender.Image, name = x.FollowSender.UserName, jobTitle = x.FollowSender.jopTitile}).ToListAsync();
+                var followering =await db.Follows.Where(x => x.FollowSenderId == userId).Select(x => new Follower_VM { id = x.FollowSenderId, img = x.FollowSender.ProfileImage, name = x.FollowSender.UserName, jobTitle = x.FollowSender.jopTitile}).ToListAsync();
                 return followering;
             }
             else

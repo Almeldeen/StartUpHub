@@ -81,7 +81,6 @@ namespace API.Controllers
             return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
         }
         [HttpGet("Islogged")]
-
         public async Task<IActionResult> IsloggedAsync()
         {
 

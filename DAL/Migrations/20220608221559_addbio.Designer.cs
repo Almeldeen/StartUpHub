@@ -4,14 +4,16 @@ using DAL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220608221559_addbio")]
+    partial class addbio
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -277,9 +279,7 @@ namespace DAL.Migrations
 
                     b.HasKey("InterenId");
 
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Interens");
                 });
@@ -754,8 +754,8 @@ namespace DAL.Migrations
             modelBuilder.Entity("DAL.Models.Interen", b =>
                 {
                     b.HasOne("DAL.Data.ApplicationUser", "User")
-                        .WithOne("Interen")
-                        .HasForeignKey("DAL.Models.Interen", "UserId");
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -1003,11 +1003,6 @@ namespace DAL.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("DAL.Data.ApplicationUser", b =>
-                {
-                    b.Navigation("Interen");
                 });
 
             modelBuilder.Entity("DAL.Models.Field", b =>

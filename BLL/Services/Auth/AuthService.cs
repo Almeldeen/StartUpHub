@@ -190,7 +190,8 @@ namespace BLL.Services.Auth
                 if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
                 {
                     var userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                    var user = await userManager.FindByIdAsync(userId);
+                    var user = await userManager.FindByNameAsync(userId);
+                    
                     var userRole = await userManager.GetRolesAsync(user);
                     var account_VM = new Account_VM()
                     {
@@ -199,7 +200,8 @@ namespace BLL.Services.Auth
                         role = userRole.FirstOrDefault(),
                         email = user.Email,
                         mobile = user.PhoneNumber,
-                        image = user.Image,
+                        image = user.ProfileImage,
+                        address=user.Location,
                         isConfirmed = user.EmailConfirmed,
                         username = user.UserName
                     };

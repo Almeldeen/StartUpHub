@@ -15,9 +15,12 @@ namespace DAL.Data
         public string FullName { get; set; }
         public string Description { get; set; }   
         public string Location { get; set; }      
-        public string Image { get; set; }
+        public string Bio { get; set; }      
+        public string ProfileImage { get; set; }
+        public string CoverImage { get; set; }
         public string jopTitile { get; set; }
         public bool AccountVerification { get; set; }
+        public Interen Interen { get; set; }
         //public List<RefreshToken>? RefreshTokens { get; set; }
 
     }

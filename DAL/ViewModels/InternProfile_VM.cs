@@ -9,7 +9,7 @@ namespace DAL.ViewModels
 {
     public class InternProfile_VM
     {
-        public string id { get; set; }
+        public string InterenId { get; set; }
         public int followersCount { get; set; }
         public int followingCount { get; set; }
         public string about { get; set; }

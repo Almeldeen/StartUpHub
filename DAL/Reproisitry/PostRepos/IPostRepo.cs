@@ -13,6 +13,7 @@ namespace DAL.Reproisitry.PostRepos
         public Task<PostVM> EditPostAsync(PostVM post);
         public Task<int> DeletePostAsync(int id);
         public Task<PostVM> GetByIdPostAsync(int id);
-        public Task<List<PostVM>> GetAllPostAsync();
+        public Task<ResponseVM<PostVM>> GetAllPostAsync(int pagenum, int pagesize);
+        public Task<ResponseVM<PostVM>> GetUserPostsAsync(int pagenum, int pagesize);
     }
 }
