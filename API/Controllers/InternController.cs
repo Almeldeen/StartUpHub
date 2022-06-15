@@ -103,5 +103,15 @@ namespace API.Controllers
                 return BadRequest();
             }
         }
+        [HttpPost("ChangePhoto")]
+        public async Task<IActionResult> ChangePhoto([FromForm]IFormFile image ,[FromForm] string type)
+        {
+            var result = await _internService.ChangePhoto(image , type);
+            if (result!=null)
+            {
+                return Ok(result);
+            }
+            return BadRequest();
+        }
     }
 }

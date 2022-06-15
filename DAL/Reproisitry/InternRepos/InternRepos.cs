@@ -44,6 +44,35 @@ namespace DAL.Reproisitry.InternRepos
             return null;
         }
 
+        public async Task<string> ChangePhoto(string path, string type)
+        {
+            try
+            {
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var user = await userManager.FindByNameAsync(username);
+                if (type == "Profile")
+                {
+                    user.ProfileImage = path;
+                }
+                else if (type == "Cover")
+                {
+                    user.CoverImage = path;
+                }
+                var res = await userManager.UpdateAsync(user);
+                if (res.Succeeded)
+                {
+                    return path;
+                }
+                return null;
+            }
+            catch (Exception)
+            {
+
+                return null;
+            }
+           
+        }
+
         public async Task<InternApplaied_VM> GetApllaiedJopById(int internShipId)
         {
             var data = await db.InternApplaieds.Where(x => x.InternShipId == internShipId).Select(x => new InternApplaied_VM {   InterenId = x.InternId, InternShipId = x.InternShipId, State = x.State }).FirstOrDefaultAsync();

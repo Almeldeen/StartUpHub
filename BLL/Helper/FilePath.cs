@@ -10,6 +10,8 @@ namespace BLL.Helper
     {
         static public readonly string ImagePost = "/wwwroot/IMGsPosts/";
         static public readonly string CV = "/wwwroot/CVs/";
+        static public readonly string Profile = "/wwwroot/ImagesProfile/";
+        static public readonly string Cover = "/wwwroot/ImagesCover/";
 
     }
 }
