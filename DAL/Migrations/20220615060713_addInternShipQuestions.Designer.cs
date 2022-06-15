@@ -4,14 +4,16 @@ using DAL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220615060713_addInternShipQuestions")]
+    partial class addInternShipQuestions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -296,6 +298,9 @@ namespace DAL.Migrations
                     b.Property<int>("InternShipId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<byte>("State")
                         .HasColumnType("tinyint");
 
@@ -304,28 +309,6 @@ namespace DAL.Migrations
                     b.HasIndex("InternShipId");
 
                     b.ToTable("InternApplaieds");
-                });
-
-            modelBuilder.Entity("DAL.Models.InternApplaiedQAnswers", b =>
-                {
-                    b.Property<int>("QId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("InternId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("InternShipId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("QAnswer")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("QId", "InternId", "InternShipId")
-                        .HasName("PK_InternApplaiedQAnswers");
-
-                    b.HasIndex("InternId", "InternShipId");
-
-                    b.ToTable("InternApplaiedQAnswers");
                 });
 
             modelBuilder.Entity("DAL.Models.InternShip", b =>
@@ -738,25 +721,6 @@ namespace DAL.Migrations
                     b.Navigation("InternShip");
                 });
 
-            modelBuilder.Entity("DAL.Models.InternApplaiedQAnswers", b =>
-                {
-                    b.HasOne("DAL.Models.InternShipQuestions", "InternShipQuestions")
-                        .WithMany()
-                        .HasForeignKey("QId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DAL.Models.InternApplaied", "InternApplaied")
-                        .WithMany("internApplaiedQAnswers")
-                        .HasForeignKey("InternId", "InternShipId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("InternApplaied");
-
-                    b.Navigation("InternShipQuestions");
-                });
-
             modelBuilder.Entity("DAL.Models.InternShip", b =>
                 {
                     b.HasOne("DAL.Models.Field", "Field")
@@ -955,11 +919,6 @@ namespace DAL.Migrations
                     b.Navigation("InternApplaieds");
 
                     b.Navigation("InternSkills");
-                });
-
-            modelBuilder.Entity("DAL.Models.InternApplaied", b =>
-                {
-                    b.Navigation("internApplaiedQAnswers");
                 });
 
             modelBuilder.Entity("DAL.Models.InternShip", b =>

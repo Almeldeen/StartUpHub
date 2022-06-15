@@ -20,6 +20,7 @@ namespace DAL.ViewModels
         public string userId { get; set; }
        
         public  List<SkillsVM> skills { get; set; }
+        public  List<InternShipQuestionsVM> InternShipQuestions { get; set; }
 
     }
 }
