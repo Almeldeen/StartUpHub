@@ -33,6 +33,8 @@
     <Folder Include="wwwroot\IMGsPosts\" />
     <Folder Include="wwwroot\IMGsPosts\" />
     <Folder Include="wwwroot\CVs\" />
+    <Folder Include="wwwroot\ImagesProfile\" />
+    <Folder Include="wwwroot\ImagesCover\" />
   </ItemGroup>
 
 </Project>

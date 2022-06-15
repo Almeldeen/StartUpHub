@@ -25,6 +25,26 @@ namespace BLL.Services.Intern
             return await repo.AddInternApplaied(internApplaied);
         }
 
+        public async Task<string> ChangePhoto(IFormFile image, string type)
+        {
+            string Path = string.Empty;
+            if (type == "Profile")
+            {
+                string FileName = await SaveFiles.SaveFileAsync(image, FilePath.Profile);
+                 Path = httpContextAccessor.HttpContext.Request.Host.Value + "/ImagesProfile/" + FileName;
+            }
+            else if (type == "Cover")
+            {
+                string FileName = await SaveFiles.SaveFileAsync(image, FilePath.Cover);
+                Path = httpContextAccessor.HttpContext.Request.Host.Value + "/ImagesCover/" + FileName;
+
+            }
+
+
+            return await repo.ChangePhoto(Path,type);
+
+        }
+
         public async Task<InternApplaied_VM> GetApllaiedJopById(int InternShipId)
         {
             return await repo.GetApllaiedJopById(InternShipId);

@@ -14,5 +14,6 @@ namespace DAL.Reproisitry.InternRepos
         public Task<List<InternApplaied_VM>> GetApplaiedJops();
         public Task<InternApplaied_VM> GetApllaiedJopById(int InternShipId);
         public  Task<bool> UpdateProfile(UpdateInternVM updateIntern);
+        public  Task<string> ChangePhoto(string path , string type);
     }
 }
