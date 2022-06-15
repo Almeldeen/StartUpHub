@@ -75,14 +75,14 @@ namespace DAL.Reproisitry.InternRepos
 
         public async Task<InternApplaied_VM> GetApllaiedJopById(int internShipId)
         {
-            var data = await db.InternApplaieds.Where(x => x.InternShipId == internShipId).Select(x => new InternApplaied_VM {  Content = x.Content, InterenId = x.InternId, InternShipId = x.InternShipId, State = x.State }).FirstOrDefaultAsync();
+            var data = await db.InternApplaieds.Where(x => x.InternShipId == internShipId).Select(x => new InternApplaied_VM {   InterenId = x.InternId, InternShipId = x.InternShipId, State = x.State }).FirstOrDefaultAsync();
             return data;
         }
 
         public async Task<List<InternApplaied_VM>> GetApplaiedJops()
         {
             var userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var data = await db.InternApplaieds.Where(x => x.InternId == userId).Select(x => new InternApplaied_VM { Content = x.Content, InterenId = x.InternId, InternShipId = x.InternShipId, State = x.State }).ToListAsync();
+            var data = await db.InternApplaieds.Where(x => x.InternId == userId).Select(x => new InternApplaied_VM {  InterenId = x.InternId, InternShipId = x.InternShipId, State = x.State }).ToListAsync();
             return data;
         }
 

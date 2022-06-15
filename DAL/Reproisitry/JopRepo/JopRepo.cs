@@ -41,13 +41,26 @@ namespace DAL.Reproisitry.JopRepo
                     return null;
 
                 }
-                List<InternShipSkils> jopskills = new List<InternShipSkils>();
-                foreach (var item in jop.skills)
+                if (jop.skills.Count>0)
                 {
-                    jopskills.Add(new InternShipSkils { InternShipId = data.InternShipId, SkillsId = item.SkillsId });
+                    List<InternShipSkils> jopskills = new List<InternShipSkils>();
+                    foreach (var item in jop.skills)
+                    {
+                        jopskills.Add(new InternShipSkils { InternShipId = data.InternShipId, SkillsId = item.SkillsId });
 
+                    }
+                    await db.InternShipSkils.AddRangeAsync(jopskills);
                 }
-                await db.InternShipSkils.AddRangeAsync(jopskills);
+                if (jop.InternShipQuestions.Count>0)
+                {
+                    List<InternShipQuestions> internShipQuestions = new List<InternShipQuestions>();
+                    foreach (var item in jop.InternShipQuestions)
+                    {
+                        internShipQuestions.Add(new InternShipQuestions { InternShipId = data.InternShipId, QContent = item.QContent });
+
+                    }
+                    await db.InternShipQuestions.AddRangeAsync(internShipQuestions);
+                }
                 var result = await db.SaveChangesAsync();
                 if (result > 0)
                 {

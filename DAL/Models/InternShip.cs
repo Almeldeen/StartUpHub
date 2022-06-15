@@ -27,6 +27,7 @@ namespace DAL.Models
         public virtual List<Intern> Interns { get; set; }
         public virtual List<Skills> Skills { get; set; }
         public virtual List<InternShipSkils> InternShipSkils { get; set; }
+        public virtual List<InternShipQuestions> InternShipQuestions { get; set; }
         public virtual List<InternApplaied> InternApplaieds { get; set; }
     }
 }
