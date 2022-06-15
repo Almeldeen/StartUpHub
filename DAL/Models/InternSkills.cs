@@ -13,8 +13,8 @@ namespace DAL.Models
         [ForeignKey("SkillsId")]
         public int SkillsId { get; set; }
         [ForeignKey("InternId")]
-        public int InternId { get; set; }
+        public string InternId { get; set; }
         public virtual Skills Skills { get; set; }
-        public virtual Interen Intern { get; set; }
+        public virtual Intern Intern { get; set; }
     }
 }

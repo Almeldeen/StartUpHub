@@ -3,8 +3,10 @@ using BLL.Services.Auth;
 using DAL.Data;
 using DAL.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,11 +22,13 @@ namespace API.Controllers
     {
         private readonly IAuthService _authService;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly IHostingEnvironment env;
 
-        public AuthController(IAuthService authService, UserManager<ApplicationUser> userManager)
+        public AuthController(IAuthService authService, UserManager<ApplicationUser> userManager, IHostingEnvironment env)
         {
             _authService = authService;
             this.userManager = userManager;
+            this.env = env;
         }
         [HttpPost("Register")]
         [AllowAnonymous]
@@ -41,12 +45,26 @@ namespace API.Controllers
                 if (!result.IsAuthenticated)
                     return BadRequest(result.Message);
                 var token = await userManager.GenerateEmailConfirmationTokenAsync(userManager.FindByEmailAsync(model.Email).Result);
-               
-                var confirmationLink = "<a href='http://internnes-001-site1.btempurl.com"
+                result.EmailConfirmToken = token;
+                var confirmationLink = "<a href='http://startuphub-001-site1.dtempurl.com"
     + @Url.Action("ConfirmEmail", "Auth", new { token = token, email = model.Email })
-    + "'>Click here to ConfirmEmail</a>";
+    + "'style='text-decoration:none;line-height:100%;background:#2195f3;color:white;font-family:Ubuntu,Helvetica,Arial,sans-serif;font-size:15px;font-weight:normal;text-transform:none;margin:0px;'target='_blank'" +
+    ">Verify Email</a>";
+                var pathToFile = env.WebRootPath
+                       + Path.DirectorySeparatorChar.ToString()
+                       + "Templates"
+                       + Path.DirectorySeparatorChar.ToString()
+                       + "email.html";
+                var builder = new BodyBuilder();
+                using (StreamReader SourceReader = System.IO.File.OpenText(pathToFile))
+                {
+                    builder.HtmlBody = SourceReader.ReadToEnd();
+                }
+                builder.HtmlBody = builder.HtmlBody.Replace("{user name}", model.fullName);
+                builder.HtmlBody = builder.HtmlBody.Replace("{link}", confirmationLink);
+               
                 //var confirmationLink = Url.Link("ConfirmEmailAuth", new { token=token, email = model.Email }, Request.Scheme);
-                bool res = EmailHelper.SendEmail(model.Email, confirmationLink);
+                bool res = EmailHelper.SendEmail(model.Email, builder.HtmlBody);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -71,14 +89,19 @@ namespace API.Controllers
             return Ok(result);
         }
         [HttpGet("ConfirmEmail")]
+        [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string token, string email)
         {
             var user = await userManager.FindByEmailAsync(email);
             if (user == null)
-                return Ok("Error");
+                return BadRequest();
 
             var result = await userManager.ConfirmEmailAsync(user, token);
-            return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
         [HttpGet("Islogged")]
         public async Task<IActionResult> IsloggedAsync()

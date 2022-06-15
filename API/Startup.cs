@@ -127,6 +127,8 @@ namespace API
            .AllowAnyMethod()
            .AllowAnyHeader());
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseFileServer();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();

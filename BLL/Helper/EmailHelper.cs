@@ -15,7 +15,7 @@ namespace BLL.Helper
             try
             {
                 MailMessage mailMessage = new MailMessage();
-            mailMessage.From = new MailAddress("almeldeen06@gmail.com", "Internes"); //IMPORTANT: This must be same as your smtp authentication address.
+            mailMessage.From = new MailAddress("almeldeen06@gmail.com", "StartUpHub"); //IMPORTANT: This must be same as your smtp authentication address.
             mailMessage.To.Add(userEmail);
         
 
@@ -26,7 +26,7 @@ namespace BLL.Helper
             SmtpClient smtp = new SmtpClient();
 
             //IMPORANT:  Your smtp login email MUST be same as your FROM address. 
-            NetworkCredential Credentials = new NetworkCredential("almeldeen06@gmail.com", "Ay978645312@");
+            NetworkCredential Credentials = new NetworkCredential("almeldeen06@gmail.com", "dwepgdwtxmujjhig");
             smtp.Host = "smtp.gmail.com";
             smtp.UseDefaultCredentials = false;
             smtp.Credentials = Credentials;

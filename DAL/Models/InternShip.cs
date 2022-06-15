@@ -13,6 +13,8 @@ namespace DAL.Models
     {
         [Key]
         public int InternShipId { get; set; }
+        public string Name { get; set; }
+
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Content { get; set; }
@@ -22,7 +24,9 @@ namespace DAL.Models
         [ForeignKey("UserId")]
         public string UserId { get; set; }
         public virtual ApplicationUser User { get; set; }
-        public virtual List<Interen> Interens { get; set; }
+        public virtual List<Intern> Interns { get; set; }
         public virtual List<Skills> Skills { get; set; }
+        public virtual List<InternShipSkils> InternShipSkils { get; set; }
+        public virtual List<InternApplaied> InternApplaieds { get; set; }
     }
 }

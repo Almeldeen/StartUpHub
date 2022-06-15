@@ -23,13 +23,15 @@ namespace BLL.Services.Auth
 
     public class AuthService : IAuthService
     {
+        private readonly ApplicationDbContext db;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IOptions<JWT> jwt;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly JWT _jwt;
-        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt, IHttpContextAccessor httpContextAccessor)
+        public AuthService(ApplicationDbContext db,UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt, IHttpContextAccessor httpContextAccessor)
         {
+            this.db = db;
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.jwt = jwt;
@@ -53,7 +55,8 @@ namespace BLL.Services.Auth
                     Email = model.Email,
                     FullName = model.fullName,
                     Location = model.address,
-                    PhoneNumber = model.mobile
+                    PhoneNumber = model.mobile,
+                    FieldId=model.FieldId,
                 };
 
                 var result = await userManager.CreateAsync(user, model.Password);
@@ -69,7 +72,16 @@ namespace BLL.Services.Auth
                 }
 
                 await userManager.AddToRoleAsync(user, model.role);
+                if (model.role== "Internee")
+                {
+                    DAL.Models.Intern intern = new DAL.Models.Intern();
+                    
+                    intern.UserId = userManager.FindByNameAsync(model.Username).Result.Id;
+                    intern.InternId = intern.UserId;
+                    await db.Interns.AddAsync(intern);
+                    await db.SaveChangesAsync();
 
+                }
                 var jwtSecurityToken = await CreateJwtToken(user);
 
                 return new AuthModel

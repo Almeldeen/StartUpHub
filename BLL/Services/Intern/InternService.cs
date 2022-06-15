@@ -1,4 +1,5 @@
-﻿using DAL.Reproisitry.InternRepos;
+﻿using BLL.Helper;
+using DAL.Reproisitry.InternRepos;
 using DAL.ViewModels;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -12,10 +13,12 @@ namespace BLL.Services.Intern
     public class InternService : IInternService
     {
         private readonly IInternRepos repo;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public InternService(IInternRepos repo)
+        public InternService(IInternRepos repo, IHttpContextAccessor httpContextAccessor)
         {
             this.repo = repo;
+            this.httpContextAccessor = httpContextAccessor;
         }
         public async Task<InternApplaied_VM> AddInternApplaied(InternApplaied_VM internApplaied)
         {
@@ -39,6 +42,12 @@ namespace BLL.Services.Intern
         }
         public async Task<bool> UpdateProfile(UpdateInternVM updateIntern)
         {
+            if (updateIntern.CV!=null)
+            {
+                string FileName = await SaveFiles.SaveFileAsync(updateIntern.CV, FilePath.CV);
+                updateIntern.CVPath = httpContextAccessor.HttpContext.Request.Host.Value + "/CVs/" + FileName;
+            }
+                      
             return await repo.UpdateProfile(updateIntern);
         }
     }

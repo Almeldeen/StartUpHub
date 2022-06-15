@@ -16,9 +16,9 @@ namespace DAL.Models
         public string StudentActivities { get; set; }
         public TimeSpan StartDate { get; set; }
         public TimeSpan EndDate { get; set; }
-        [ForeignKey("InterenId")]
-        public string InterenId { get; set; }
-        public virtual Interen Interen { get; set; }
+        [ForeignKey("InternId")]
+        public string InternId { get; set; }
+        public virtual Intern Intern { get; set; }
     }
 }
 

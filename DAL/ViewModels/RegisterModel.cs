@@ -14,6 +14,7 @@ namespace DAL.ViewModels
         public string role { get; set; }
         public string mobile { get; set; }
         public string address { get; set; }
+        public int FieldId { get; set; }
 
         [Required, StringLength(50)]
         public string Username { get; set; }

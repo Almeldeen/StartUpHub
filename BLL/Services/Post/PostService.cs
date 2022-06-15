@@ -1,6 +1,7 @@
 ﻿using BLL.Helper;
 using DAL.Reproisitry.PostRepos;
 using DAL.ViewModels;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,19 +13,25 @@ namespace BLL.Services.Post
     public class PostService : IPostService
     {
         private readonly IPostRepo repo;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public PostService(IPostRepo repo)
+        public PostService(IPostRepo repo, IHttpContextAccessor httpContextAccessor)
         {
             this.repo = repo;
+            this.httpContextAccessor = httpContextAccessor;
         }
         public async Task<PostVM> AddPostAsync(PostVM Post)
         {
-            Post.PostImagePath = new List<string>();
-            foreach (var item in Post.PostImage)
+            if (Post.PostImage.Count>0)
             {
-                string path = await SaveFiles.SaveFileAsync(item, FilePath.ImagePost);
-                Post.PostImagePath.Add(path);
-            }
+                Post.PostImagePath = new List<string>();
+                foreach (var item in Post.PostImage)
+                {
+                    string FileName = await SaveFiles.SaveFileAsync(item, FilePath.ImagePost);
+                    string path = httpContextAccessor.HttpContext.Request.Host.Value + "/IMGsPosts/" + FileName;                    
+                    Post.PostImagePath.Add(path);
+                }
+            }           
             return await repo.AddPostAsync(Post);
         }
 

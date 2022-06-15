@@ -38,7 +38,7 @@ namespace DAL.Reproisitry.InternRepos
             var res = await db.SaveChangesAsync();
             if (res > 0)
             {
-                internApplaied.Id = data.Id;
+                
                 return internApplaied;
             }
             return null;
@@ -46,14 +46,14 @@ namespace DAL.Reproisitry.InternRepos
 
         public async Task<InternApplaied_VM> GetApllaiedJopById(int internShipId)
         {
-            var data = await db.InternApplaieds.Where(x => x.InternShipId == internShipId).Select(x => new InternApplaied_VM { Id = x.Id, Content = x.Content, InterenId = x.InterenId, InternShipId = x.InternShipId, State = x.State }).FirstOrDefaultAsync();
+            var data = await db.InternApplaieds.Where(x => x.InternShipId == internShipId).Select(x => new InternApplaied_VM {  Content = x.Content, InterenId = x.InternId, InternShipId = x.InternShipId, State = x.State }).FirstOrDefaultAsync();
             return data;
         }
 
         public async Task<List<InternApplaied_VM>> GetApplaiedJops()
         {
             var userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var data = await db.InternApplaieds.Where(x => x.InterenId == userId).Select(x => new InternApplaied_VM { Id = x.Id, Content = x.Content, InterenId = x.InterenId, InternShipId = x.InternShipId, State = x.State }).ToListAsync();
+            var data = await db.InternApplaieds.Where(x => x.InternId == userId).Select(x => new InternApplaied_VM { Content = x.Content, InterenId = x.InternId, InternShipId = x.InternShipId, State = x.State }).ToListAsync();
             return data;
         }
 
@@ -65,19 +65,30 @@ namespace DAL.Reproisitry.InternRepos
                 {
                     var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                     var userid = userManager.FindByNameAsync(username).Result.Id;
-                    var data = await db.Interens.Where(x => x.UserId == userid).Select(x => new InternProfile_VM
+                    var data = await db.Interns.Where(x => x.UserId == userid).Select(x => new InternProfile_VM
                     {
-                        InterenId = x.InterenId,
-                        followersCount = x.Follows.Count(),
-                        followingCount = x.Follows.Count(),
-                        about = x.User.Description,
+                        InterenId = x.InternId,
+                        followersCount = x.User.FollowsSender.Count(),
+                        followingCount = x.User.FollowsReceiver.Count(),
+                        about = x.User.Bio,
                         address = x.User.Location,
                         jobTitle = x.User.jopTitile,
-                        //fields= x.f.Where(x => x. == userId).Count(),
-                        education = x.Educations.ToList(),
-                        skills = x.Skills.ToList(),
-                        //availableToWork=x.,
-                        birthdate = x.Birthday
+                        field=x.User.Field.FieldName,
+                        education = x.Educations.Select(x=> new Education_VM 
+                        {
+                           degree=x.Degree,
+                           educationID=x.EducationID,
+                           endDate=x.EndDate,
+                           interenId=x.InternId,
+                           fieldOfStudy=x.FieldOfStudy,
+                           school=x.School,
+                           startDate=x.StartDate,
+                           studentActivities=x.StudentActivities,
+                        }).ToList(),
+                        skills = x.Skills.Select(x=> new SkillsVM {SkillsId=x.SkillsId,Name=x.Name }).ToList(),                        
+                        availableToWork=x.availableToWork,
+                        birthdate = x.Birthday,
+                        CV=x.CV,
                     }).FirstOrDefaultAsync();
                     return data;
                 }
@@ -101,21 +112,61 @@ namespace DAL.Reproisitry.InternRepos
                     var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                     var user = await userManager.FindByNameAsync(username);
                     user.Email = updateIntern.email;
-                    user.Bio = updateIntern.bio;
+                    user.Bio = updateIntern.about;
+                    user.Location = updateIntern.address;
+                    user.jopTitile = updateIntern.jobTitle;
+                    user.FieldId = updateIntern.fields;
                     var result = await userManager.UpdateAsync(user);
                     if (!result.Succeeded)
                     {
                         return false;
                     }
-                    var skils = await db.InternSkills.Where(x => x.Intern.UserId == user.Id).ToListAsync();
-                    var internid = skils.Select(x => x.InternId).FirstOrDefault();
-                    db.InternSkills.RemoveRange(skils);
-                    List<InternSkills> internSkills = new List<InternSkills>();
-                    foreach (var item in updateIntern.skills)
+                    var intern = await db.Interns.Where(x => x.UserId == user.Id).FirstOrDefaultAsync();
+                    intern.Birthday =updateIntern.birthdate;
+                    intern.availableToWork =updateIntern.availableToWork;
+                    intern.CV = updateIntern.CVPath;
+                    if (updateIntern.skills.Count > 0)
                     {
-                        internSkills.Add(new InternSkills { InternId = internid, SkillsId = item });
+                        var skils = await db.InternSkills.Where(x => x.Intern.UserId == user.Id).ToListAsync();
+                    if (skils!=null)
+                    {
+                        db.InternSkills.RemoveRange(skils);
+                        await db.SaveChangesAsync();
                     }
-                    await db.InternSkills.AddRangeAsync(internSkills);
+                    
+                        List<InternSkills> internSkills = new List<InternSkills>();
+                        foreach (var item in updateIntern.skills)
+                        {
+                            internSkills.Add(new InternSkills { InternId = intern.InternId, SkillsId = item });
+                        }
+                        await db.InternSkills.AddRangeAsync(internSkills);
+                    }
+
+                    if (updateIntern.education.Count>0)
+                    {
+                        var edu = await db.Educations.Where(x => x.Intern.UserId == user.Id).ToListAsync();
+                        if (edu != null)
+                        {
+                            db.Educations.RemoveRange(edu);
+                            await db.SaveChangesAsync();
+                        }
+                        List<Education> educations = new List<Education>();
+                        foreach (var item in updateIntern.education)
+                        {
+                            educations.Add(new Education
+                            {
+                                InternId = intern.InternId,
+                                School = item.school,
+                                StartDate = item.startDate,
+                                StudentActivities = item.studentActivities,
+                                FieldOfStudy = item.fieldOfStudy,
+                                Degree = item.degree,
+                                EndDate = item.endDate,
+                            });
+                        }
+                        await db.Educations.AddRangeAsync(educations);
+                    }
+                    
                     int res = await db.SaveChangesAsync();
                     if (res > 0)
                     {

@@ -43,13 +43,17 @@ namespace DAL.Reproisitry.PostRepos
                 {
                     return null;
                 }
-                List<ImagePosts> imagePosts = new List<ImagePosts>();
-                foreach (var item in post.PostImagePath)
+                if (post.PostImagePath.Count>0)
                 {
-                    imagePosts.Add(new ImagePosts { ImagePath = item, PostId = data.PostId });
+                    List<ImagePosts> imagePosts = new List<ImagePosts>();
+                    foreach (var item in post.PostImagePath)
+                    {
+                        imagePosts.Add(new ImagePosts { ImagePath = item, PostId = data.PostId });
+                    }
+                    await db.ImagePosts.AddRangeAsync(imagePosts);
+                    res = await db.SaveChangesAsync();
                 }
-                await db.ImagePosts.AddRangeAsync(imagePosts);
-                res = await db.SaveChangesAsync();
+             
                 if (res > 0)
                 {
                     post.PostId = data.PostId;
@@ -91,7 +95,6 @@ namespace DAL.Reproisitry.PostRepos
 
 
         }
-
         public async Task<PostVM> EditPostAsync(PostVM post)
         {
             try
@@ -124,27 +127,36 @@ namespace DAL.Reproisitry.PostRepos
                 {
                     var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                     var UserId = userMangger.FindByNameAsync(username).Result.Id;
-                    var data = await db.Posts.Skip(pagesize * (pagenum - 1)).Take(pagesize).Select(a => new PostVM
+                    var following = await db.Follows.Where(x => x.FollowSenderId == UserId).Select(x => x.FollowReceiverId).ToListAsync();
+                    var listdata = new List<PostVM>();
+                    foreach (var item in following)
                     {
-                        PostId = a.PostId,
-                        Content = a.Content,
-                        FieldId = a.Field.FieldId,
-                        FieldName = a.Field.FieldName,
-                        UserId = a.User.Id,
-                        UserImg = a.User.ProfileImage,
-                        UserJobTitle = a.User.jopTitile,
-                        UserName = a.User.UserName,
-                        likes = a.Likes.Select(x => new PostLikesVM
+                        var data = await db.Posts.Where(x=> x.UserId==item).Skip(pagesize * (pagenum - 1)).Take(pagesize).Select(a => new PostVM
                         {
-                            userFullName = x.User.UserName,
-                            userId = x.UserId,
-                            userImg = x.User.ProfileImage,
-                            userJobTitle = x.User.jopTitile,
-                        }).ToList(),
-                        PostImagePath = a.ImagePosts.Select(x => x.ImagePath).ToList(),
-                    }).ToListAsync();
+                            PostId = a.PostId,
+                            Content = a.Content,
+                            FieldId = a.Field.FieldId,
+                            FieldName = a.Field.FieldName,
+                            UserId = a.User.Id,
+                            UserImg = a.User.ProfileImage,
+                            UserJobTitle = a.User.jopTitile,
+                            UserName = a.User.UserName,
+                            likes = a.Likes.Select(x => new PostLikesVM
+                            {
+                                userFullName = x.User.UserName,
+                                userId = x.UserId,
+                                userImg = x.User.ProfileImage,
+                                userJobTitle = x.User.jopTitile,
+                            }).ToList(),
+                            PostImagePath = a.ImagePosts.Select(x => x.ImagePath).ToList(),
+                        }).ToListAsync();
+                        listdata.AddRange(data);
+                    }
+                   
                     ResponseVM<PostVM> response = new ResponseVM<PostVM>();
-                    response.Data = data;
+                    var rnd = new Random();
+                    var randata = listdata.OrderBy(item => rnd.Next());
+                    response.Data = randata;
                     response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.Posts.CountAsync() / pagesize));
                     response.CurrentPage = pagenum;
                     return response;

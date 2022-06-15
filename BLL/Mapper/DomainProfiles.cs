@@ -19,8 +19,8 @@ namespace BLL.Mapper
             CreateMap<Skills, SkillsVM>();
             CreateMap<PostVM, Post>();
             CreateMap<Post, PostVM>();
-            CreateMap<Jop, JopVM>();
-            CreateMap<JopVM, Jop>();
+            CreateMap<InternShip, JopVM>();
+            CreateMap<JopVM, InternShip>();
             CreateMap<InternApplaied_VM, InternApplaied>();
             CreateMap<InternApplaied, InternApplaied_VM>();
         }

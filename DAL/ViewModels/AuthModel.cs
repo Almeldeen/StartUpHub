@@ -13,6 +13,7 @@ namespace DAL.ViewModels
         public string Message { get; set; }
         public bool IsAuthenticated { get; set; }
         public bool IsConfirmed { get; set; }
+        public string EmailConfirmToken { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
         public string fullName { get; set; }

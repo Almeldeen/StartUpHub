@@ -16,9 +16,10 @@ namespace DAL.Models
         [ForeignKey("FieldId")]
         public int FieldId { get; set; }
         public virtual Field Field { get; set; }
-        public virtual List<Interen> Interens { get; set; }
-        public virtual List<Jop> Jops { get; set; }
-        public virtual List<JopSkills> JopSkills { get; set; }
+        public virtual List<Intern> Interens { get; set; }
+        public virtual List<InternShip> InternShips { get; set; }
+        //public virtual List<JopSkills> JopSkills { get; set; }
         public virtual List<InternShipSkils> InternShipSkils { get; set; }
+        public virtual List<InternSkills> InternSkills { get; set; }
     }
 }

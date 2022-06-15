@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220608194917_addcoverimage")]
-    partial class addcoverimage
+    [Migration("20220609224746_seedroles")]
+    partial class seedroles
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,6 +32,9 @@ namespace DAL.Migrations
                     b.Property<bool>("AccountVerification")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Bio")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -48,6 +51,9 @@ namespace DAL.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<int>("FieldId")
+                        .HasColumnType("int");
 
                     b.Property<string>("FullName")
                         .IsRequired()
@@ -97,6 +103,9 @@ namespace DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FieldId")
+                        .IsUnique();
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -150,7 +159,7 @@ namespace DAL.Migrations
                     b.Property<string>("FieldOfStudy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("InterenId")
+                    b.Property<string>("InternId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("School")
@@ -164,7 +173,7 @@ namespace DAL.Migrations
 
                     b.HasKey("EducationID");
 
-                    b.HasIndex("InterenId");
+                    b.HasIndex("InternId");
 
                     b.ToTable("Educations");
                 });
@@ -179,7 +188,7 @@ namespace DAL.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("InterenId")
+                    b.Property<string>("InternId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Title")
@@ -190,7 +199,7 @@ namespace DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InterenId");
+                    b.HasIndex("InternId");
 
                     b.ToTable("Experiences");
                 });
@@ -218,15 +227,10 @@ namespace DAL.Migrations
                     b.Property<string>("FollowReceiverId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("InterenId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("FollowSenderId", "FollowReceiverId")
                         .HasName("PK_Follow");
 
                     b.HasIndex("FollowReceiverId");
-
-                    b.HasIndex("InterenId");
 
                     b.ToTable("Follows");
                 });
@@ -251,9 +255,9 @@ namespace DAL.Migrations
                     b.ToTable("ImagePosts");
                 });
 
-            modelBuilder.Entity("DAL.Models.Interen", b =>
+            modelBuilder.Entity("DAL.Models.Intern", b =>
                 {
-                    b.Property<string>("InterenId")
+                    b.Property<string>("InternId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Birthday")
@@ -274,35 +278,30 @@ namespace DAL.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("InterenId");
+                    b.HasKey("InternId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
-                    b.ToTable("Interens");
+                    b.ToTable("Interns");
                 });
 
             modelBuilder.Entity("DAL.Models.InternApplaied", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InterenId")
+                    b.Property<string>("InternId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("InternShipId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<byte>("State")
                         .HasColumnType("tinyint");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("InterenId");
+                    b.HasKey("InternId", "InternShipId");
 
                     b.HasIndex("InternShipId");
 
@@ -324,6 +323,9 @@ namespace DAL.Migrations
 
                     b.Property<int>("FieldId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -358,72 +360,17 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.Models.InternSkills", b =>
                 {
-                    b.Property<int>("InternId")
-                        .HasColumnType("int");
+                    b.Property<string>("InternId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("SkillsId")
                         .HasColumnType("int");
 
-                    b.Property<string>("InternInterenId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("InternId", "SkillsId")
-                        .HasName("PK_InternSkills");
-
-                    b.HasIndex("InternInterenId");
+                    b.HasKey("InternId", "SkillsId");
 
                     b.HasIndex("SkillsId");
 
                     b.ToTable("InternSkills");
-                });
-
-            modelBuilder.Entity("DAL.Models.Jop", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("FieldId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FieldId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Jops");
-                });
-
-            modelBuilder.Entity("DAL.Models.JopSkills", b =>
-                {
-                    b.Property<int>("JopId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SkillsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("JopId", "SkillsId");
-
-                    b.HasIndex("SkillsId");
-
-                    b.ToTable("JopSkills");
                 });
 
             modelBuilder.Entity("DAL.Models.Like", b =>
@@ -457,6 +404,9 @@ namespace DAL.Migrations
 
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CteatedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("FieldId")
                         .HasColumnType("int");
@@ -503,9 +453,6 @@ namespace DAL.Migrations
                     b.Property<int>("FieldId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("InternShipId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -513,39 +460,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("FieldId");
 
-                    b.HasIndex("InternShipId");
-
                     b.ToTable("Skills");
-                });
-
-            modelBuilder.Entity("InterenInternShip", b =>
-                {
-                    b.Property<string>("InterensInterenId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("InternShipsInternShipId")
-                        .HasColumnType("int");
-
-                    b.HasKey("InterensInterenId", "InternShipsInternShipId");
-
-                    b.HasIndex("InternShipsInternShipId");
-
-                    b.ToTable("InterenInternShip");
-                });
-
-            modelBuilder.Entity("InterenSkills", b =>
-                {
-                    b.Property<string>("InterensInterenId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("SkillsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("InterensInterenId", "SkillsId");
-
-                    b.HasIndex("SkillsId");
-
-                    b.ToTable("InterenSkills");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -679,6 +594,17 @@ namespace DAL.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("DAL.Data.ApplicationUser", b =>
+                {
+                    b.HasOne("DAL.Models.Field", "Field")
+                        .WithOne("User")
+                        .HasForeignKey("DAL.Data.ApplicationUser", "FieldId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Field");
+                });
+
             modelBuilder.Entity("DAL.Models.Comment", b =>
                 {
                     b.HasOne("DAL.Models.Post", "Post")
@@ -698,39 +624,35 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.Models.Education", b =>
                 {
-                    b.HasOne("DAL.Models.Interen", "Interen")
+                    b.HasOne("DAL.Models.Intern", "Intern")
                         .WithMany("Educations")
-                        .HasForeignKey("InterenId");
+                        .HasForeignKey("InternId");
 
-                    b.Navigation("Interen");
+                    b.Navigation("Intern");
                 });
 
             modelBuilder.Entity("DAL.Models.Experience", b =>
                 {
-                    b.HasOne("DAL.Models.Interen", "Interen")
+                    b.HasOne("DAL.Models.Intern", "Intern")
                         .WithMany()
-                        .HasForeignKey("InterenId");
+                        .HasForeignKey("InternId");
 
-                    b.Navigation("Interen");
+                    b.Navigation("Intern");
                 });
 
             modelBuilder.Entity("DAL.Models.Follow", b =>
                 {
                     b.HasOne("DAL.Data.ApplicationUser", "FollowReceiver")
-                        .WithMany()
+                        .WithMany("FollowsSender")
                         .HasForeignKey("FollowReceiverId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DAL.Data.ApplicationUser", "FollowSender")
-                        .WithMany()
+                        .WithMany("FollowsReceiver")
                         .HasForeignKey("FollowSenderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("DAL.Models.Interen", null)
-                        .WithMany("Follows")
-                        .HasForeignKey("InterenId");
 
                     b.Navigation("FollowReceiver");
 
@@ -748,28 +670,30 @@ namespace DAL.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("DAL.Models.Interen", b =>
+            modelBuilder.Entity("DAL.Models.Intern", b =>
                 {
                     b.HasOne("DAL.Data.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                        .WithOne("Interen")
+                        .HasForeignKey("DAL.Models.Intern", "UserId");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("DAL.Models.InternApplaied", b =>
                 {
-                    b.HasOne("DAL.Models.Interen", "Interen")
-                        .WithMany()
-                        .HasForeignKey("InterenId");
+                    b.HasOne("DAL.Models.Intern", "Intern")
+                        .WithMany("InternApplaieds")
+                        .HasForeignKey("InternId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("DAL.Models.InternShip", "InternShip")
-                        .WithMany()
+                        .WithMany("InternApplaieds")
                         .HasForeignKey("InternShipId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Interen");
+                    b.Navigation("Intern");
 
                     b.Navigation("InternShip");
                 });
@@ -777,7 +701,7 @@ namespace DAL.Migrations
             modelBuilder.Entity("DAL.Models.InternShip", b =>
                 {
                     b.HasOne("DAL.Models.Field", "Field")
-                        .WithMany()
+                        .WithMany("InternShips")
                         .HasForeignKey("FieldId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -794,7 +718,7 @@ namespace DAL.Migrations
             modelBuilder.Entity("DAL.Models.InternShipSkils", b =>
                 {
                     b.HasOne("DAL.Models.InternShip", "InternShip")
-                        .WithMany()
+                        .WithMany("InternShipSkils")
                         .HasForeignKey("InternShipId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -812,53 +736,19 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.Models.InternSkills", b =>
                 {
-                    b.HasOne("DAL.Models.Interen", "Intern")
-                        .WithMany()
-                        .HasForeignKey("InternInterenId");
+                    b.HasOne("DAL.Models.Intern", "Intern")
+                        .WithMany("InternSkills")
+                        .HasForeignKey("InternId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("DAL.Models.Skills", "Skills")
-                        .WithMany()
+                        .WithMany("InternSkills")
                         .HasForeignKey("SkillsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Intern");
-
-                    b.Navigation("Skills");
-                });
-
-            modelBuilder.Entity("DAL.Models.Jop", b =>
-                {
-                    b.HasOne("DAL.Models.Field", "Field")
-                        .WithMany("Jops")
-                        .HasForeignKey("FieldId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DAL.Data.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Field");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DAL.Models.JopSkills", b =>
-                {
-                    b.HasOne("DAL.Models.Jop", "Jop")
-                        .WithMany("JopSkills")
-                        .HasForeignKey("JopId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DAL.Models.Skills", "Skills")
-                        .WithMany("JopSkills")
-                        .HasForeignKey("SkillsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Jop");
 
                     b.Navigation("Skills");
                 });
@@ -914,41 +804,7 @@ namespace DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DAL.Models.InternShip", null)
-                        .WithMany("Skills")
-                        .HasForeignKey("InternShipId");
-
                     b.Navigation("Field");
-                });
-
-            modelBuilder.Entity("InterenInternShip", b =>
-                {
-                    b.HasOne("DAL.Models.Interen", null)
-                        .WithMany()
-                        .HasForeignKey("InterensInterenId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DAL.Models.InternShip", null)
-                        .WithMany()
-                        .HasForeignKey("InternShipsInternShipId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("InterenSkills", b =>
-                {
-                    b.HasOne("DAL.Models.Interen", null)
-                        .WithMany()
-                        .HasForeignKey("InterensInterenId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DAL.Models.Skills", null)
-                        .WithMany()
-                        .HasForeignKey("SkillsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1002,30 +858,40 @@ namespace DAL.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("DAL.Data.ApplicationUser", b =>
+                {
+                    b.Navigation("FollowsReceiver");
+
+                    b.Navigation("FollowsSender");
+
+                    b.Navigation("Interen");
+                });
+
             modelBuilder.Entity("DAL.Models.Field", b =>
                 {
-                    b.Navigation("Jops");
+                    b.Navigation("InternShips");
 
                     b.Navigation("posts");
 
                     b.Navigation("Skills");
+
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DAL.Models.Interen", b =>
+            modelBuilder.Entity("DAL.Models.Intern", b =>
                 {
                     b.Navigation("Educations");
 
-                    b.Navigation("Follows");
+                    b.Navigation("InternApplaieds");
+
+                    b.Navigation("InternSkills");
                 });
 
             modelBuilder.Entity("DAL.Models.InternShip", b =>
                 {
-                    b.Navigation("Skills");
-                });
+                    b.Navigation("InternApplaieds");
 
-            modelBuilder.Entity("DAL.Models.Jop", b =>
-                {
-                    b.Navigation("JopSkills");
+                    b.Navigation("InternShipSkils");
                 });
 
             modelBuilder.Entity("DAL.Models.Post", b =>
@@ -1041,7 +907,7 @@ namespace DAL.Migrations
                 {
                     b.Navigation("InternShipSkils");
 
-                    b.Navigation("JopSkills");
+                    b.Navigation("InternSkills");
                 });
 #pragma warning restore 612, 618
         }

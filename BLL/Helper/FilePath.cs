@@ -9,6 +9,7 @@ namespace BLL.Helper
     class FilePath
     {
         static public readonly string ImagePost = "/wwwroot/IMGsPosts/";
+        static public readonly string CV = "/wwwroot/CVs/";
 
     }
 }

@@ -40,7 +40,7 @@ namespace API.Controllers
 
         }
         [HttpPost("update-profile")]
-        public async Task<IActionResult> UpdateProfile(UpdateInternVM updateIntern)
+        public async Task<IActionResult> UpdateProfile([FromForm] UpdateInternVM updateIntern)
         {
             try
             {
@@ -75,7 +75,7 @@ namespace API.Controllers
                 return BadRequest();
             }
         }
-        [HttpGet("applyjop")]
+        [HttpGet("GetApplaiedJops")]
         public async Task<IActionResult> GetApplaiedJops()
         {
 
@@ -89,7 +89,7 @@ namespace API.Controllers
                 return BadRequest();
             }
         }
-        [HttpGet("applyjop")]
+        [HttpGet("GetApllaiedJopById")]
         public async Task<IActionResult> GetApllaiedJopById(int InternShipId)
         {
 

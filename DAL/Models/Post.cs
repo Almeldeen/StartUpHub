@@ -12,6 +12,7 @@ namespace DAL.Models
     {
         public int PostId { get; set; }
         public string Content { get; set; }
+        public DateTime CteatedDate { get; set; }
       
         [ForeignKey("FieldId")]
         public  int FieldId { get; set; }

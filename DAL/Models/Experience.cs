@@ -14,8 +14,8 @@ namespace DAL.Models
         public string Title { get; set; }
         public string Description { get; set; }
         public byte Type { get; set; }
-        [ForeignKey("InterenId")]
-        public string InterenId { get; set; }
-        public virtual Interen Interen { get; set; }
+        [ForeignKey("InternId")]
+        public string InternId { get; set; }
+        public virtual Intern Intern { get; set; }
     }
 }

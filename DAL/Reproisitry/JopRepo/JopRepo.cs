@@ -32,26 +32,26 @@ namespace DAL.Reproisitry.JopRepo
         {
             try
             {
-                var data = mapper.Map<Jop>(jop);
+                var data = mapper.Map<InternShip>(jop);
                 data.UserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                await db.Jops.AddAsync(data);
+                await db.InternShips.AddAsync(data);
                 var res = await db.SaveChangesAsync();
                 if (res <=0)
                 {
                     return null;
 
                 }
-                List<JopSkills> jopskills = new List<JopSkills>();
+                List<InternShipSkils> jopskills = new List<InternShipSkils>();
                 foreach (var item in jop.skills)
                 {
-                    jopskills.Add(new JopSkills { JopId = data.Id, SkillsId = item.SkillsId });
+                    jopskills.Add(new InternShipSkils { InternShipId = data.InternShipId, SkillsId = item.SkillsId });
 
                 }
-                await db.JopSkills.AddRangeAsync(jopskills);
+                await db.InternShipSkils.AddRangeAsync(jopskills);
                 var result = await db.SaveChangesAsync();
                 if (result > 0)
                 {
-                    jop.id = data.Id;
+                    jop.id = data.InternShipId;
                     return jop;
 
                 }
@@ -65,18 +65,12 @@ namespace DAL.Reproisitry.JopRepo
             }
         }
            
-          
-
-
-
-    
-
         public async Task<int> DeleteJop(int id)
         {
             try
             {
-                var data = await db.Jops.FindAsync(id);
-                db.Jops.Remove(data);
+                var data = await db.InternShips.FindAsync(id);
+                db.InternShips.Remove(data);
                 var res = await db.SaveChangesAsync();
                 if (res > 0)
                 {
@@ -94,7 +88,7 @@ namespace DAL.Reproisitry.JopRepo
 
         public async Task<List<JopVM>> GetAllJop()
         {
-            var data = await db.Jops.Select(a => new JopVM { id = a.Id, name = a.Name, startDate = a.StartDate, endDate = a.EndDate, content = a.Content, fieldId = a.Field.FieldId, fieldName = a.Field.FieldName, userId = a.User.Id, skills = a.Skills.Select(a => new SkillsVM { SkillsId = a.SkillsId, Name = a.Name }).ToList() }).ToListAsync();
+            var data = await db.InternShips.Select(a => new JopVM { id = a.InternShipId, name = a.Name, startDate = a.StartDate, endDate = a.EndDate, content = a.Content, fieldId = a.Field.FieldId, fieldName = a.Field.FieldName, userId = a.User.Id, skills = a.Skills.Select(a => new SkillsVM { SkillsId = a.SkillsId, Name = a.Name }).ToList() }).ToListAsync();
             return data;
         }
     }

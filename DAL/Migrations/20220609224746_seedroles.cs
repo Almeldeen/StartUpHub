@@ -3,7 +3,7 @@ using System;
 
 namespace DAL.Migrations
 {
-    public partial class SeedRoles : Migration
+    public partial class seedroles : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
