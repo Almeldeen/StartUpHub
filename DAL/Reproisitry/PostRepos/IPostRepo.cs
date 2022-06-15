@@ -12,6 +12,12 @@ namespace DAL.Reproisitry.PostRepos
         public Task<PostVM> AddPostAsync(PostVM post);
         public Task<PostVM> EditPostAsync(PostVM post);
         public Task<int> DeletePostAsync(int id);
+        public Task<int> Like(int PostId);
+        public Task<int> DisLike(int PostId);
+        public Task<CommentVM> Comment(int PostId,string Cotent);
+        public Task<CommentVM> EditComment(int PostId, int commentId, string Cotent);
+        public Task<int> DeletComment(int commentId,int PostId);
+        public Task<int> RateComment(int commentId,int PostId, char type);
         public Task<PostVM> GetByIdPostAsync(int id);
         public Task<ResponseVM<PostVM>> GetAllPostAsync(int pagenum, int pagesize);
         public Task<ResponseVM<PostVM>> GetUserPostsAsync(int pagenum, int pagesize);

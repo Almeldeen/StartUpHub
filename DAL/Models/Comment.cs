@@ -11,6 +11,7 @@ namespace DAL.Models
     public class Comment
     {
         public int Id { get; set; }
+        public int Rate { get; set; }
         public string Content { get; set; }
         [ForeignKey("PostId")]
         public int PostId { get; set; }

@@ -218,5 +218,162 @@ namespace DAL.Reproisitry.PostRepos
             var data = await db.Posts.Where(a => a.PostId == id).Select(a => new PostVM { PostId = a.PostId, Content = a.Content, FieldId = a.Field.FieldId, FieldName = a.Field.FieldName, UserId = a.User.Id, PostImagePath = a.ImagePosts.Select(x => x.ImagePath).ToList() }).FirstOrDefaultAsync();
             return data;
         }
+
+        public async Task<int> Like(int PostId)
+        {
+            try
+            {
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var UserId = userMangger.FindByNameAsync(username).Result.Id;
+                var data = new Like();
+                data.PostId = PostId;
+                data.UserId = UserId;
+                await db.Likes.AddAsync(data);
+                int res = await db.SaveChangesAsync();
+                if (res > 0)
+                {
+                   
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+
+            }
+
+
+        }
+
+       
+
+        public async Task<int> DisLike(int PostId)
+        {
+            try
+            {
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var UserId = userMangger.FindByNameAsync(username).Result.Id;
+
+                var data = await db.Likes.Where(a => a.PostId == PostId && a.UserId == UserId).FirstOrDefaultAsync();
+                 db.Likes.Remove(data);
+                int res = await db.SaveChangesAsync();
+                if (res > 0)
+                {
+
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+
+            }
+        }
+
+        public async Task<CommentVM> Comment(int PostId, string Cotent)
+        {
+            try
+            {
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var UserId = userMangger.FindByNameAsync(username).Result.Id;
+                var data = new Comment();
+                data.PostId = PostId;
+                data.UserId = UserId;
+                data.Content = Cotent;
+                await db.Comments.AddAsync(data);
+                int res = await db.SaveChangesAsync();
+                if (res > 0)
+                {
+                    var comment = mapper.Map<CommentVM>(data);
+                    return comment;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return null;
+
+            }
+        }
+
+        public async Task<CommentVM> EditComment(int PostId, int commentId, string Content)
+        {
+            try
+            {
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var UserId = userMangger.FindByNameAsync(username).Result.Id;
+                var data = await db.Comments.Where(a => a.PostId == PostId && a.UserId == UserId && a.Id == commentId).FirstOrDefaultAsync();
+                data.Content = Content;
+                int res = await db.SaveChangesAsync();
+                if (res > 0)
+                {
+                    var comment = mapper.Map<CommentVM>(data);
+                    return comment;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+
+                return null;
+            }
+           
+        }
+
+        public async Task<int> DeletComment(int commentId, int PostId)
+        {
+            try
+            {
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var UserId = userMangger.FindByNameAsync(username).Result.Id;
+
+                var data = await db.Comments.Where(a => a.PostId == PostId && a.UserId == UserId && a.Id == commentId).FirstOrDefaultAsync();
+                db.Comments.Remove(data);
+                int res = await db.SaveChangesAsync();
+                if (res > 0)
+                {
+
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+
+            }
+        }
+
+        public async Task<int> RateComment(int commentId, int PostId,char type)
+        {
+            try
+            {
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var UserId = userMangger.FindByNameAsync(username).Result.Id;
+                var data = await db.Comments.Where(a => a.PostId == PostId && a.UserId == UserId && a.Id == commentId).FirstOrDefaultAsync();
+                if (type=='+')
+                {
+                    data.Rate += 1;
+                }
+                else if (type=='-')
+                {
+                    data.Rate -= 1;
+                }
+                int res = await db.SaveChangesAsync();
+                if (res > 0)
+                {
+                  
+                    return data.Rate;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+
+                return 0;
+            }
+        }
     }
 }
