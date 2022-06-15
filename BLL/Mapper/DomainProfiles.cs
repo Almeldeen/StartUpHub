@@ -23,6 +23,8 @@ namespace BLL.Mapper
             CreateMap<JopVM, InternShip>();
             CreateMap<InternApplaied_VM, InternApplaied>();
             CreateMap<InternApplaied, InternApplaied_VM>();
+            CreateMap<Comment, CommentVM>();
+            CreateMap<CommentVM, Comment>();
         }
         
     }

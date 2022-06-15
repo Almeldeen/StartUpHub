@@ -35,6 +35,9 @@
     <Folder Include="wwwroot\CVs\" />
     <Folder Include="wwwroot\ImagesProfile\" />
     <Folder Include="wwwroot\ImagesCover\" />
+    <Folder Include="wwwroot\CVs\" />
+    <Folder Include="wwwroot\CVs\" />
+    <Folder Include="wwwroot\ImagesProfile\" />
   </ItemGroup>
 
 </Project>
