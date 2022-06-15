@@ -9,7 +9,7 @@ namespace DAL.ViewModels
    public class InternShipQuestionsVM
     {
         public int QId { get; set; }
-        public int QContent { get; set; }       
+        public string QContent { get; set; }       
         public int InternShipId { get; set; }
       
     }

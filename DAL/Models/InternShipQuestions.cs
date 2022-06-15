@@ -12,7 +12,7 @@ namespace DAL.Models
     {
         [Key]
         public int QId { get; set; }
-        public int QContent { get; set; }
+        public string QContent { get; set; }
         [ForeignKey("InternShipId")]
         public int InternShipId { get; set; }
         public InternShip internShip { get; set; }

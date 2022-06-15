@@ -3,6 +3,7 @@ using BLL.Mapper;
 using BLL.Services.Auth;
 using BLL.Services.Field;
 using BLL.Services.Intern;
+using BLL.Services.JopServicess;
 using BLL.Services.Post;
 using BLL.Services.Skills;
 using DAL.Data;
@@ -71,6 +72,7 @@ namespace API
             services.AddScoped<IInternRepos, InternRepos>();
             services.AddScoped<IInternService, InternService>();
             services.AddScoped<IJopRepo, JopRepo>();
+            services.AddScoped<IJopServices, JopServices>();
 
             services.AddAuthentication(options =>
             {

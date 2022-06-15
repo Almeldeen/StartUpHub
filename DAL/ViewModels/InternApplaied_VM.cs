@@ -8,10 +8,10 @@ namespace DAL.ViewModels
 {
     public class InternApplaied_VM
     {
-        public int Id { get; set; }
-        public string Content { get; set; }
         public byte State { get; set; }
         public int InternShipId { get; set; }
         public string InterenId { get; set; }
+        public List<InternApplaiedQAnswersVM> answers { get; set; }
+
     }
 }

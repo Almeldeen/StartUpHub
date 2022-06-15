@@ -61,7 +61,7 @@ namespace API.Controllers
             
 
         }
-        [HttpGet("applyjop")]
+        [HttpPost("applyjop")]
         public async Task<IActionResult> AddInternApplaied(InternApplaied_VM internApplaied)
         {
 
@@ -75,7 +75,7 @@ namespace API.Controllers
                 return BadRequest();
             }
         }
-        [HttpGet("GetApplaiedJops")]
+        [HttpGet("getapplaiedjops")]
         public async Task<IActionResult> GetApplaiedJops()
         {
 
@@ -89,7 +89,7 @@ namespace API.Controllers
                 return BadRequest();
             }
         }
-        [HttpGet("GetApllaiedJopById")]
+        [HttpGet("getapllaiedjopbyid")]
         public async Task<IActionResult> GetApllaiedJopById(int InternShipId)
         {
 

@@ -19,42 +19,43 @@ namespace DAL.Reproisitry.JopRepo
         private readonly ApplicationDbContext db;
         private readonly IMapper mapper;
         private readonly IHttpContextAccessor httpContextAccessor;
-        
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public JopRepo(ApplicationDbContext db  , IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public JopRepo(ApplicationDbContext db  , IMapper mapper, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager)
         {
             this.db = db;
             this.mapper = mapper;
             this.httpContextAccessor = httpContextAccessor;
-           
+            this.userManager = userManager;
         }
         public async Task<JopVM> AddJop(JopVM jop)
         {
             try
             {
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var userid = userManager.FindByNameAsync(username).Result.Id;
                 var data = mapper.Map<InternShip>(jop);
-                data.UserId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                data.UserId = userid;            
                 await db.InternShips.AddAsync(data);
                 var res = await db.SaveChangesAsync();
                 if (res <=0)
                 {
                     return null;
-
                 }
-                if (jop.skills.Count>0)
+                if (jop.skillls.Count>0)
                 {
                     List<InternShipSkils> jopskills = new List<InternShipSkils>();
-                    foreach (var item in jop.skills)
+                    foreach (var item in jop.skillls)
                     {
                         jopskills.Add(new InternShipSkils { InternShipId = data.InternShipId, SkillsId = item.SkillsId });
 
                     }
                     await db.InternShipSkils.AddRangeAsync(jopskills);
                 }
-                if (jop.InternShipQuestions.Count>0)
+                if (jop.questions.Count>0)
                 {
                     List<InternShipQuestions> internShipQuestions = new List<InternShipQuestions>();
-                    foreach (var item in jop.InternShipQuestions)
+                    foreach (var item in jop.questions)
                     {
                         internShipQuestions.Add(new InternShipQuestions { InternShipId = data.InternShipId, QContent = item.QContent });
 
@@ -101,7 +102,7 @@ namespace DAL.Reproisitry.JopRepo
 
         public async Task<List<JopVM>> GetAllJop()
         {
-            var data = await db.InternShips.Select(a => new JopVM { id = a.InternShipId, name = a.Name, startDate = a.StartDate, endDate = a.EndDate, content = a.Content, fieldId = a.Field.FieldId, fieldName = a.Field.FieldName, userId = a.User.Id, skills = a.Skills.Select(a => new SkillsVM { SkillsId = a.SkillsId, Name = a.Name }).ToList() }).ToListAsync();
+            var data = await db.InternShips.Select(a => new JopVM { id = a.InternShipId, title = a.title, startDate = a.StartDate, endDate = a.EndDate, content = a.Content, fieldId = a.Field.FieldId, fieldName = a.Field.FieldName, userId = a.User.Id, skillls = a.Skills.Select(a => new SkillsVM { SkillsId = a.SkillsId, Name = a.Name }).ToList(),questions=a.InternShipQuestions.Select(x=> new InternShipQuestionsVM { QId=x.QId,QContent=x.QContent}).ToList() }).ToListAsync();
             return data;
         }
     }
