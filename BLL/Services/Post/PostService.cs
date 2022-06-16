@@ -58,5 +58,35 @@ namespace BLL.Services.Post
         {
             return await repo.GetByIdPostAsync(id);
         }
+
+        public async Task<int> Like(int PostId)
+        {
+            return await repo.Like(PostId);
+        }
+
+        public async Task<int> DisLike(int PostId)
+        {
+            return await repo.DisLike(PostId);
+        }
+
+        public async Task<CommentVM> Comment(int PostId, string Cotent)
+        {
+            return await repo.Comment(PostId, Cotent);
+        }
+
+        public async Task<CommentVM> EditComment(int PostId, int commentId, string Cotent)
+        {
+            return await repo.EditComment(PostId, commentId, Cotent);
+        }
+
+        public async Task<int> DeletComment(int commentId, int PostId)
+        {
+            return await repo.DeletComment(PostId, commentId);
+        }
+
+        public async Task<int> RateComment(int commentId, int PostId, char type)
+        {
+            return await repo.RateComment(commentId,PostId, type);
+        }
     }
 }

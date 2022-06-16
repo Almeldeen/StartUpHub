@@ -28,6 +28,11 @@ namespace DAL.Reproisitry.Followers
             this.userManager = userManager;
         }
 
+        public Task<bool> FollowBack(string ReciveId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<List<Follower_VM>> Followers( )
         {
             if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
@@ -56,6 +61,11 @@ namespace DAL.Reproisitry.Followers
             {
                 return null;
             }
+        }
+
+        public Task<bool> SendFollow(string ReciveId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

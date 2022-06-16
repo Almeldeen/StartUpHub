@@ -28,7 +28,121 @@ namespace API.Controllers
             return Ok(res);
                 
         }
+        [HttpPost("Like")]
+        public async Task<IActionResult> Like(int PostId)
+        {
+            try
+            {
+                var res = await service.Like(PostId);
+                if (res != 0)
+                {
+                    return Ok(res);
 
+                }
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+            
+        }
+        [HttpDelete("DisLike")]
+        public async Task<IActionResult> DisLike(int PostId)
+        {
+            try
+            {
+                var res = await service.DisLike(PostId);
+                if (res != 0)
+                {
+                    return Ok(res);
+
+                }
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("Comment")]
+        public async Task<IActionResult> Comment(int PostId, string Cotent)
+        {
+            try
+            {
+                var res = await service.Comment(PostId, Cotent);
+                if (res != null)
+                {
+                    return Ok(res);
+
+                }
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPut("EditComment")]
+        public async Task<IActionResult> EditComment(int PostId, int commentId, string Cotent)
+        {
+            try
+            {
+                var res = await service.EditComment(PostId, commentId, Cotent);
+                if (res != null)
+                {
+                    return Ok(res);
+
+                }
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpDelete("DeletComment")]
+        public async Task<IActionResult> DeletComment(int commentId, int PostId)
+        {
+            try
+            {
+                var res = await service.DeletComment(commentId, PostId);
+                if (res != 0)
+                {
+                    return Ok(res);
+
+                }
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPut("RateComment")]
+        public async Task<IActionResult> RateComment(int commentId, int PostId, char type)
+        {
+            try
+            {
+                var res = await service.RateComment(commentId, PostId,type);
+                if (res != 0)
+                {
+                    return Ok(res);
+
+                }
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+        }
         //public async Task<IActionResult> EditPostAsync([FromForm] PostVM post)
         //{
 
