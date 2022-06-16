@@ -13,5 +13,6 @@ namespace DAL.Reproisitry.Followers
         public Task<List<Follower_VM> >Following( );
         public Task<bool> SendFollow(string ReciveId);
         public Task<bool> FollowBack(string ReciveId);
+        public Task<bool> UnFollow(string ReciveId);
     }
 }

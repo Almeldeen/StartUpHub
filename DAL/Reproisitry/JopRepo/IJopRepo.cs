@@ -12,5 +12,7 @@ namespace DAL.Reproisitry.JopRepo
         public Task<JopVM> AddJop(JopVM jop);
         public Task<int> DeleteJop(int id);
         public Task<List<JopVM>> GetAllJop();
+        public Task<List<InternAppliedCompanyVM>> GetAllAppliedIntern( int internshipid);
+
     }
 }
