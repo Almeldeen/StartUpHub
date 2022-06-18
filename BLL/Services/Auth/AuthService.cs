@@ -56,7 +56,6 @@ namespace BLL.Services.Auth
                     FullName = model.fullName,
                     Location = model.address,
                     PhoneNumber = model.mobile,
-                    FieldId=model.FieldId,
                 };
 
                 var result = await userManager.CreateAsync(user, model.Password);
@@ -71,8 +70,8 @@ namespace BLL.Services.Auth
                     return new AuthModel { Message = errors };
                 }
 
-                await userManager.AddToRoleAsync(user, model.role);
-                if (model.role== "Internee")
+                await userManager.AddToRoleAsync(user, model.role.ToUpper());
+                if (model.role.ToUpper() == "INTERN".ToUpper())
                 {
                     DAL.Models.Intern intern = new DAL.Models.Intern();
                     

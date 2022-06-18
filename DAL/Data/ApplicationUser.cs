@@ -25,7 +25,7 @@ namespace DAL.Data
         public List<Follow> FollowsSender { get; set; }
         public List<Follow> FollowsReceiver { get; set; }
         [ForeignKey("FieldId")]
-        public int FieldId { get; set; }
+        public int? FieldId { get; set; }
         public virtual Field Field { get; set; }
         //public List<RefreshToken>? RefreshTokens { get; set; }
 
