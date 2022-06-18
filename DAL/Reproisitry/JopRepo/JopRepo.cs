@@ -100,6 +100,23 @@ namespace DAL.Reproisitry.JopRepo
             
         }
 
+        public async Task<List<InternAppliedCompanyVM>> GetAllAppliedIntern(int intershipid)
+        {
+            try
+            {
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var userid = userManager.FindByNameAsync(username).Result.Id;
+                var data = await db.InternApplaieds.Where(a => a.InternShip.UserId == userid && a.InternShipId == intershipid).Select(x => new InternAppliedCompanyVM { InternId = x.InternId, FullName = x.Intern.User.FullName, jopTitile = x.Intern.User.jopTitile, Nationality = x.Intern.Nationality, Birthday = x.Intern.Birthday, College = x.Intern.College, CV = x.Intern.CV, Gender = x.Intern.Gender, State = x.State, ProfileImage = x.Intern.User.ProfileImage, availableToWork = x.Intern.availableToWork }).ToListAsync();
+                return data;
+            }
+            catch (Exception ex)
+            {
+
+                return null;
+            }
+            
+        }
+
         public async Task<List<JopVM>> GetAllJop()
         {
             var data = await db.InternShips.Select(a => new JopVM { id = a.InternShipId, title = a.title, startDate = a.StartDate, endDate = a.EndDate, content = a.Content, fieldId = a.Field.FieldId, fieldName = a.Field.FieldName, userId = a.User.Id, skillls = a.Skills.Select(a => new SkillsVM { SkillsId = a.SkillsId, Name = a.Name }).ToList(),questions=a.InternShipQuestions.Select(x=> new InternShipQuestionsVM { QId=x.QId,QContent=x.QContent}).ToList() }).ToListAsync();
