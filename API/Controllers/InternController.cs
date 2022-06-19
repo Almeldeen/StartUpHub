@@ -23,7 +23,6 @@ namespace API.Controllers
         {
             _internService = internService;
         }
-
         [HttpGet("get-profile")]
         public async Task<IActionResult> GetProfile()
         {

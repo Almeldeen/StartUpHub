@@ -1,4 +1,6 @@
-﻿using DAL.ViewModels;
+﻿using DAL.Data;
+using DAL.Models;
+using DAL.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +17,7 @@ namespace DAL.Reproisitry.InternRepos
         public Task<InternApplaied_VM> GetApllaiedJopById(int InternShipId);
         public  Task<bool> UpdateProfile(UpdateInternVM updateIntern);
         public  Task<string> ChangePhoto(string path , string type);
+        public Task<InternApplaied_VM> UpdateInternApplaied(InternApplaied_VM internApplaied);
+        public Task<List<ApplicationUser>> SearchUser(string name);
     }
 }

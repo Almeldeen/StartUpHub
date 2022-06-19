@@ -122,5 +122,11 @@ namespace DAL.Reproisitry.JopRepo
             var data = await db.InternShips.Select(a => new JopVM { id = a.InternShipId, title = a.title, startDate = a.StartDate, endDate = a.EndDate, content = a.Content, fieldId = a.Field.FieldId, fieldName = a.Field.FieldName, userId = a.User.Id, skillls = a.Skills.Select(a => new SkillsVM { SkillsId = a.SkillsId, Name = a.Name }).ToList(),questions=a.InternShipQuestions.Select(x=> new InternShipQuestionsVM { QId=x.QId,QContent=x.QContent}).ToList() }).ToListAsync();
             return data;
         }
+
+        public async Task<List<JopVM>> SearchJop(string name)
+        {
+            var data = await db.InternShips.Where(w => w.title.Contains(name)).Select(w => mapper.Map<JopVM>(w)).ToListAsync();
+            return data;
+        }
     }
 }
