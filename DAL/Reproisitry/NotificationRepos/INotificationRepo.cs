@@ -1,0 +1,17 @@
+﻿using DAL.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DAL.Reproisitry.NotificationRepos
+{
+   public interface INotificationRepo
+    {
+        public Task<NotificationVM> AddNotification(NotificationVM notification);
+        public Task<List<NotificationVM>> GetAllNotifications();
+        public Task<bool> ReadNotifications(int notificationId);
+
+    }
+}

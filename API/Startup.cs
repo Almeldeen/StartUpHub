@@ -1,13 +1,16 @@
 using BLL.Helper;
+using BLL.Hups;
 using BLL.Mapper;
 using BLL.Services.Auth;
 using BLL.Services.Field;
+using BLL.Services.Followers;
 using BLL.Services.Intern;
 using BLL.Services.JopServicess;
 using BLL.Services.Post;
 using BLL.Services.Skills;
 using DAL.Data;
 using DAL.Reproisitry.FieldRepos;
+using DAL.Reproisitry.Followers;
 using DAL.Reproisitry.InternRepos;
 using DAL.Reproisitry.JopRepo;
 using DAL.Reproisitry.PostRepos;
@@ -26,6 +29,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,8 +51,9 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-               options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
+               options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Transient
            );
+
             services.AddIdentity<ApplicationUser, IdentityRole>(opt =>
             {
                 opt.Password.RequiredLength = 7;
@@ -73,6 +78,8 @@ namespace API
             services.AddScoped<IInternService, InternService>();
             services.AddScoped<IJopRepo, JopRepo>();
             services.AddScoped<IJopServices, JopServices>();
+            services.AddScoped<IFollowersService, FollowersService>();
+            services.AddScoped<IFollowersRepo, FollowersRepo>();
 
             services.AddAuthentication(options =>
             {
@@ -105,9 +112,11 @@ namespace API
                 options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
             }); 
             services.AddHttpContextAccessor();
-
+            services.AddSignalR();
             services.AddCors();
-            services.AddControllers();
+            
+            services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
@@ -138,6 +147,7 @@ namespace API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<RealtimeHub>("/realtimeHub");
             });
         }
     }

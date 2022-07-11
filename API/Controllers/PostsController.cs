@@ -1,8 +1,10 @@
-﻿using BLL.Services.Post;
+﻿using BLL.Hups;
+using BLL.Services.Post;
 using DAL.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,14 +18,17 @@ namespace API.Controllers
     public class PostsController : ControllerBase
     {
         private readonly IPostService service;
+        private readonly IHubContext<RealtimeHub> hubContext;
 
-        public PostsController(IPostService service)
+        public PostsController(IPostService service,IHubContext<RealtimeHub> hubContext)
         {
             this.service = service;
+            this.hubContext = hubContext;
         }
         [HttpPost("AddPost")]
         public async Task<IActionResult> AddPostAsync([FromForm] PostVM post)
         {
+
             var res = await service.AddPostAsync(post);
             return Ok(res);
                 
@@ -36,6 +41,7 @@ namespace API.Controllers
                 var res = await service.Like(PostId);
                 if (res != 0)
                 {
+
                     return Ok(res);
 
                 }
@@ -78,7 +84,7 @@ namespace API.Controllers
                     return Ok(res);
 
                 }
-                return BadRequest();
+                return BadRequest(res);
             }
             catch (Exception ex)
             {
@@ -125,11 +131,49 @@ namespace API.Controllers
             }
         }
         [HttpPut("RateComment")]
-        public async Task<IActionResult> RateComment(int commentId, int PostId, char type)
+        public async Task<IActionResult> RateComment(int commentId, int PostId, string type)
         {
             try
             {
                 var res = await service.RateComment(commentId, PostId,type);
+                if (res > 0)
+                {
+                    return Ok(res);
+
+                }
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPut("updatePost")]
+        public async Task<IActionResult> EditPostAsync([FromForm] PostVM post)
+        {
+            try
+            {
+                var res = await service.EditPostAsync(post);
+                if (res != null)
+                {
+                    return Ok(res);
+
+                }
+                return BadRequest(/*res.error*/);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpDelete("deletePost")]
+        public async Task<IActionResult> DeletePostAsync( int id)
+        {
+            try
+            {
+                var res = await service.DeletePostAsync(id);
                 if (res != 0)
                 {
                     return Ok(res);
@@ -143,18 +187,7 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        //public async Task<IActionResult> EditPostAsync([FromForm] PostVM post)
-        //{
-
-        //}
-        //public async Task<IActionResult> DeletePostAsync([FromForm] int id)
-        //{
-
-        //}
-        //public async Task<IActionResult> GetByIdPostAsync([FromForm] int id)
-        //{
-
-        //}
+     
         [HttpGet("get-timeline-articles")]
         public async Task<IActionResult> GetAllPostAsync(int page, int pageSize)
         {
@@ -173,12 +206,12 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("get-user-articles")]
-        public async Task<IActionResult> GetUserPostsAsync(int page, int pageSize)
+        [HttpGet("get-post-details")]
+        public async Task<IActionResult> GetByIdPostAsync(int postId)
         {
             try
             {
-                var data = await service.GetUserPostsAsync(page, pageSize);
+                var data = await service.GetByIdPostAsync(postId);
                 if (data != null)
                 {
                     return Ok(data);
@@ -191,5 +224,43 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+   
+        [HttpGet("get-user-articles")]
+        public async Task<IActionResult> GetUserPostsAsync(string userId, int page, int pageSize)
+        {
+            try
+            {
+                var data = await service.GetUserPostsAsync(userId,page, pageSize);
+                if (data != null)
+                {
+                    return Ok(data);
+                }
+                return BadRequest(data);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("get-comments")]
+        public async Task<IActionResult> GetPostComment(int page, int pageSize,int PostId)
+        {
+            try
+            {
+                var data = await service.GetPostComment(PostId,page, pageSize);
+                if (data != null)
+                {
+                    return Ok(data);
+                }
+                return BadRequest(data);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+        }
+        
     }
 }

@@ -36,6 +36,7 @@ namespace DAL.Reproisitry.PostRepos
                 var data = mapper.Map<Post>(post);
                 var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 data.UserId = userMangger.FindByNameAsync(username).Result.Id;
+                data.CteatedDate = DateTimeOffset.Now;
                 await db.Posts.AddAsync(data);
 
                 var res = await db.SaveChangesAsync();
@@ -43,7 +44,7 @@ namespace DAL.Reproisitry.PostRepos
                 {
                     return null;
                 }
-                if (post.PostImagePath.Count>0)
+                if (post.PostImagePath!=null)
                 {
                     List<ImagePosts> imagePosts = new List<ImagePosts>();
                     foreach (var item in post.PostImagePath)
@@ -64,8 +65,9 @@ namespace DAL.Reproisitry.PostRepos
             }
             catch (Exception ex)
             {
-
-                return null;
+                var p = new PostVM();
+                //p.error = ex.Message;
+                return p;
             }
 
 
@@ -99,9 +101,25 @@ namespace DAL.Reproisitry.PostRepos
         {
             try
             {
-                var data = mapper.Map<Post>(post);
-                db.Entry(data).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                int res = await db.SaveChangesAsync();
+               
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+               var UserId = userMangger.FindByNameAsync(username).Result.Id;
+                var data = await db.Posts.FindAsync(post.PostId);
+                data.Content = post.Content;
+                data.FieldId = post.FieldId;
+                int res = 0;
+                var imgs = await db.ImagePosts.Where(x => x.PostId == post.PostId).ToListAsync();
+                db.ImagePosts.RemoveRange(imgs);
+                if (post.PostImagePath!= null)
+                {                  
+                    List<ImagePosts> imagePosts = new List<ImagePosts>();
+                    foreach (var item in post.PostImagePath)
+                    {
+                        imagePosts.Add(new ImagePosts { ImagePath = item, PostId = data.PostId });
+                    }
+                    await db.ImagePosts.AddRangeAsync(imagePosts);                  
+                }
+                res = await db.SaveChangesAsync();
                 if (res > 0)
                 {
                     post.PostId = data.PostId;
@@ -112,26 +130,56 @@ namespace DAL.Reproisitry.PostRepos
 
 
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                return null;
+                var p = new PostVM();
+                //p.error = ex.Message;
+                return p;
             }
 
         }
-        public async Task<ResponseVM<PostVM>> GetAllPostAsync(int pagenum, int pagesize)
+        public async Task<TimeLineVM> GetAllPostAsync(int pagenum, int pagesize)
         {
             try
             {
                 if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
                 {
                     var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                    var UserId = userMangger.FindByNameAsync(username).Result.Id;
-                    var following = await db.Follows.Where(x => x.FollowSenderId == UserId).Select(x => x.FollowReceiverId).ToListAsync();
-                    var listdata = new List<PostVM>();
-                    foreach (var item in following)
+                    var User = await userMangger.FindByNameAsync(username);
+                
+                    var following = await db.Follows.Where(x => x.FollowSenderId == User.Id).Select(x => x.FollowReceiverId).ToListAsync();
+                    var listdata = new TimeLineVM();
+                    listdata.Posts = new List<PostVM>();
+                    listdata.Jops = new List<JopVM>();
+                    int postcount = 0;
+                    if (following.Count>0)
                     {
-                        var data = await db.Posts.Where(x=> x.UserId==item).Skip(pagesize * (pagenum - 1)).Take(pagesize).Select(a => new PostVM
+                        foreach (var item in following)
+                        {
+                            var data = await db.Posts.Where(x => x.UserId == item).Select(a => new PostVM
+                            {
+                                PostId = a.PostId,
+                                Content = a.Content,
+                                FieldId = a.Field.FieldId,
+                                FieldName = a.Field.FieldName,
+                                UserId = a.User.Id,
+                                UserImg = a.User.ProfileImage,
+                                UserJobTitle = a.User.jopTitile,
+                                UserName = a.User.FullName,
+                                createdDate = a.CteatedDate,
+                                postType="article".ToUpper(),
+                                likesCount = a.Likes.Count(),
+                                commentsCount = a.Comments.Count(),
+                                likedByUser = a.Likes.Any(x => x.UserId == User.Id),
+                                PostImagePath = a.ImagePosts.Select(x => x.ImagePath).ToList(),
+                            }).OrderByDescending(x=> x.createdDate).ToListAsync();
+                            postcount += data.Count();
+                            listdata.Posts.AddRange(data);
+                        }
+                    }
+                    else
+                    {
+                        var data = await db.Posts.OrderByDescending(x=> x.Likes.Count()).Skip(4 * (pagenum - 1)).Take(4).Select(a => new PostVM
                         {
                             PostId = a.PostId,
                             Content = a.Content,
@@ -140,26 +188,78 @@ namespace DAL.Reproisitry.PostRepos
                             UserId = a.User.Id,
                             UserImg = a.User.ProfileImage,
                             UserJobTitle = a.User.jopTitile,
-                            UserName = a.User.UserName,
-                            likes = a.Likes.Select(x => new PostLikesVM
-                            {
-                                userFullName = x.User.UserName,
-                                userId = x.UserId,
-                                userImg = x.User.ProfileImage,
-                                userJobTitle = x.User.jopTitile,
-                            }).ToList(),
+                            UserName = a.User.FullName,
+                            postType = "article".ToUpper(),
+                            createdDate = a.CteatedDate,
+                            likesCount = a.Likes.Count(),
+                            commentsCount = a.Comments.Count(),
+                            likedByUser = a.Likes.Any(x => x.UserId == User.Id),
                             PostImagePath = a.ImagePosts.Select(x => x.ImagePath).ToList(),
-                        }).ToListAsync();
-                        listdata.AddRange(data);
+                        }).OrderByDescending(x => x.createdDate).ToListAsync();
+                        listdata.Posts.AddRange(data);
                     }
-                   
-                    ResponseVM<PostVM> response = new ResponseVM<PostVM>();
+                    if (User.FieldId!=null)
+                    {
+                        listdata.Jops = await db.InternShips.Where(x => x.FieldId == User.FieldId).Skip(1 * (pagenum - 1)).Take(1).Select(x => new JopVM
+                        {
+                            content = x.Content,
+                            skillls = x.Skills.Select(x => new SkillsVM { Name = x.Name }).ToList(),
+                            fieldName = x.Field.FieldName,
+                            endDate = x.EndDate,
+                            companyName=x.User.FullName,
+                            companyImg=x.User.ProfileImage,
+                            companyJobTitle=x.User.jopTitile,
+                            appliedCount=x.InternApplaieds.Count(),
+                            startDate = x.StartDate,
+                            postType = "jop".ToUpper(),
+                            id = x.InternShipId,
+                            questions = x.InternShipQuestions.Select(x => new InternShipQuestionsVM { QId = x.QId, QContent = x.QContent }).ToList(),
+                            title = x.title,
+                            userId = x.UserId,
+                        }).OrderByDescending(x => x.startDate).ToListAsync();
+                    }
+                    else
+                    {
+                        listdata.Jops = await db.InternShips.Skip(1 * (pagenum - 1)).Take(1).Select(x => new JopVM
+                        {
+                            content = x.Content,
+                            skillls = x.Skills.Select(x => new SkillsVM { Name = x.Name }).ToList(),
+                            fieldName = x.Field.FieldName,
+                            endDate = x.EndDate,
+                            startDate = x.StartDate,
+                            companyName = x.User.FullName,
+                            companyImg = x.User.ProfileImage,
+                            companyJobTitle = x.User.jopTitile,
+                            appliedCount = x.InternApplaieds.Count(),
+                            postType = "jop".ToUpper(),
+                            id = x.InternShipId,
+                            questions = x.InternShipQuestions.Select(x => new InternShipQuestionsVM { QId = x.QId, QContent = x.QContent }).ToList(),
+                            title = x.title,
+                            userId = x.UserId,
+                        }).OrderByDescending(x => x.startDate).ToListAsync();
+                    }
+
+
+
+                    foreach (var item in listdata.Posts)
+                    {
+                        var user = await userMangger.FindByIdAsync(item.UserId);
+                        var role = await userMangger.GetRolesAsync(user);
+                        item.userRole = role[0];
+                    }
                     var rnd = new Random();
-                    var randata = listdata.OrderBy(item => rnd.Next());
-                    response.Data = randata;
-                    response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.Posts.CountAsync() / pagesize));
-                    response.CurrentPage = pagenum;
-                    return response;
+                    listdata.Posts = listdata.Posts.OrderByDescending(x=> x.likesCount).Skip(4 * (pagenum - 1)).Take(4).OrderBy(item => rnd.Next()).ToList();
+                    if (postcount>0)
+                    {
+                        listdata.TotalPages = Convert.ToInt32(Math.Ceiling((double)postcount / pagesize));
+
+                    }
+                    else
+                    {
+                        listdata.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.Posts.CountAsync() / pagesize));
+                    }
+                    listdata.CurrentPage = pagenum;
+                    return listdata;
                 }
                 return null;
             }
@@ -169,45 +269,78 @@ namespace DAL.Reproisitry.PostRepos
                 return null;
             }
         }
-        public async Task<ResponseVM<PostVM>> GetUserPostsAsync(int pagenum,int pagesize)
+        public async Task<ResponseVM<PostVM>> GetUserPostsAsync(string userId, int pagenum,int pagesize)
         {
             try
             {
                 if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
                 {
-                    var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                    var UserId = userMangger.FindByNameAsync(username).Result.Id;
-                    var data = await db.Posts.Where(x=> x.UserId==UserId).Skip(pagesize*(pagenum-1)).Take(pagesize).Select(a => new PostVM
-                    {
-                        PostId = a.PostId,
-                        Content = a.Content,
-                        FieldId = a.Field.FieldId,
-                        FieldName = a.Field.FieldName,
-                        UserId = a.User.Id,
-                        UserImg = a.User.ProfileImage,
-                        UserJobTitle = a.User.jopTitile,
-                        UserName = a.User.UserName,
-                        likes = a.Likes.Select(x => new PostLikesVM
-                        {
-                            userFullName = x.User.UserName,
-                            userId = x.UserId,
-                            userImg = x.User.ProfileImage,
-                            userJobTitle = x.User.jopTitile,
-                        }).ToList(),
-                        PostImagePath = a.ImagePosts.Select(x => x.ImagePath).ToList(),
-                    }).ToListAsync();
+                   
                     ResponseVM<PostVM> response = new ResponseVM<PostVM>();
-                    response.Data = data;
-                    response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.Posts.Where(x => x.UserId == UserId).CountAsync() / pagesize));
-                    response.CurrentPage = pagenum;
+                    var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    var User = await userMangger.FindByNameAsync(username);
+                    if (userId==null)
+                    {
+                        
+                        var data = await db.Posts.Where(x => x.UserId == User.Id).Skip(pagesize * (pagenum - 1)).Take(pagesize).Select(a => new PostVM
+                        {
+                            PostId = a.PostId,
+                            Content = a.Content,
+                            FieldId = a.Field.FieldId,
+                            FieldName = a.Field.FieldName,
+                            UserId = a.User.Id,
+                            UserImg = a.User.ProfileImage,
+                            UserJobTitle = a.User.jopTitile,
+                            UserName = a.User.FullName,
+                            likesCount = a.Likes.Count(),
+                            createdDate = a.CteatedDate,
+                            commentsCount = a.Comments.Count(),
+                            likedByUser = a.Likes.Any(x => x.UserId == User.Id),
+                            PostImagePath = a.ImagePosts.Select(x => x.ImagePath).ToList(),
+                        }).OrderByDescending(x => x.createdDate).ToListAsync();
+
+                        response.Data = data;
+                        response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.Posts.Where(x => x.UserId == User.Id).CountAsync() / pagesize));
+                        response.CurrentPage = pagenum;
+                    }
+                    else
+                    {
+                        var data = await db.Posts.Include(x => x.User).Where(x => x.UserId == userId).Skip(pagesize * (pagenum - 1)).Take(pagesize).Select(a => new PostVM
+                        {
+                            PostId = a.PostId,
+                            Content = a.Content,
+                            FieldId = a.Field.FieldId,
+                            FieldName = a.Field.FieldName,
+                            UserId = a.User.Id,
+                            UserImg = a.User.ProfileImage,
+                            UserJobTitle = a.User.jopTitile,
+                            UserName = a.User.FullName,
+                            likesCount = a.Likes.Count(),
+                            createdDate = a.CteatedDate,
+                            commentsCount = a.Comments.Count(),
+                            likedByUser = a.Likes.Any(x => x.UserId == User.Id),
+                            PostImagePath = a.ImagePosts.Select(x => x.ImagePath).ToList(),
+                        }).OrderByDescending(x => x.createdDate).ToListAsync();
+
+                        response.Data = data;
+                        response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.Posts.Where(x => x.UserId == User.Id).CountAsync() / pagesize));
+                        response.CurrentPage = pagenum;
+                    }
+                    foreach (var item in response.Data)
+                    {
+                        var user = await userMangger.FindByIdAsync(item.UserId);
+                        var role= await userMangger.GetRolesAsync(user);
+                        item.userRole = role[0];
+                    }
                     return response;
                 }
                 return null;
             }
             catch (Exception ex)
             {
-
-                return null;
+                ResponseVM<PostVM> response = new ResponseVM<PostVM>();
+                response.errormsg = ex.Message;
+                return response;
             }
            
           
@@ -215,8 +348,39 @@ namespace DAL.Reproisitry.PostRepos
 
         public async Task<PostVM> GetByIdPostAsync(int id)
         {
-            var data = await db.Posts.Where(a => a.PostId == id).Select(a => new PostVM { PostId = a.PostId, Content = a.Content, FieldId = a.Field.FieldId, FieldName = a.Field.FieldName, UserId = a.User.Id, PostImagePath = a.ImagePosts.Select(x => x.ImagePath).ToList() }).FirstOrDefaultAsync();
-            return data;
+            try
+            {
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var User =await userMangger.FindByNameAsync(username);
+                var data = await db.Posts.Where(a => a.PostId == id).Select(a => new PostVM
+                {
+                    PostId = a.PostId,
+                    Content = a.Content,
+                    FieldId = a.Field.FieldId,
+                    FieldName = a.Field.FieldName,
+                    UserId = a.User.Id,
+                    PostImagePath = a.ImagePosts.Select(x => x.ImagePath).ToList(),
+                    UserImg = a.User.ProfileImage,
+                    UserJobTitle = a.User.jopTitile,
+                 
+                    UserName = a.User.UserName,
+                    createdDate = a.CteatedDate,
+                    likesCount = a.Likes.Count(),
+                    commentsCount = a.Comments.Count(),
+                    likedByUser = a.Likes.Any(x => x.UserId == User.Id),
+                }).FirstOrDefaultAsync();
+                var user = await userMangger.FindByIdAsync(data.UserId);
+                var role = await userMangger.GetRolesAsync(user);
+                data.userRole = role[0];
+                return data;
+
+            }
+            catch (Exception ex)
+            {
+
+                return null;
+            }
+       
         }
 
         public async Task<int> Like(int PostId)
@@ -282,11 +446,24 @@ namespace DAL.Reproisitry.PostRepos
                 data.PostId = PostId;
                 data.UserId = UserId;
                 data.Content = Cotent;
+                data.CreatedDate = DateTimeOffset.Now;
                 await db.Comments.AddAsync(data);
                 int res = await db.SaveChangesAsync();
                 if (res > 0)
                 {
-                    var comment = mapper.Map<CommentVM>(data);
+                    var comment = await db.Comments.Where(x => x.Id == data.Id).Select(a => new CommentVM
+                    {
+                        Id = a.Id,
+                        Content = a.Content,
+                        createDate = a.CreatedDate,
+                        rating = a.Rate,
+                        userId = a.UserId,
+                        jobTitle = a.User.jopTitile,
+                        userImg = a.User.ProfileImage,
+                        userName = a.User.FullName,
+                        ratedByUser = a.commentRates.Any(x => x.UserId == a.UserId && x.CommentId == a.Id) == true ? a.commentRates.Where(x => x.UserId == a.UserId && x.CommentId == a.Id).Select(x => x.RateType).FirstOrDefault() : "NONE",
+                    }).FirstOrDefaultAsync();
+              
                     return comment;
                 }
                 return null;
@@ -309,7 +486,18 @@ namespace DAL.Reproisitry.PostRepos
                 int res = await db.SaveChangesAsync();
                 if (res > 0)
                 {
-                    var comment = mapper.Map<CommentVM>(data);
+                    var comment = await db.Comments.Where(x => x.Id == commentId).Select(a => new CommentVM
+                    {
+                        Id = a.Id,
+                        Content = a.Content,
+                        createDate = a.CreatedDate,
+                        rating = a.Rate,
+                        userId = a.UserId,
+                        jobTitle = a.User.jopTitile,
+                        userImg = a.User.ProfileImage,
+                        userName = a.User.FullName,
+                        ratedByUser = a.commentRates.Any(x => x.UserId == a.UserId && x.CommentId == a.Id) == true ? a.commentRates.Where(x => x.UserId == a.UserId && x.CommentId == a.Id).Select(x => x.RateType).FirstOrDefault() : "NONE",
+                    }).FirstOrDefaultAsync();
                     return comment;
                 }
                 return null;
@@ -346,26 +534,36 @@ namespace DAL.Reproisitry.PostRepos
             }
         }
 
-        public async Task<int> RateComment(int commentId, int PostId,char type)
+        public async Task<int> RateComment(int commentId, int PostId,string type)
         {
             try
             {
                 var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 var UserId = userMangger.FindByNameAsync(username).Result.Id;
-                var data = await db.Comments.Where(a => a.PostId == PostId && a.UserId == UserId && a.Id == commentId).FirstOrDefaultAsync();
-                if (type=='+')
+                var data = await db.Comments.Where(a => a.PostId == PostId && a.Id == commentId).FirstOrDefaultAsync();
+                if (type=="UP")
                 {
                     data.Rate += 1;
                 }
-                else if (type=='-')
+                else if (type=="DOWN")
                 {
                     data.Rate -= 1;
+                }
+                var oldrate = await db.commentRates.Where(x => x.CommentId == commentId && x.UserId == UserId).FirstOrDefaultAsync();
+                if (oldrate == null)
+                {
+                    var com = new CommentRate() { CommentId = commentId, RateType = type, UserId = UserId };
+                    await db.commentRates.AddAsync(com);
+                }
+                else
+                {
+                    oldrate.RateType = type;
                 }
                 int res = await db.SaveChangesAsync();
                 if (res > 0)
                 {
                   
-                    return data.Rate;
+                    return res;
                 }
                 return 0;
             }
@@ -375,5 +573,44 @@ namespace DAL.Reproisitry.PostRepos
                 return 0;
             }
         }
+        public async Task<ResponseVM<CommentVM>> GetPostComment(int PostId,int pagenum, int pagesize)
+        {
+            try
+            {
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var UserId = userMangger.FindByNameAsync(username).Result.Id;
+                var data = await db.Comments.Where(x => x.PostId == PostId).Skip(pagesize * (pagenum - 1)).Take(pagesize).Select(a => new CommentVM
+                {
+                   Id=a.Id,
+                   Content=a.Content,
+                   createDate=a.CreatedDate,
+                   rating=a.Rate,
+                   userId=a.UserId,
+                    jobTitle =a.User.jopTitile,
+                   userImg=a.User.ProfileImage,
+                   userName=a.User.FullName,
+                   ratedByUser=a.commentRates.Any(x=> x.UserId==UserId&&x.CommentId==a.Id)==true? a.commentRates.Where(x => x.UserId == UserId && x.CommentId == a.Id).Select(x=> x.RateType).FirstOrDefault() :"NONE",
+                }).OrderByDescending(x=> x.rating).ToListAsync();
+                ResponseVM<CommentVM> response = new ResponseVM<CommentVM>();
+                response.Data = data;
+                foreach (var item in response.Data)
+                {
+                    var user = await userMangger.FindByIdAsync(item.userId);
+                    var role = await userMangger.GetRolesAsync(user);
+                    item.userRole = role[0];
+                }
+                response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.Comments.Where(x => x.PostId == PostId).CountAsync() / pagesize));
+                response.CurrentPage = pagenum;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                ResponseVM<CommentVM> response = new ResponseVM<CommentVM>();
+                response.errormsg = ex.Message;
+                return response;
+            }
+        }
+      
+
     }
 }

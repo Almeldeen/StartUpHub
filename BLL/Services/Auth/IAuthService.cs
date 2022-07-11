@@ -13,5 +13,7 @@ namespace BLL.Services.Auth
         Task<AuthModel> LoginAsync(LoginVM model);
         Task<bool> IsloggedAsync();
         Task<Account_VM> AccountAsync();
+        public Task<bool> ChangePassword(string newPassword, string oldPassword);
+
     }
 }

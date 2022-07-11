@@ -72,5 +72,22 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("GetJopDetails")]
+        public async Task<IActionResult> GetJopDetails(int jopId)
+        {
+            try
+            {
+                var res = await services.GetJopDetails(jopId);
+                if (res != null)
+                {
+                    return Ok(res);
+                }
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

@@ -12,6 +12,7 @@ namespace DAL.Models
     {
         public int Id { get; set; }
         public int Rate { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
         public string Content { get; set; }
         [ForeignKey("PostId")]
         public int PostId { get; set; }
@@ -19,6 +20,7 @@ namespace DAL.Models
         [ForeignKey("UserId")]
         public string UserId { get; set; }
         public virtual ApplicationUser User { get; set; }
+        public List<CommentRate> commentRates { get; set; }
 
     }
 }

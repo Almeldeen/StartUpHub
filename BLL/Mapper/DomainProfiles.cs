@@ -25,6 +25,8 @@ namespace BLL.Mapper
             CreateMap<InternApplaied, InternApplaied_VM>();
             CreateMap<Comment, CommentVM>();
             CreateMap<CommentVM, Comment>();
+            CreateMap<Notifications, NotificationVM>();
+            CreateMap<NotificationVM, Notifications>();
         }
         
     }

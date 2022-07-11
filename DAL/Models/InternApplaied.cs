@@ -11,7 +11,7 @@ namespace DAL.Models
    public class InternApplaied
     {
         
-        public byte State { get; set; }
+        public string State { get; set; }
         [ForeignKey("InternShipId")]
         public int InternShipId { get; set; }
         public virtual InternShip InternShip { get; set; }

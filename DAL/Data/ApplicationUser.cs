@@ -24,9 +24,15 @@ namespace DAL.Data
         public Intern Interen { get; set; }
         public List<Follow> FollowsSender { get; set; }
         public List<Follow> FollowsReceiver { get; set; }
+        public List<Notifications> ReciverNotifications { get; set; }
+        public List<Chat> ChatSender { get; set; }
+        public List<Chat> ChatReceiver { get; set; }
         [ForeignKey("FieldId")]
         public int? FieldId { get; set; }
         public virtual Field Field { get; set; }
+        public virtual List<Post> Posts { get; set; }
+   
+
         //public List<RefreshToken>? RefreshTokens { get; set; }
 
     }

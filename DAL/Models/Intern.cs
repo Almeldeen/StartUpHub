@@ -15,7 +15,7 @@ namespace DAL.Models
         public string InternId { get; set; }
         public string CV { get; set; }
         public string College { get; set; }
-        public DateTime Birthday { get; set; }
+        public DateTime? Birthday { get; set; }
         public string Nationality { get; set; }
         public bool availableToWork { get; set; }
 

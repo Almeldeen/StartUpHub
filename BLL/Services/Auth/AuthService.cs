@@ -227,5 +227,18 @@ namespace BLL.Services.Auth
             }
 
         }
+
+        public async Task<bool> ChangePassword(string newPassword, string oldPassword)
+        {
+            var userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await userManager.FindByNameAsync(userId);
+            var res = await userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+            if (res.Succeeded)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }

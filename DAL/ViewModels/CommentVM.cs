@@ -9,10 +9,17 @@ namespace DAL.ViewModels
    public class CommentVM
     {
         public int Id { get; set; }
+        public int rating { get; set; }
         public string Content { get; set; }
-       
-        public int PostId { get; set; }
-       
-        public string UserId { get; set; }
+        public DateTimeOffset createDate { get; set; }
+        public string ratedByUser { get; set; }
+        public string userName { get; set; }
+        public string userId { get; set; }
+        public string userRole { get; set; }
+        public string jobTitle { get; set; }
+        public string userImg { get; set; }
+
+
     }
+
 }

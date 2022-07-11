@@ -17,6 +17,7 @@ namespace DAL.Models
 
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public DateTimeOffset Createdate { get; set; }
         public string Content { get; set; }
         [ForeignKey("FieldId")]
         public int FieldId { get; set; }

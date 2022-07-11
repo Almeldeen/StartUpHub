@@ -9,7 +9,12 @@ namespace BLL.Services.Followers
 {
     public interface IFollowersService
     {
-        public Task<List<Follower_VM>> Followers( );
-        public Task<List<Follower_VM>> Following( );
+        public Task<ResponseVM<Follower_VM>> Followers(int pagenum, int pagesize);
+        public Task<ResponseVM<Follower_VM>> Following(int pagenum, int pagesize);
+        public Task<bool> SendFollow(string ReciveId);
+        public Task<bool> FollowBack(string ReciveId);
+        public Task<bool> UnFollow(string ReciveId);
+        public Task<ResponseVM<Follower_VM>> GetPeopleToFollow(int pagenum, int pagesize);
+
     }
 }

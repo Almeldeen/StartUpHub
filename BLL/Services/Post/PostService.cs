@@ -22,17 +22,28 @@ namespace BLL.Services.Post
         }
         public async Task<PostVM> AddPostAsync(PostVM Post)
         {
-            if (Post.PostImage.Count>0)
+            try
             {
-                Post.PostImagePath = new List<string>();
-                foreach (var item in Post.PostImage)
+                if (Post.PostImage != null/*|Post.PostImage.Count>0*/)
                 {
-                    string FileName = await SaveFiles.SaveFileAsync(item, FilePath.ImagePost);
-                    string path = httpContextAccessor.HttpContext.Request.Host.Value + "/IMGsPosts/" + FileName;                    
-                    Post.PostImagePath.Add(path);
+                    Post.PostImagePath = new List<string>();
+                    foreach (var item in Post.PostImage)
+                    {
+                        string FileName = await SaveFiles.SaveFileAsync(item, FilePath.ImagePost);
+                        string path = httpContextAccessor.HttpContext.Request.Host.Value + "/IMGsPosts/" + FileName;
+                        Post.PostImagePath.Add(path);
+                    }
                 }
-            }           
-            return await repo.AddPostAsync(Post);
+                return await repo.AddPostAsync(Post);
+            }
+            catch (Exception ex)
+            {
+
+                var p = new PostVM();
+                //p.error = ex.Message;
+                return p;
+            }
+
         }
 
         public async Task<int> DeletePostAsync(int id)
@@ -42,18 +53,44 @@ namespace BLL.Services.Post
 
         public async Task<PostVM> EditPostAsync(PostVM Post)
         {
-            return await repo.EditPostAsync(Post);
+            try
+            {
+                if (Post.PostImage != null)
+                {
+                    Post.PostImagePath = new List<string>();
+                    foreach (var item in Post.PostImage)
+                    {
+                        string FileName = await SaveFiles.SaveFileAsync(item, FilePath.ImagePost);
+                        string path = httpContextAccessor.HttpContext.Request.Host.Value + "/IMGsPosts/" + FileName;
+                        Post.PostImagePath.Add(path);
+                    }
+                }
+                return await repo.EditPostAsync(Post);
+            }
+            catch (Exception ex)
+            {
+
+                var p = new PostVM();
+                //p.error = ex.Message;
+                return p;
+            }
+         
         }
 
-        public async Task<ResponseVM<PostVM>> GetAllPostAsync(int pagenum, int pagesize)
+        public async Task<TimeLineVM> GetAllPostAsync(int pagenum, int pagesize)
         {
             return await repo.GetAllPostAsync(pagenum, pagesize);
         }
-        public async Task<ResponseVM<PostVM>> GetUserPostsAsync(int pagenum, int pagesize)
+        public async Task<ResponseVM<PostVM>> GetUserPostsAsync(string userId, int pagenum, int pagesize)
         {
-            return await repo.GetUserPostsAsync(pagenum, pagesize);
+            return await repo.GetUserPostsAsync(userId,pagenum, pagesize);
         }
+        public async Task<ResponseVM<CommentVM>> GetPostComment(int PostId, int pagenum, int pagesize)
+        {
+            return await repo.GetPostComment(PostId,pagenum, pagesize);
 
+        }
+       
         public async Task<PostVM> GetByIdPostAsync(int id)
         {
             return await repo.GetByIdPostAsync(id);
@@ -81,10 +118,10 @@ namespace BLL.Services.Post
 
         public async Task<int> DeletComment(int commentId, int PostId)
         {
-            return await repo.DeletComment(PostId, commentId);
+            return await repo.DeletComment(commentId,PostId);
         }
 
-        public async Task<int> RateComment(int commentId, int PostId, char type)
+        public async Task<int> RateComment(int commentId, int PostId, string type)
         {
             return await repo.RateComment(commentId,PostId, type);
         }

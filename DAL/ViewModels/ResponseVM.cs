@@ -11,6 +11,7 @@ namespace DAL.ViewModels
         public IEnumerable<T> Data { get; set; }
         public int TotalPages { get; set; }
         public int CurrentPage { get; set; }
+        public string errormsg { get; set; }
     }
    
 }

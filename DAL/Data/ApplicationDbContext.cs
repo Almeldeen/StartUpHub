@@ -16,6 +16,7 @@ namespace DAL.Data
 
         }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<CommentRate> commentRates { get; set; }
         public DbSet<Education> Educations { get; set; }
         public DbSet<Experience> Experiences { get; set; }
         public DbSet<Follow> Follows { get; set; }
@@ -32,6 +33,8 @@ namespace DAL.Data
         public DbSet<Ratting> Rattings { get; set; }     
         public DbSet<InternApplaied> InternApplaieds { get; set; }
         public DbSet<ImagePosts> ImagePosts { get; set; }
+        public DbSet<Chat> Chats { get; set; }
+        public DbSet<Notifications> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -47,6 +50,9 @@ namespace DAL.Data
             builder.Entity<InternApplaiedQAnswers>()
               .HasKey(b => new { b.QId, b.InternId,b.InternShipId })
               .HasName("PK_InternApplaiedQAnswers");
+            builder.Entity<CommentRate>()
+              .HasKey(b => new { b.UserId,b.CommentId })
+              .HasName("PK_CommentRate");
             builder.Entity<Intern>()
                  .HasMany(d => d.Skills)
                  .WithMany(x => x.Interens)
@@ -106,6 +112,15 @@ namespace DAL.Data
             builder.Entity<Follow>()
                .HasOne(f => f.FollowReceiver)
                .WithMany(f => f.FollowsSender);
+            builder.Entity<Chat>()
+                .HasOne(f => f.Sender)
+                .WithMany(f => f.ChatReceiver);
+            builder.Entity<Chat>()
+               .HasOne(f => f.Reciver)
+               .WithMany(f => f.ChatSender);
+            builder.Entity<Notifications>()
+             .HasOne(f => f.Reciver)
+             .WithMany(f => f.ReciverNotifications);
             builder.Entity<InternApplaiedQAnswers>()
                  .HasOne(f => f.InternApplaied)
                  .WithMany(f => f.internApplaiedQAnswers);

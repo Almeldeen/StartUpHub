@@ -25,10 +25,10 @@ namespace API.Controllers
         }
 
         [HttpGet("get-profile")]
-        public async Task<IActionResult> GetProfile()
+        public async Task<IActionResult> GetProfile(string userId)
         {
 
-            var result = await _internService.GetProfile();
+            var result = await _internService.GetProfile(userId);
             if (result != null)
             {
                 return Ok(result);
@@ -111,7 +111,17 @@ namespace API.Controllers
             {
                 return Ok(result);
             }
-            return BadRequest();
+            return BadRequest(result);
+        }
+        [HttpGet("simple-stats")]
+        public async Task<IActionResult> SimpleStats()
+        {
+            var result = await _internService.SimpleStats();
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
         }
     }
 }

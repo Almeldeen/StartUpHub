@@ -14,6 +14,7 @@ namespace DAL.ViewModels
         public int PostId { get; set; }
         [JsonProperty("content")]
         public string Content { get; set; }
+        public string userRole { get; set; }
         [JsonIgnore]
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public List<IFormFile> PostImage { get; set; }
@@ -33,10 +34,13 @@ namespace DAL.ViewModels
         public string UserImg { get; set; }
         [JsonProperty("userJobTitle")]
         public string UserJobTitle { get; set; }
-        public int createdDate { get; set; }
+        public DateTimeOffset createdDate { get; set; }
 
-
-        public List<PostLikesVM> likes { get; set; }
+        public int likesCount { get; set; }
+        public int commentsCount { get; set; }
+        public bool likedByUser { get; set; }
+        public string postType { get; set; }
+        //public List<PostLikesVM> likes { get; set; }
         //public  List<string> Comments { get; set; }
     }
 }

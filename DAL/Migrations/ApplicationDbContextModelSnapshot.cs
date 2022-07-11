@@ -50,7 +50,7 @@ namespace DAL.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("FieldId")
+                    b.Property<int?>("FieldId")
                         .HasColumnType("int");
 
                     b.Property<string>("FullName")
@@ -103,7 +103,8 @@ namespace DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FieldId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[FieldId] IS NOT NULL");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -116,6 +117,34 @@ namespace DAL.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("DAL.Models.Chat", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ReciverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SenderId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReciverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Chats");
+                });
+
             modelBuilder.Entity("DAL.Models.Comment", b =>
                 {
                     b.Property<int>("Id")
@@ -126,7 +155,13 @@ namespace DAL.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rate")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
@@ -139,6 +174,25 @@ namespace DAL.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("DAL.Models.CommentRate", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("CommentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RateType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "CommentId")
+                        .HasName("PK_CommentRate");
+
+                    b.HasIndex("CommentId");
+
+                    b.ToTable("commentRates");
                 });
 
             modelBuilder.Entity("DAL.Models.Education", b =>
@@ -258,7 +312,7 @@ namespace DAL.Migrations
                     b.Property<string>("InternId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("Birthday")
+                    b.Property<DateTime?>("Birthday")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CV")
@@ -296,8 +350,8 @@ namespace DAL.Migrations
                     b.Property<int>("InternShipId")
                         .HasColumnType("int");
 
-                    b.Property<byte>("State")
-                        .HasColumnType("tinyint");
+                    b.Property<string>("State")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("InternId", "InternShipId");
 
@@ -337,6 +391,9 @@ namespace DAL.Migrations
 
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("Createdate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
@@ -435,6 +492,43 @@ namespace DAL.Migrations
                     b.ToTable("Likes");
                 });
 
+            modelBuilder.Entity("DAL.Models.Notifications", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("JopId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ReciverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SenderId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReciverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("DAL.Models.Post", b =>
                 {
                     b.Property<int>("PostId")
@@ -445,8 +539,8 @@ namespace DAL.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CteatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("CteatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("FieldId")
                         .HasColumnType("int");
@@ -638,11 +732,24 @@ namespace DAL.Migrations
                 {
                     b.HasOne("DAL.Models.Field", "Field")
                         .WithOne("User")
-                        .HasForeignKey("DAL.Data.ApplicationUser", "FieldId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DAL.Data.ApplicationUser", "FieldId");
 
                     b.Navigation("Field");
+                });
+
+            modelBuilder.Entity("DAL.Models.Chat", b =>
+                {
+                    b.HasOne("DAL.Data.ApplicationUser", "Reciver")
+                        .WithMany("ChatSender")
+                        .HasForeignKey("ReciverId");
+
+                    b.HasOne("DAL.Data.ApplicationUser", "Sender")
+                        .WithMany("ChatReceiver")
+                        .HasForeignKey("SenderId");
+
+                    b.Navigation("Reciver");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("DAL.Models.Comment", b =>
@@ -658,6 +765,25 @@ namespace DAL.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DAL.Models.CommentRate", b =>
+                {
+                    b.HasOne("DAL.Models.Comment", "Comment")
+                        .WithMany("commentRates")
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DAL.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
 
                     b.Navigation("User");
                 });
@@ -840,6 +966,21 @@ namespace DAL.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("DAL.Models.Notifications", b =>
+                {
+                    b.HasOne("DAL.Data.ApplicationUser", "Reciver")
+                        .WithMany("ReciverNotifications")
+                        .HasForeignKey("ReciverId");
+
+                    b.HasOne("DAL.Data.ApplicationUser", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId");
+
+                    b.Navigation("Reciver");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("DAL.Models.Post", b =>
                 {
                     b.HasOne("DAL.Models.Field", "Field")
@@ -849,7 +990,7 @@ namespace DAL.Migrations
                         .IsRequired();
 
                     b.HasOne("DAL.Data.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("Posts")
                         .HasForeignKey("UserId");
 
                     b.Navigation("Field");
@@ -930,11 +1071,24 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.Data.ApplicationUser", b =>
                 {
+                    b.Navigation("ChatReceiver");
+
+                    b.Navigation("ChatSender");
+
                     b.Navigation("FollowsReceiver");
 
                     b.Navigation("FollowsSender");
 
                     b.Navigation("Interen");
+
+                    b.Navigation("Posts");
+
+                    b.Navigation("ReciverNotifications");
+                });
+
+            modelBuilder.Entity("DAL.Models.Comment", b =>
+                {
+                    b.Navigation("commentRates");
                 });
 
             modelBuilder.Entity("DAL.Models.Field", b =>

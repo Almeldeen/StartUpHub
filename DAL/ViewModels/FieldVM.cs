@@ -8,7 +8,7 @@ namespace DAL.ViewModels
 {
     public class FieldVM
     {
-        public int FieldId { get; set; }
+        public int? FieldId { get; set; }
         public string FieldName { get; set; }
         
     }

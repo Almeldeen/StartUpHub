@@ -17,9 +17,10 @@ namespace DAL.Reproisitry.PostRepos
         public Task<CommentVM> Comment(int PostId,string Cotent);
         public Task<CommentVM> EditComment(int PostId, int commentId, string Cotent);
         public Task<int> DeletComment(int commentId,int PostId);
-        public Task<int> RateComment(int commentId,int PostId, char type);
+        public Task<int> RateComment(int commentId,int PostId, string type);
         public Task<PostVM> GetByIdPostAsync(int id);
-        public Task<ResponseVM<PostVM>> GetAllPostAsync(int pagenum, int pagesize);
-        public Task<ResponseVM<PostVM>> GetUserPostsAsync(int pagenum, int pagesize);
+        public Task<TimeLineVM> GetAllPostAsync(int pagenum, int pagesize);
+        public Task<ResponseVM<PostVM>> GetUserPostsAsync(string userId, int pagenum, int pagesize);
+        public Task<ResponseVM<CommentVM>> GetPostComment(int PostId, int pagenum, int pagesize);
     }
 }

@@ -12,5 +12,8 @@ namespace DAL.ViewModels
         public string name { get; set; }
         public string img { get; set; }
         public string jobTitle { get; set; }
+        public string userRole { get; set; }
+        public bool followedMe { get; set; }
+        public bool followedHim { get; set; }
     }
 }

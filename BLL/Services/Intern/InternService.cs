@@ -25,23 +25,34 @@ namespace BLL.Services.Intern
             return await repo.AddInternApplaied(internApplaied);
         }
 
+     
+
         public async Task<string> ChangePhoto(IFormFile image, string type)
         {
-            string Path = string.Empty;
-            if (type == "Profile")
+            try
             {
-                string FileName = await SaveFiles.SaveFileAsync(image, FilePath.Profile);
-                 Path = httpContextAccessor.HttpContext.Request.Host.Value + "/ImagesProfile/" + FileName;
+                string Path = string.Empty;
+                if (type == "Profile")
+                {
+                    string FileName = await SaveFiles.SaveFileAsync(image, FilePath.Profile);
+                    Path = httpContextAccessor.HttpContext.Request.Host.Value + "/ImagesProfile/" + FileName;
+                }
+                else if (type == "Cover")
+                {
+                    string FileName = await SaveFiles.SaveFileAsync(image, FilePath.Cover);
+                    Path = httpContextAccessor.HttpContext.Request.Host.Value + "/ImagesCover/" + FileName;
+
+                }
+
+
+                return await repo.ChangePhoto(Path, type);
             }
-            else if (type == "Cover")
+            catch (Exception ex)
             {
-                string FileName = await SaveFiles.SaveFileAsync(image, FilePath.Cover);
-                Path = httpContextAccessor.HttpContext.Request.Host.Value + "/ImagesCover/" + FileName;
 
+                return ex.Message;
             }
-
-
-            return await repo.ChangePhoto(Path,type);
+           
 
         }
 
@@ -55,9 +66,9 @@ namespace BLL.Services.Intern
             return await repo.GetApplaiedJops();
         }
 
-        public async Task<InternProfile_VM> GetProfile()
+        public async Task<InternProfile_VM> GetProfile(string userId)
         {
-            return await repo.GetProfile();
+            return await repo.GetProfile(userId);
 
         }
         public async Task<bool> UpdateProfile(UpdateInternVM updateIntern)
@@ -67,8 +78,12 @@ namespace BLL.Services.Intern
                 string FileName = await SaveFiles.SaveFileAsync(updateIntern.CV, FilePath.CV);
                 updateIntern.CVPath = httpContextAccessor.HttpContext.Request.Host.Value + "/CVs/" + FileName;
             }
-                      
+           
             return await repo.UpdateProfile(updateIntern);
+        }
+        public async Task<internSimpleStatsVM> SimpleStats()
+        {
+            return await repo.SimpleStats();
         }
     }
 }

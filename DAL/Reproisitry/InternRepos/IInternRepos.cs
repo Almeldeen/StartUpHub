@@ -9,11 +9,12 @@ namespace DAL.Reproisitry.InternRepos
 {
     public interface IInternRepos
     {
-        public Task<InternProfile_VM> GetProfile( );
+        public Task<InternProfile_VM> GetProfile(string userId);
         public Task<InternApplaied_VM> AddInternApplaied(InternApplaied_VM internApplaied);
         public Task<List<InternApplaied_VM>> GetApplaiedJops();
         public Task<InternApplaied_VM> GetApllaiedJopById(int InternShipId);
         public  Task<bool> UpdateProfile(UpdateInternVM updateIntern);
         public  Task<string> ChangePhoto(string path , string type);
+        public  Task<internSimpleStatsVM> SimpleStats();
     }
 }

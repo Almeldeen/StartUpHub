@@ -42,7 +42,7 @@ namespace DAL.Reproisitry.JopRepo
                 {
                     return null;
                 }
-                if (jop.skillls.Count>0)
+                if (jop.skillls!=null)
                 {
                     List<InternShipSkils> jopskills = new List<InternShipSkils>();
                     foreach (var item in jop.skillls)
@@ -52,7 +52,7 @@ namespace DAL.Reproisitry.JopRepo
                     }
                     await db.InternShipSkils.AddRangeAsync(jopskills);
                 }
-                if (jop.questions.Count>0)
+                if (jop.questions!=null)
                 {
                     List<InternShipQuestions> internShipQuestions = new List<InternShipQuestions>();
                     foreach (var item in jop.questions)
@@ -120,6 +120,30 @@ namespace DAL.Reproisitry.JopRepo
         public async Task<List<JopVM>> GetAllJop()
         {
             var data = await db.InternShips.Select(a => new JopVM { id = a.InternShipId, title = a.title, startDate = a.StartDate, endDate = a.EndDate, content = a.Content, fieldId = a.Field.FieldId, fieldName = a.Field.FieldName, userId = a.User.Id, skillls = a.Skills.Select(a => new SkillsVM { SkillsId = a.SkillsId, Name = a.Name }).ToList(),questions=a.InternShipQuestions.Select(x=> new InternShipQuestionsVM { QId=x.QId,QContent=x.QContent}).ToList() }).ToListAsync();
+            return data;
+        }
+        public async Task<JopVM> GetJopDetails (int jopId)
+        {
+            var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userid = userManager.FindByNameAsync(username).Result.Id;
+            var data = await db.InternShips.Where(x=> x.InternShipId==jopId).Select(x => new JopVM 
+            {
+                content = x.Content,
+                skillls = x.Skills.Select(x => new SkillsVM { Name = x.Name }).ToList(),
+                fieldName = x.Field.FieldName,
+                endDate = x.EndDate,
+                startDate = x.StartDate,
+                companyName = x.User.FullName,
+                companyImg = x.User.ProfileImage,
+                companyJobTitle = x.User.jopTitile,
+                appliedCount = x.InternApplaieds.Count(),
+                postType = "jop".ToUpper(),
+                id = x.InternShipId,
+                questions = x.InternShipQuestions.Select(x => new InternShipQuestionsVM { QId = x.QId, QContent = x.QContent }).ToList(),
+                title = x.title,
+                userId = x.UserId,
+                appliedByUser=x.InternApplaieds.Any(x=> x.Intern.UserId==userid),
+            }).FirstOrDefaultAsync();
             return data;
         }
     }

@@ -92,10 +92,10 @@ namespace DAL.Reproisitry.InternRepos
                 }
                 return null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                return null;
+                return ex.Message;
             }
            
         }
@@ -106,7 +106,13 @@ namespace DAL.Reproisitry.InternRepos
             {
                 var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 var userid = userManager.FindByNameAsync(username).Result.Id;
-                var data = await db.InternApplaieds.Where(x => x.InternShipId == internShipId && x.InternId == userid).Select(x => new InternApplaied_VM { InterenId = x.InternId, InternShipId = x.InternShipId, State = x.State }).FirstOrDefaultAsync();
+                var data = await db.InternApplaieds.Where(x => x.InternShipId == internShipId && x.InternId == userid).Select(x => new InternApplaied_VM {                   
+                    InterenId = x.InternId,
+                    InternShipId = x.InternShipId,
+                    State = x.State,
+                    skills=x.InternShip.Skills.Select(x=> new SkillsVM {SkillsId=x.SkillsId,Name=x.Name }).ToList(),
+                    
+                }).FirstOrDefaultAsync();
                 return data;
             }
             catch (Exception ex)
@@ -125,39 +131,86 @@ namespace DAL.Reproisitry.InternRepos
             return data;
         }
 
-        public async Task<InternProfile_VM> GetProfile()
+        public async Task<InternProfile_VM> GetProfile(string userId)
         {
             try
             {
                 if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
                 {
+                    var data = new InternProfile_VM();
                     var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                    var userid = userManager.FindByNameAsync(username).Result.Id;
-                    var data = await db.Interns.Where(x => x.UserId == userid).Select(x => new InternProfile_VM
-                    {
-                        InterenId = x.InternId,
-                        followersCount = x.User.FollowsSender.Count(),
-                        followingCount = x.User.FollowsReceiver.Count(),
-                        about = x.User.Bio,
-                        address = x.User.Location,
-                        jobTitle = x.User.jopTitile,
-                        field=x.User.Field.FieldName,
-                        education = x.Educations.Select(x=> new Education_VM 
+                    var user = await userManager.FindByNameAsync(username);
+                    var role = await userManager.GetRolesAsync(user);
+                    if (userId==null)
+                    {                     
+                         data = await db.Interns.Where(x => x.UserId == user.Id).Select(x => new InternProfile_VM
                         {
-                           degree=x.Degree,
-                           educationID=x.EducationID,
-                           endDate=x.EndDate,
-                           interenId=x.InternId,
-                           fieldOfStudy=x.FieldOfStudy,
-                           school=x.School,
-                           startDate=x.StartDate,
-                           studentActivities=x.StudentActivities,
-                        }).ToList(),
-                        skills = x.Skills.Select(x=> new SkillsVM {SkillsId=x.SkillsId,Name=x.Name }).ToList(),                        
-                        availableToWork=x.availableToWork,
-                        birthdate = x.Birthday,
-                        CV=x.CV,
-                    }).FirstOrDefaultAsync();
+                            InterenId = x.InternId,
+                            followersCount = x.User.FollowsSender.Count(),
+                            followingCount = x.User.FollowsReceiver.Count(),
+                            about = x.User.Bio,
+                            address = x.User.Location,
+                            jobTitle = x.User.jopTitile,
+                            field =new FieldVM {FieldId=x.User.FieldId,FieldName=x.User.Field.FieldName },
+                             mobile = x.User.PhoneNumber,
+                             FullName = x.User.FullName,
+                            UserImg=x.User.ProfileImage,
+                            userRole=role[0],
+                            education = x.Educations.Select(x => new Education_VM
+                            {
+                                degree = x.Degree,
+                                educationID = x.EducationID,
+                                endDate = x.EndDate,
+                                interenId = x.InternId,
+                                fieldOfStudy = x.FieldOfStudy,
+                                school = x.School,
+                                startDate = x.StartDate,
+                                studentActivities = x.StudentActivities,
+                            }).FirstOrDefault(),
+                            skills = x.Skills.Select(x => new SkillsVM { SkillsId = x.SkillsId, Name = x.Name }).ToList(),
+                            availableToWork = x.availableToWork,
+                            birthdate = x.Birthday,
+                            CV = x.CV,
+                            coverImg = x.User.CoverImage,
+                        }).FirstOrDefaultAsync();
+                    }
+                    else
+                    {
+                        
+                        data = await db.Interns.Where(x => x.UserId == userId).Select(x => new InternProfile_VM
+                        {
+                            InterenId = x.InternId,
+                            followersCount = x.User.FollowsSender.Count(),
+                            followingCount = x.User.FollowsReceiver.Count(),
+                            about = x.User.Bio,
+                            address = x.User.Location,
+                            jobTitle = x.User.jopTitile,
+                            mobile=x.User.PhoneNumber,
+                            field = new FieldVM { FieldId = x.User.FieldId, FieldName = x.User.Field.FieldName },
+                            FullName = x.User.FullName,
+                             UserImg = x.User.ProfileImage,
+                             followedHim=x.User.FollowsSender.Any(a=> a.FollowSenderId==user.Id),
+                             followedMe=x.User.FollowsReceiver.Any(a=> a.FollowReceiverId==user.Id),
+                             userRole = role[0],
+                             education = x.Educations.Select(x => new Education_VM
+                            {
+                                degree = x.Degree,
+                                educationID = x.EducationID,
+                                endDate = x.EndDate,
+                                interenId = x.InternId,
+                                fieldOfStudy = x.FieldOfStudy,
+                                school = x.School,
+                                startDate = x.StartDate,
+                                studentActivities = x.StudentActivities,
+                            }).FirstOrDefault(),
+                            skills = x.Skills.Select(x => new SkillsVM { SkillsId = x.SkillsId, Name = x.Name }).ToList(),
+                            availableToWork = x.availableToWork,
+                            birthdate = x.Birthday,
+                            CV = x.CV,
+                            coverImg = x.User.CoverImage,
+                        }).FirstOrDefaultAsync();
+                    }
+                  
                     return data;
                 }
                 return null;
@@ -180,21 +233,24 @@ namespace DAL.Reproisitry.InternRepos
                 {
                     var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                     var user = await userManager.FindByNameAsync(username);
-                    user.Email = updateIntern.email;
-                    user.Bio = updateIntern.about;
+                    user.Email = updateIntern.email==null?user.Email:updateIntern.email;
+                    user.Bio = updateIntern.about==null?user.Bio:updateIntern.about;
                     user.Location = updateIntern.address;
                     user.jopTitile = updateIntern.jobTitle;
-                    user.FieldId = updateIntern.fields;
+                    user.FieldId = updateIntern.fieldId;
+                    user.PhoneNumber = updateIntern.mobile;
+                    user.FullName = updateIntern.fullName==null?user.FullName:updateIntern.fullName;
                     var result = await userManager.UpdateAsync(user);
                     if (!result.Succeeded)
                     {
                         return false;
                     }
                     var intern = await db.Interns.Where(x => x.UserId == user.Id).FirstOrDefaultAsync();
+
                     intern.Birthday =updateIntern.birthdate;
                     intern.availableToWork =updateIntern.availableToWork;
                     intern.CV = updateIntern.CVPath;
-                    if (updateIntern.skills.Count > 0)
+                    if (updateIntern.skills!=null)
                     {
                         var skils = await db.InternSkills.Where(x => x.Intern.UserId == user.Id).ToListAsync();
                     if (skils!=null)
@@ -206,12 +262,12 @@ namespace DAL.Reproisitry.InternRepos
                         List<InternSkills> internSkills = new List<InternSkills>();
                         foreach (var item in updateIntern.skills)
                         {
-                            internSkills.Add(new InternSkills { InternId = intern.InternId, SkillsId = item });
+                            internSkills.Add(new InternSkills { InternId = intern.InternId, SkillsId = (int)item });
                         }
                         await db.InternSkills.AddRangeAsync(internSkills);
                     }
 
-                    if (updateIntern.education.Count>0)
+                    if (updateIntern.education!=null)
                     {
                         var edu = await db.Educations.Where(x => x.Intern.UserId == user.Id).ToListAsync();
                         if (edu != null)
@@ -250,6 +306,20 @@ namespace DAL.Reproisitry.InternRepos
 
                 return false;
             }
+        }
+        public async Task<internSimpleStatsVM> SimpleStats()
+        {
+            var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await userManager.FindByNameAsync(username);
+            var data = await db.Interns.Where(x => x.UserId == user.Id).Select(x => new internSimpleStatsVM
+            {
+                articleCount =x.User.Posts.Count(),
+                followers = x.User.FollowsReceiver.Count(),
+                following = x.User.FollowsSender.Count(),
+                jobTitle = x.User.jopTitile,
+                internshipRequests = x.InternApplaieds.Count(),
+            }).FirstOrDefaultAsync();
+            return data;
         }
     }
 }

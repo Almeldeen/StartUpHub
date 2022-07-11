@@ -18,8 +18,9 @@ namespace BLL.Services.Post
         public Task<CommentVM> Comment(int PostId, string Cotent);
         public Task<CommentVM> EditComment(int PostId, int commentId, string Cotent);
         public Task<int> DeletComment(int commentId, int PostId);
-        public Task<int> RateComment(int commentId, int PostId, char type);
-        public Task<ResponseVM<PostVM>> GetAllPostAsync(int pagenum,int pagesize);
-        public Task<ResponseVM<PostVM>> GetUserPostsAsync(int pagenum, int pagesize);
+        public Task<int> RateComment(int commentId, int PostId, string type);
+        public Task<TimeLineVM> GetAllPostAsync(int pagenum,int pagesize);
+        public Task<ResponseVM<PostVM>> GetUserPostsAsync(string userId,int pagenum, int pagesize);
+        public Task<ResponseVM<CommentVM>> GetPostComment(int PostId, int pagenum, int pagesize);
     }
 }

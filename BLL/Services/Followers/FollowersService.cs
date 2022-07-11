@@ -17,14 +17,32 @@ namespace BLL.Services.Followers
             this.repo = repo;
         }
 
-        public Task<List<Follower_VM>> Followers( )
+        public async Task<ResponseVM<Follower_VM>> Followers(int pagenum, int pagesize)
         {
-            return repo.Followers();
+            return await repo.Followers(pagenum, pagesize);
         }
 
-        public Task<List<Follower_VM>> Following( )
+        public async Task<ResponseVM<Follower_VM>> Following(int pagenum, int pagesize)
         {
-            return repo.Following();
+            return await repo.Following(pagenum, pagesize);
+        }
+        public async Task<ResponseVM<Follower_VM>> GetPeopleToFollow(int pagenum, int pagesize)
+        {
+            return await repo.GetPeopleToFollow(pagenum,pagesize);
+        }
+        public async Task<bool> SendFollow(string ReciveId)
+        {
+            return await repo.SendFollow(ReciveId);
+        }
+        public async Task<bool> FollowBack(string ReciveId)
+        {
+            return await repo.FollowBack(ReciveId);
+
+        }
+        public async Task<bool> UnFollow(string ReciveId)
+        {
+            return await repo.UnFollow(ReciveId);
+
         }
     }
 }

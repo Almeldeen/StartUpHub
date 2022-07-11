@@ -129,6 +129,20 @@ namespace API.Controllers
                 return BadRequest();
             }
         }
+        [HttpPost("ChangePassword")]
+        public async Task<IActionResult> ChangePassword(string newPassword, string oldPassword)
+        {
+            var result = await _authService.ChangePassword(newPassword, oldPassword);
+            if (result)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
 
 
     }
