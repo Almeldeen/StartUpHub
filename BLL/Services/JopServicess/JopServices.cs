@@ -36,5 +36,10 @@ namespace BLL.Services.JopServicess
             return await repo.GetJopDetails(jopId);
 
         }
+
+        public async Task<List<JopVM>> SearchJop(string name)
+        {
+            return await repo.SearchJop( name);
+        }
     }
 }

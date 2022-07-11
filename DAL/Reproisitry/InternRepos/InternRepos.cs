@@ -67,8 +67,8 @@ namespace DAL.Reproisitry.InternRepos
 
                 return null;
             }
-           
-           
+
+
         }
 
         public async Task<string> ChangePhoto(string path, string type)
@@ -97,7 +97,7 @@ namespace DAL.Reproisitry.InternRepos
 
                 return ex.Message;
             }
-           
+
         }
 
         public async Task<InternApplaied_VM> GetApllaiedJopById(int internShipId)
@@ -120,14 +120,14 @@ namespace DAL.Reproisitry.InternRepos
 
                 return null;
             }
-           
+
         }
 
         public async Task<List<InternApplaied_VM>> GetApplaiedJops()
         {
             var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var userId = userManager.FindByNameAsync(username).Result.Id;
-            var data = await db.InternApplaieds.Where(x => x.InternId == userId).Select(x => new InternApplaied_VM {  InterenId = x.InternId, InternShipId = x.InternShipId, State = x.State }).ToListAsync();
+            var data = await db.InternApplaieds.Where(x => x.InternId == userId).Select(x => new InternApplaied_VM { InterenId = x.InternId, InternShipId = x.InternShipId, State = x.State }).ToListAsync();
             return data;
         }
 
@@ -225,6 +225,39 @@ namespace DAL.Reproisitry.InternRepos
 
         }
 
+        public async Task<List<ApplicationUser>> SearchUser(string name)
+        {
+            var data = await db.Users.Where(w => w.UserName.Contains(name) || w.FullName.Contains(name)).ToListAsync();
+            return data;
+        }
+
+        public async Task<InternApplaied_VM> UpdateInternApplaied(InternApplaied_VM internApplaied)
+        {
+            try
+            {
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var userid = userManager.FindByNameAsync(username).Result.Id;
+                var data = mapper.Map<InternApplaied>(internApplaied);
+                data.InternId = userid;
+                var oldInternApplaied = await db.InternApplaieds.Where(w => w.InternId == userid && w.InternShipId == internApplaied.InternShipId).SingleOrDefaultAsync();
+                data.internApplaiedQAnswers = oldInternApplaied.internApplaiedQAnswers;
+                db.Entry(data).State = EntityState.Modified;
+                var res = await db.SaveChangesAsync();
+                if (res > 0)
+                {
+                    return internApplaied;
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
         public async Task<bool> UpdateProfile(UpdateInternVM updateIntern)
         {
             try
@@ -253,12 +286,12 @@ namespace DAL.Reproisitry.InternRepos
                     if (updateIntern.skills!=null)
                     {
                         var skils = await db.InternSkills.Where(x => x.Intern.UserId == user.Id).ToListAsync();
-                    if (skils!=null)
-                    {
-                        db.InternSkills.RemoveRange(skils);
-                        await db.SaveChangesAsync();
-                    }
-                    
+                        if (skils != null)
+                        {
+                            db.InternSkills.RemoveRange(skils);
+                            await db.SaveChangesAsync();
+                        }
+
                         List<InternSkills> internSkills = new List<InternSkills>();
                         foreach (var item in updateIntern.skills)
                         {
@@ -291,7 +324,7 @@ namespace DAL.Reproisitry.InternRepos
                         }
                         await db.Educations.AddRangeAsync(educations);
                     }
-                    
+
                     int res = await db.SaveChangesAsync();
                     if (res > 0)
                     {

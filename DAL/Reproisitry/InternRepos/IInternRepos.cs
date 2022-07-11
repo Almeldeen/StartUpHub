@@ -23,5 +23,7 @@ namespace DAL.Reproisitry.InternRepos
         public Task<InternApplaied_VM> UpdateInternApplaied(InternApplaied_VM internApplaied);
         public Task<List<ApplicationUser>> SearchUser(string name);
 
+        public Task<InternApplaied_VM> UpdateInternApplaied(InternApplaied_VM internApplaied);
+        public Task<List<ApplicationUser>> SearchUser(string name);
     }
 }

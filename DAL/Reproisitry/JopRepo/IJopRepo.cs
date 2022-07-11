@@ -14,6 +14,7 @@ namespace DAL.Reproisitry.JopRepo
         public Task<List<JopVM>> GetAllJop();
         public Task<List<InternAppliedCompanyVM>> GetAllAppliedIntern( int internshipid);
         public  Task<JopVM> GetJopDetails(int jopId);
+        public Task<List<JopVM>> SearchJop(string name);
 
     }
 }

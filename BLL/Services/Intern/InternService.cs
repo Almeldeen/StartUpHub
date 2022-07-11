@@ -1,4 +1,5 @@
 ﻿using BLL.Helper;
+using DAL.Data;
 using DAL.Reproisitry.InternRepos;
 using DAL.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -71,6 +72,17 @@ namespace BLL.Services.Intern
             return await repo.GetProfile(userId);
 
         }
+
+        public async Task<List<ApplicationUser>> SearchUser(string name)
+        {
+            return await repo.SearchUser( name);
+        }
+
+        public async Task<InternApplaied_VM> UpdateInternApplaied(InternApplaied_VM internApplaied)
+        {
+            return await repo.UpdateInternApplaied(internApplaied);
+        }
+
         public async Task<bool> UpdateProfile(UpdateInternVM updateIntern)
         {
             if (updateIntern.CV!=null)

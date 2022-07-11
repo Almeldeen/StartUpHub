@@ -146,5 +146,11 @@ namespace DAL.Reproisitry.JopRepo
             }).FirstOrDefaultAsync();
             return data;
         }
+
+        public async Task<List<JopVM>> SearchJop(string name)
+        {
+            var data = await db.InternShips.Where(w => w.title.Contains(name)).Select(w => mapper.Map<JopVM>(w)).ToListAsync();
+            return data;
+        }
     }
 }

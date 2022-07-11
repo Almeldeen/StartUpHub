@@ -13,5 +13,6 @@ namespace BLL.Services.JopServicess
         public Task<int> DeleteJop(int id);
         public Task<List<JopVM>> GetAllJop();
         public Task<JopVM> GetJopDetails(int jopId);
+        public Task<List<JopVM>> SearchJop(string name);
     }
 }
