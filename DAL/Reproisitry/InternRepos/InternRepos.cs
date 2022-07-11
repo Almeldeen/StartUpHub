@@ -355,14 +355,6 @@ namespace DAL.Reproisitry.InternRepos
             return data;
         }
 
-        public Task<InternApplaied_VM> UpdateInternApplaied(InternApplaied_VM internApplaied)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<ApplicationUser>> SearchUser(string name)
-        {
-            throw new NotImplementedException();
-        }
+      
     }
 }
