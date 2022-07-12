@@ -25,5 +25,6 @@ namespace DAL.Reproisitry.InternRepos
 
         public Task<bool> CancelRequest(int InternShipId);
         public  Task<ResponseVM<JopVM>> SearchJobs(int? fieldid, int page, int pageSize);
+
     }
 }

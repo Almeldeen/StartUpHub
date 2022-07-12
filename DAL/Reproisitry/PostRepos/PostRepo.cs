@@ -198,9 +198,12 @@ namespace DAL.Reproisitry.PostRepos
                         }).OrderByDescending(x => x.createdDate).ToListAsync();
                         listdata.Posts.AddRange(data);
                     }
+                    var rnd = new Random();
+                    listdata.Posts = listdata.Posts.OrderByDescending(x => x.likesCount).Skip(4 * (pagenum - 1)).Take(4).OrderBy(item => rnd.Next()).ToList();
+                    int pgsize = 4 - (listdata.Posts.Count() - 1);
                     if (User.FieldId!=null)
                     {
-                        listdata.Jops = await db.InternShips.Where(x => x.FieldId == User.FieldId).OrderByDescending(x => x.Createdate).Skip(1 * (pagenum - 1)).Take(1).Select(x => new JopVM
+                        listdata.Jops = await db.InternShips.Where(x => x.FieldId == User.FieldId).OrderByDescending(x => x.Createdate).Skip(pgsize * (pagenum - pgsize)).Take(pgsize).Select(x => new JopVM
                         {
                             content = x.Content,
                             skillls = x.Skills.Select(x => new SkillsVM { Name = x.Name }).ToList(),
@@ -220,7 +223,8 @@ namespace DAL.Reproisitry.PostRepos
                     }
                     else
                     {
-                        listdata.Jops = await db.InternShips.OrderByDescending(x => x.Createdate).Skip(1 * (pagenum - 1)).Take(1).Select(x => new JopVM
+                       
+                        listdata.Jops = await db.InternShips.OrderByDescending(x => x.Createdate).Skip(pgsize * (pagenum - pgsize)).Take(pgsize).Select(x => new JopVM
                         {
                             content = x.Content,
                             skillls = x.Skills.Select(x => new SkillsVM { Name = x.Name }).ToList(),
@@ -247,8 +251,7 @@ namespace DAL.Reproisitry.PostRepos
                         var role = await userMangger.GetRolesAsync(user);
                         item.userRole = role[0];
                     }
-                    var rnd = new Random();
-                    listdata.Posts = listdata.Posts.OrderByDescending(x=> x.likesCount).Skip(4 * (pagenum - 1)).Take(4).OrderBy(item => rnd.Next()).ToList();
+                   
                     if (postcount>0)
                     {
                         listdata.TotalPages = Convert.ToInt32(Math.Ceiling((double)postcount / pagesize));

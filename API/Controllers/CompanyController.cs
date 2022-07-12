@@ -120,5 +120,27 @@ namespace API.Controllers
             }
             return BadRequest(result);
         }
+        [Authorize(Roles = "COMPANY")]
+        [HttpGet("simple-stats")]
+        public async Task<IActionResult> SimpleStats()
+        {
+            var result = await services.SimpleStats();
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+        [Authorize(Roles = "COMPANY")]
+        [HttpGet("GetApllaiedJopById")]
+        public async Task<IActionResult> GetApllaiedJopById(int internShipId, string internId)
+        {
+            var result = await services.GetApllaiedJopById(internShipId, internId);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
     }
 }

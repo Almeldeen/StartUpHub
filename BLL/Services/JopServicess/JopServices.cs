@@ -36,6 +36,10 @@ namespace BLL.Services.JopServicess
             return await repo.GetJopDetails(jopId);
 
         }
+        public async Task<CompanySimpleStatsVM> SimpleStats()
+        {
+            return await repo.SimpleStats();
+        }
 
         public async Task<List<JopVM>> SearchJop(string name)
         {
@@ -48,6 +52,11 @@ namespace BLL.Services.JopServicess
         public async Task<ResponseVM<InternAppliedCompanyVM>> GetAllAppliedIntern(int InternShipId, int page, int pageSize)
         {
             return await repo.GetAllAppliedIntern(InternShipId, page, pageSize);
+        }
+        public async Task<InternApplaied_VM> GetApllaiedJopById(int internShipId, string internId)
+        {
+            return await repo.GetApllaiedJopById(internShipId, internId);
+
         }
     }
 }

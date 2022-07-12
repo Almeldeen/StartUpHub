@@ -111,7 +111,7 @@ namespace DAL.Reproisitry.JopRepo
                 response.Data = await db.InternApplaieds.Where(a => a.InternShip.UserId == userid && a.InternShipId == InternShipId).OrderByDescending(x => x.Createdate).Skip(pageSize * (page - 1)).Take(pageSize)
                     .Select(x => new InternAppliedCompanyVM { InternId = x.InternId, 
                         FullName = x.Intern.User.FullName,
-                        jopTitile = x.Intern.User.jopTitile,
+                        jopTitle = x.Intern.User.jopTitile,
                         Nationality = x.Intern.Nationality,
                         Birthday = x.Intern.Birthday, 
                         College = x.Intern.College, 
@@ -205,19 +205,55 @@ namespace DAL.Reproisitry.JopRepo
                 return false;
             }
         }
-        public async Task<internSimpleStatsVM> SimpleStats()
+        public async Task<CompanySimpleStatsVM> SimpleStats()
         {
             var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var user = await userManager.FindByNameAsync(username);
-            var data = await db.Interns.Where(x => x.UserId == user.Id).Select(x => new internSimpleStatsVM
+            var data = await db.Users.Where(x => x.Id == user.Id).Select(x => new CompanySimpleStatsVM
             {
-                articleCount = x.User.Posts.Count(),
-                followers = x.User.FollowsReceiver.Count(),
-                following = x.User.FollowsSender.Count(),
-                jobTitle = x.User.jopTitile,
-                internshipRequests = x.InternApplaieds.Count(),
+                articleCount = x.Posts.Count(),
+                followers = x.FollowsReceiver.Count(),
+                following = x.FollowsSender.Count(),
+                jobTitle = x.jopTitile,
+                internshipRequests =  db.InternShips.Where(x => x.UserId == user.Id).Count(),
+                in_ProgressRequests = db.InternApplaieds.Where(x=> x.InternShip.UserId == user.Id && x.State == "IN_PROGRESS").Count(),
+                pendingRequests= db.InternApplaieds.Where(x => x.InternShip.UserId == user.Id &&x.State == "PENDING").Count(),
+                
             }).FirstOrDefaultAsync();
             return data;
+        }
+        public async Task<InternApplaied_VM> GetApllaiedJopById(int internShipId,string internId)
+        {
+            try
+            {
+               
+                var data = await db.InternApplaieds.Where(x => x.InternShipId == internShipId && x.InternId == internId).Select(x => new InternApplaied_VM
+                {
+                    InterenId = x.InternId,
+                    InternShipId = x.InternShipId,
+                    State = x.State,
+                    skills = x.InternShip.Skills.Select(x => new SkillsVM { SkillsId = x.SkillsId, Name = x.Name }).ToList(),
+                    startDate = x.InternShip.StartDate,
+                    answers = x.internApplaiedQAnswers.Select(x => new InternApplaiedQAnswersVM { question = x.InternShipQuestions.QContent, answer = x.QAnswer }).ToList(),
+                    appliedCount = x.InternId.Count(),                   
+                    content = x.InternShip.Content,
+                    endDate = x.InternShip.EndDate,
+                    fieldName = x.InternShip.Field.FieldName,
+                    internEmail = x.Intern.User.Email,
+                    internId = x.InternId,
+                    internName = x.Intern.User.FullName,
+                    title = x.InternShip.title,
+                    userId = x.InternShip.UserId,
+                    CV = x.Intern.CV,
+                }).FirstOrDefaultAsync();
+                return data;
+            }
+            catch (Exception ex)
+            {
+
+                return null;
+            }
+
         }
     }
 }

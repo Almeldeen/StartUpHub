@@ -80,7 +80,25 @@ namespace BLL.Helper.SendNotifay
           
         }
 
+        public async Task SendMsg(MessageVM message)
+        {
+            var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await userManager.FindByNameAsync(username);
+            NotificationVM notification = new NotificationVM()
+            {
+                Type = "NEWMSG",
+                SenderId = user.Id,
+                UserName = user.FullName,
+                ReciverId = message.ReciverId,
+                UserImg = user.ProfileImage,
+                Read = false,
+                Createdate = message.Createdate
+            };
+            await notificationRepo.AddNotification(notification);
+            await hubContext.Clients.User(message.ReciverId).SendAsync("ReciveMsg", message);
+            await hubContext.Clients.User(message.ReciverId).SendAsync("GetNotifcation", notification);
 
+        }
     }
 }
 

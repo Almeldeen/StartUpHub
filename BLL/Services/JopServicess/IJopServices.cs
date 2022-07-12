@@ -16,6 +16,9 @@ namespace BLL.Services.JopServicess
         public Task<List<JopVM>> SearchJop(string name);
         public Task<bool> ChangeState(int InternShipId, string InternId, string State);
         public Task<ResponseVM<InternAppliedCompanyVM>> GetAllAppliedIntern(int InternShipId, int page, int pageSize);
+        public  Task<CompanySimpleStatsVM> SimpleStats();
+        public  Task<InternApplaied_VM> GetApllaiedJopById(int internShipId, string internId);
+
 
     }
 }

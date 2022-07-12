@@ -16,6 +16,9 @@ namespace DAL.Reproisitry.JopRepo
         public  Task<JopVM> GetJopDetails(int jopId);
         public Task<List<JopVM>> SearchJop(string name);
         public Task<bool> ChangeState(int InternShipId, string InternId, string State);
+        public  Task<CompanySimpleStatsVM> SimpleStats();
+        public Task<InternApplaied_VM> GetApllaiedJopById(int internShipId, string internId);
+
 
     }
 }
