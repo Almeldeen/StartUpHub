@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using MimeKit;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -46,8 +48,10 @@ namespace API.Controllers
                     return BadRequest(result.Message);
                 var token = await userManager.GenerateEmailConfirmationTokenAsync(userManager.FindByEmailAsync(model.Email).Result);
                 result.EmailConfirmToken = token;
-                var confirmationLink = "<a href='http://startuphub-001-site1.dtempurl.com"
-    + @Url.Action("ConfirmEmail", "Auth", new { token = token, email = model.Email })
+                byte[] tokenGeneratedBytes = Encoding.UTF8.GetBytes(token);
+                var codeEncoded = WebEncoders.Base64UrlEncode(tokenGeneratedBytes);
+                var confirmationLink = $"<a href='https://startuphub.vercel.app/confirm-email?email={model.Email}&token={codeEncoded}"
+    //+ @Url.Action("ConfirmEmail", "Auth", new { email = model.Email, token = token  })
     + "'style='text-decoration:none;line-height:100%;background:#2195f3;color:white;font-family:Ubuntu,Helvetica,Arial,sans-serif;font-size:15px;font-weight:normal;text-transform:none;margin:0px;'target='_blank'" +
     ">Verify Email</a>";
                 var pathToFile = env.WebRootPath
@@ -88,20 +92,30 @@ namespace API.Controllers
 
             return Ok(result);
         }
-        [HttpGet("ConfirmEmail")]
+        [HttpPost("ConfirmEmail")]
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string token, string email)
         {
-            var user = await userManager.FindByEmailAsync(email);
-            if (user == null)
-                return BadRequest();
-
-            var result = await userManager.ConfirmEmailAsync(user, token);
-            if (result.Succeeded)
+            try
             {
-                return Ok();
+                var user = await userManager.FindByEmailAsync(email);
+                if (user == null)
+                    return BadRequest();
+                var codeDecodedBytes = WebEncoders.Base64UrlDecode(token);
+                var codeDecoded = Encoding.UTF8.GetString(codeDecodedBytes);
+                var result = await userManager.ConfirmEmailAsync(user, codeDecoded);
+                if (result.Succeeded)
+                {
+                    return Ok();
+                }
+                return BadRequest();
             }
-            return BadRequest();
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+          
         }
         [HttpGet("Islogged")]
         public async Task<IActionResult> IsloggedAsync()

@@ -4,14 +4,16 @@ using DAL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220712033041_dasdas")]
+    partial class dasdas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -124,31 +126,6 @@ namespace DAL.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ReciverId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SenderId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReciverId");
-
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("Chats");
-                });
-
-            modelBuilder.Entity("DAL.Models.ChatMsgs", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("ChatId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
@@ -166,13 +143,11 @@ namespace DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChatId");
-
                     b.HasIndex("ReciverId");
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("ChatMsgs");
+                    b.ToTable("Chats");
                 });
 
             modelBuilder.Entity("DAL.Models.Comment", b =>
@@ -576,7 +551,7 @@ namespace DAL.Migrations
                     b.HasKey("UserId", "ConnectionId")
                         .HasName("PK_OnlineUser");
 
-                    b.ToTable("OnlineUsers");
+                    b.ToTable("OnlineUser");
                 });
 
             modelBuilder.Entity("DAL.Models.Post", b =>
@@ -796,29 +771,6 @@ namespace DAL.Migrations
                     b.HasOne("DAL.Data.ApplicationUser", "Sender")
                         .WithMany("ChatReceiver")
                         .HasForeignKey("SenderId");
-
-                    b.Navigation("Reciver");
-
-                    b.Navigation("Sender");
-                });
-
-            modelBuilder.Entity("DAL.Models.ChatMsgs", b =>
-                {
-                    b.HasOne("DAL.Models.Chat", "Chat")
-                        .WithMany("Msgs")
-                        .HasForeignKey("ChatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DAL.Data.ApplicationUser", "Reciver")
-                        .WithMany()
-                        .HasForeignKey("ReciverId");
-
-                    b.HasOne("DAL.Data.ApplicationUser", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId");
-
-                    b.Navigation("Chat");
 
                     b.Navigation("Reciver");
 
@@ -1170,11 +1122,6 @@ namespace DAL.Migrations
                     b.Navigation("Posts");
 
                     b.Navigation("ReciverNotifications");
-                });
-
-            modelBuilder.Entity("DAL.Models.Chat", b =>
-                {
-                    b.Navigation("Msgs");
                 });
 
             modelBuilder.Entity("DAL.Models.Comment", b =>

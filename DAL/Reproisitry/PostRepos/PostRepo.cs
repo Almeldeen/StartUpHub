@@ -156,7 +156,7 @@ namespace DAL.Reproisitry.PostRepos
                     {
                         foreach (var item in following)
                         {
-                            var data = await db.Posts.Where(x => x.UserId == item).Select(a => new PostVM
+                            var data = await db.Posts.Where(x => x.UserId == item).OrderByDescending(x => x.Likes.Count()).Select(a => new PostVM
                             {
                                 PostId = a.PostId,
                                 Content = a.Content,
@@ -179,7 +179,7 @@ namespace DAL.Reproisitry.PostRepos
                     }
                     else
                     {
-                        var data = await db.Posts.OrderByDescending(x=> x.Likes.Count()).Skip(4 * (pagenum - 1)).Take(4).Select(a => new PostVM
+                        var data = await db.Posts.OrderByDescending(x => x.Likes.Count()).Skip(4 * (pagenum - 1)).Take(4).Select(a => new PostVM
                         {
                             PostId = a.PostId,
                             Content = a.Content,
@@ -200,7 +200,7 @@ namespace DAL.Reproisitry.PostRepos
                     }
                     if (User.FieldId!=null)
                     {
-                        listdata.Jops = await db.InternShips.Where(x => x.FieldId == User.FieldId).Skip(1 * (pagenum - 1)).Take(1).Select(x => new JopVM
+                        listdata.Jops = await db.InternShips.Where(x => x.FieldId == User.FieldId).OrderByDescending(x => x.Createdate).Skip(1 * (pagenum - 1)).Take(1).Select(x => new JopVM
                         {
                             content = x.Content,
                             skillls = x.Skills.Select(x => new SkillsVM { Name = x.Name }).ToList(),
@@ -216,11 +216,11 @@ namespace DAL.Reproisitry.PostRepos
                             questions = x.InternShipQuestions.Select(x => new InternShipQuestionsVM { QId = x.QId, QContent = x.QContent }).ToList(),
                             title = x.title,
                             userId = x.UserId,
-                        }).OrderByDescending(x => x.startDate).ToListAsync();
+                        }).ToListAsync();
                     }
                     else
                     {
-                        listdata.Jops = await db.InternShips.Skip(1 * (pagenum - 1)).Take(1).Select(x => new JopVM
+                        listdata.Jops = await db.InternShips.OrderByDescending(x => x.Createdate).Skip(1 * (pagenum - 1)).Take(1).Select(x => new JopVM
                         {
                             content = x.Content,
                             skillls = x.Skills.Select(x => new SkillsVM { Name = x.Name }).ToList(),
@@ -236,7 +236,7 @@ namespace DAL.Reproisitry.PostRepos
                             questions = x.InternShipQuestions.Select(x => new InternShipQuestionsVM { QId = x.QId, QContent = x.QContent }).ToList(),
                             title = x.title,
                             userId = x.UserId,
-                        }).OrderByDescending(x => x.startDate).ToListAsync();
+                        }).ToListAsync();
                     }
 
 
@@ -282,7 +282,7 @@ namespace DAL.Reproisitry.PostRepos
                     if (userId==null)
                     {
                         
-                        var data = await db.Posts.Where(x => x.UserId == User.Id).Skip(pagesize * (pagenum - 1)).Take(pagesize).Select(a => new PostVM
+                        var data = await db.Posts.Where(x => x.UserId == User.Id).OrderByDescending(x => x.CteatedDate).Skip(pagesize * (pagenum - 1)).Take(pagesize).Select(a => new PostVM
                         {
                             PostId = a.PostId,
                             Content = a.Content,
@@ -297,7 +297,7 @@ namespace DAL.Reproisitry.PostRepos
                             commentsCount = a.Comments.Count(),
                             likedByUser = a.Likes.Any(x => x.UserId == User.Id),
                             PostImagePath = a.ImagePosts.Select(x => x.ImagePath).ToList(),
-                        }).OrderByDescending(x => x.createdDate).ToListAsync();
+                        }).ToListAsync();
 
                         response.Data = data;
                         response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.Posts.Where(x => x.UserId == User.Id).CountAsync() / pagesize));
@@ -305,7 +305,7 @@ namespace DAL.Reproisitry.PostRepos
                     }
                     else
                     {
-                        var data = await db.Posts.Include(x => x.User).Where(x => x.UserId == userId).Skip(pagesize * (pagenum - 1)).Take(pagesize).Select(a => new PostVM
+                        var data = await db.Posts.Where(x => x.UserId == userId).OrderByDescending(x => x.CteatedDate).Skip(pagesize * (pagenum - 1)).Take(pagesize).Select(a => new PostVM
                         {
                             PostId = a.PostId,
                             Content = a.Content,
@@ -320,7 +320,7 @@ namespace DAL.Reproisitry.PostRepos
                             commentsCount = a.Comments.Count(),
                             likedByUser = a.Likes.Any(x => x.UserId == User.Id),
                             PostImagePath = a.ImagePosts.Select(x => x.ImagePath).ToList(),
-                        }).OrderByDescending(x => x.createdDate).ToListAsync();
+                        }).ToListAsync();
 
                         response.Data = data;
                         response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.Posts.Where(x => x.UserId == User.Id).CountAsync() / pagesize));

@@ -20,5 +20,9 @@ namespace BLL.Services.Intern
         public  Task<internSimpleStatsVM> SimpleStats();
         public Task<InternApplaied_VM> UpdateInternApplaied(InternApplaied_VM internApplaied);
         public Task<List<ApplicationUser>> SearchUser(string name);
+   
+        public Task<bool> CancelRequest(int InternShipId);
+        public  Task<ResponseVM<JopVM>> SearchJobs(int? fieldid, int page, int pageSize);
+
     }
 }

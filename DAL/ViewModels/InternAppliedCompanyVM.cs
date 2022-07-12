@@ -25,7 +25,7 @@ namespace DAL.ViewModels
         
       
         public string ProfileImage { get; set; }
-       
+        public DateTimeOffset Createdate { get; set; }
         public string jopTitile { get; set; }
     }
 }

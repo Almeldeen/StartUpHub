@@ -1,28 +1,36 @@
-﻿using BLL.Services.Intern;
+﻿using BLL.Helper;
+using BLL.Helper.SendNotifay;
+using BLL.Hups;
+using BLL.Services.Intern;
 using DAL.Data;
+using DAL.Reproisitry.NotificationRepos;
 using DAL.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace API.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class InternController : ControllerBase
     {
         private readonly IInternService _internService;
+        private readonly ISendNotification sendNotification;
 
-        public InternController(IInternService internService)
+        public InternController(IInternService internService,ISendNotification sendNotification)
         {
             _internService = internService;
+            this.sendNotification = sendNotification;
         }
+        [Authorize(Roles = "INTERN,COMPANY")]
         [HttpGet("get-profile")]
         public async Task<IActionResult> GetProfile(string userId)
         {
@@ -38,6 +46,8 @@ namespace API.Controllers
             }
 
         }
+        [Authorize(Roles = "INTERN")]
+
         [HttpPost("update-profile")]
         public async Task<IActionResult> UpdateProfile([FromForm] UpdateInternVM updateIntern)
         {
@@ -60,6 +70,8 @@ namespace API.Controllers
             
 
         }
+        [Authorize(Roles = "INTERN")]
+
         [HttpPost("applyjop")]
         public async Task<IActionResult> AddInternApplaied(InternApplaied_VM internApplaied)
         {
@@ -67,6 +79,7 @@ namespace API.Controllers
             var result = await _internService.AddInternApplaied(internApplaied);
             if (result != null)
             {
+                await sendNotification.SendNotifcation(internApplaied.userId, internApplaied.InternShipId, null,"APPLAYJOB");
                 return Ok(result);
             }
             else
@@ -74,6 +87,8 @@ namespace API.Controllers
                 return BadRequest();
             }
         }
+        [Authorize(Roles = "INTERN")]
+
         [HttpGet("getapplaiedjops")]
         public async Task<IActionResult> GetApplaiedJops()
         {
@@ -88,6 +103,7 @@ namespace API.Controllers
                 return BadRequest();
             }
         }
+        [Authorize(Roles = "INTERN,COMPANY")]
         [HttpGet("getapllaiedjopbyid")]
         public async Task<IActionResult> GetApllaiedJopById(int InternShipId)
         {
@@ -102,6 +118,7 @@ namespace API.Controllers
                 return BadRequest();
             }
         }
+        [Authorize(Roles = "INTERN,COMPANY")]
         [HttpPost("ChangePhoto")]
         public async Task<IActionResult> ChangePhoto([FromForm]IFormFile image ,[FromForm] string type)
         {
@@ -112,11 +129,40 @@ namespace API.Controllers
             }
             return BadRequest(result);
         }
+        [Authorize(Roles = "INTERN")]
+
         [HttpGet("simple-stats")]
         public async Task<IActionResult> SimpleStats()
         {
             var result = await _internService.SimpleStats();
             if (result != null)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+
+
+
+        [Authorize(Roles = "INTERN")]
+
+        [HttpPost("cancel-request")]
+        public async Task<IActionResult> CancelRequest(int InternShipId)
+        {
+            var result = await _internService.CancelRequest(InternShipId);
+            if (result)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+
+        }
+        [Authorize(Roles = "INTERN")]
+        [HttpGet("SearchJobs")]
+        public async Task<IActionResult> SearchJobs(int? fieldid, int page, int pageSize)
+        {
+            var result = await _internService.SearchJobs(fieldid, page, pageSize);
+            if (result!=null)
             {
                 return Ok(result);
             }

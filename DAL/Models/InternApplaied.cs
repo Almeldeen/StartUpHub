@@ -18,7 +18,7 @@ namespace DAL.Models
         [ForeignKey("InternId")]
         public string InternId { get; set; }
         public virtual Intern Intern { get; set; }
-
+        public DateTimeOffset Createdate { get; set; }
         public List<InternApplaiedQAnswers> internApplaiedQAnswers { get; set; }
 
     }

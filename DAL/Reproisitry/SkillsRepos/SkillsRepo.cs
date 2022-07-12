@@ -93,10 +93,13 @@ namespace DAL.Reproisitry.SkillsRepos
         }
         #endregion
         #region GetAll
-        public async Task<List<SkillsVM>> GetAllSkillsAsync()
+        public async Task<ResponseVM<SkillsVM>> GetAllSkillsAsync(int? feildId, int page, int pageSize)
         {
-            var data =await db.Skills.Select(a => new SkillsVM { SkillsId = a.SkillsId, Name = a.Name, FieldId = a.Field.FieldId , FieldName=a.Field.FieldName}).ToListAsync();
-            return data;
+            ResponseVM<SkillsVM> response = new ResponseVM<SkillsVM>();
+            response.Data = await db.Skills.Where(x=> x.FieldId==feildId).Skip(pageSize * (page - 1)).Take(pageSize).Select(a => new SkillsVM { SkillsId = a.SkillsId, Name = a.Name, FieldId = a.Field.FieldId , FieldName=a.Field.FieldName}).ToListAsync();
+            response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.Skills.Where(x => x.FieldId == feildId).CountAsync() / pageSize));
+            response.CurrentPage = page;
+            return response;
         }
         #endregion
         #region GetById

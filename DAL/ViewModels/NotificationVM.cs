@@ -18,5 +18,6 @@ namespace DAL.ViewModels
         public bool Read { get; set; }
         public int? PostId { get; set; }
         public int? JopId { get; set; }
+        public DateTimeOffset Createdate { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 using BLL.Helper;
+using BLL.Helper.SendNotifay;
 using BLL.Hups;
 using BLL.Mapper;
 using BLL.Services.Auth;
@@ -6,6 +7,7 @@ using BLL.Services.Field;
 using BLL.Services.Followers;
 using BLL.Services.Intern;
 using BLL.Services.JopServicess;
+using BLL.Services.NotificationServicess;
 using BLL.Services.Post;
 using BLL.Services.Skills;
 using DAL.Data;
@@ -13,6 +15,7 @@ using DAL.Reproisitry.FieldRepos;
 using DAL.Reproisitry.Followers;
 using DAL.Reproisitry.InternRepos;
 using DAL.Reproisitry.JopRepo;
+using DAL.Reproisitry.NotificationRepos;
 using DAL.Reproisitry.PostRepos;
 using DAL.Reproisitry.SkillsRepos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -80,6 +83,9 @@ namespace API
             services.AddScoped<IJopServices, JopServices>();
             services.AddScoped<IFollowersService, FollowersService>();
             services.AddScoped<IFollowersRepo, FollowersRepo>();
+            services.AddScoped<ISendNotification,SendNotification>();
+            services.AddScoped<INotificationRepo, NotificationRepo>();
+            services.AddScoped<INotificationServices, NotificationServices>();
 
             services.AddAuthentication(options =>
             {

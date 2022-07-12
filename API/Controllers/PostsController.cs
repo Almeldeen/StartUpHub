@@ -1,4 +1,5 @@
-﻿using BLL.Hups;
+﻿using BLL.Helper.SendNotifay;
+using BLL.Hups;
 using BLL.Services.Post;
 using DAL.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -14,17 +15,18 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    
     public class PostsController : ControllerBase
     {
         private readonly IPostService service;
-        private readonly IHubContext<RealtimeHub> hubContext;
+        private readonly ISendNotification sendNotification;
 
-        public PostsController(IPostService service,IHubContext<RealtimeHub> hubContext)
+        public PostsController(IPostService service,ISendNotification sendNotification)
         {
             this.service = service;
-            this.hubContext = hubContext;
+            this.sendNotification = sendNotification;
         }
+        [Authorize(Roles = "INTERN")]
         [HttpPost("AddPost")]
         public async Task<IActionResult> AddPostAsync([FromForm] PostVM post)
         {
@@ -33,6 +35,7 @@ namespace API.Controllers
             return Ok(res);
                 
         }
+        [Authorize(Roles = "INTERN,COMPANY")]
         [HttpPost("Like")]
         public async Task<IActionResult> Like(int PostId)
         {
@@ -41,7 +44,7 @@ namespace API.Controllers
                 var res = await service.Like(PostId);
                 if (res != 0)
                 {
-
+                   await sendNotification.SendNotifcation(null, null, PostId, "LIKE");
                     return Ok(res);
 
                 }
@@ -54,6 +57,7 @@ namespace API.Controllers
             }
             
         }
+        [Authorize(Roles = "INTERN,COMPANY")]
         [HttpDelete("DisLike")]
         public async Task<IActionResult> DisLike(int PostId)
         {
@@ -73,6 +77,7 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "INTERN,COMPANY")]
         [HttpPost("Comment")]
         public async Task<IActionResult> Comment(int PostId, string Cotent)
         {
@@ -81,6 +86,7 @@ namespace API.Controllers
                 var res = await service.Comment(PostId, Cotent);
                 if (res != null)
                 {
+                    await sendNotification.SendNotifcation(null, null, PostId, "COMMENT");
                     return Ok(res);
 
                 }
@@ -92,6 +98,7 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "INTERN,COMPANY")]
         [HttpPut("EditComment")]
         public async Task<IActionResult> EditComment(int PostId, int commentId, string Cotent)
         {
@@ -111,6 +118,8 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "INTERN,COMPANY")]
+
         [HttpDelete("DeletComment")]
         public async Task<IActionResult> DeletComment(int commentId, int PostId)
         {
@@ -130,6 +139,8 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "INTERN,COMPANY")]
+
         [HttpPut("RateComment")]
         public async Task<IActionResult> RateComment(int commentId, int PostId, string type)
         {
@@ -138,6 +149,8 @@ namespace API.Controllers
                 var res = await service.RateComment(commentId, PostId,type);
                 if (res > 0)
                 {
+                    await sendNotification.SendNotifcation(null, null, PostId, "RATECOMMENT");
+
                     return Ok(res);
 
                 }
@@ -149,6 +162,8 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "INTERN")]
+
         [HttpPut("updatePost")]
         public async Task<IActionResult> EditPostAsync([FromForm] PostVM post)
         {
@@ -168,6 +183,8 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "INTERN")]
+
         [HttpDelete("deletePost")]
         public async Task<IActionResult> DeletePostAsync( int id)
         {
@@ -187,7 +204,7 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-     
+        [Authorize(Roles = "INTERN,COMPANY")]
         [HttpGet("get-timeline-articles")]
         public async Task<IActionResult> GetAllPostAsync(int page, int pageSize)
         {
@@ -206,6 +223,8 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "INTERN,COMPANY")]
+
         [HttpGet("get-post-details")]
         public async Task<IActionResult> GetByIdPostAsync(int postId)
         {
@@ -224,7 +243,7 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-   
+        [Authorize(Roles = "INTERN,COMPANY")]
         [HttpGet("get-user-articles")]
         public async Task<IActionResult> GetUserPostsAsync(string userId, int page, int pageSize)
         {
@@ -243,6 +262,8 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "INTERN,COMPANY")]
+
         [HttpGet("get-comments")]
         public async Task<IActionResult> GetPostComment(int page, int pageSize,int PostId)
         {

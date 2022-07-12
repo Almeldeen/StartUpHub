@@ -11,8 +11,8 @@ namespace DAL.ViewModels
         public string State { get; set; }
         public int InternShipId { get; set; }
         public string InterenId { get; set; }
-        public string startDate { get; set; }
-        public string endDate { get; set; }
+        public DateTime startDate { get; set; }
+        public DateTime endDate { get; set; }
         public string content { get; set; }
         public string fieldName { get; set; }
         public string userId { get; set; }
@@ -24,6 +24,7 @@ namespace DAL.ViewModels
         public string internName { get; set; }
         public string internId { get; set; }
         public string internEmail { get; set; }
+        public string CV { get; set; }
         public bool appliedByUser { get; set; }
         public List<SkillsVM> skills { get; set; }
         public List<InternApplaiedQAnswersVM> answers { get; set; }

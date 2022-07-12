@@ -1,8 +1,10 @@
-﻿using BLL.Hups;
+﻿using BLL.Helper.SendNotifay;
+using BLL.Hups;
 using BLL.Services.Followers;
 using DAL.Data;
 using DAL.Reproisitry.NotificationRepos;
 using DAL.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -17,22 +19,17 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class FollowersController : ControllerBase
     {
         private readonly IFollowersService _followersService;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly INotificationRepo notificationRepo;
-        private readonly IHubContext<RealtimeHub> hubContext;
+        private readonly ISendNotification sendNotification;
 
-        public FollowersController(IFollowersService followersService,IHttpContextAccessor httpContextAccessor,UserManager<ApplicationUser> userManager,INotificationRepo notificationRepo,
-            IHubContext<RealtimeHub> hubContext)
+
+        public FollowersController(IFollowersService followersService, ISendNotification sendNotification)
         {
             _followersService = followersService;
-            this.httpContextAccessor = httpContextAccessor;
-            this.userManager = userManager;
-            this.notificationRepo = notificationRepo;
-            this.hubContext = hubContext;
+            this.sendNotification = sendNotification;
         }
         [HttpGet("get-followers")]
         public async Task<IActionResult> Followers(int pagenum, int pagesize)
@@ -85,20 +82,7 @@ namespace API.Controllers
             var res= await _followersService.SendFollow(userId);
             if (res)
             {
-                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                var user =await userManager.FindByNameAsync(username);
-                NotificationVM notification = new NotificationVM()
-                {
-                    Type = "FOLLOW",
-                    SenderId = user.Id,
-                    ReciverId = userId,
-                    UserName = user.FullName,
-                    UserImg = user.ProfileImage,
-                    Read = false,
-                    Content = $"{user.FullName} followed you"
-                };
-                await notificationRepo.AddNotification(notification);
-                await hubContext.Clients.User(userId).SendAsync("GetNotifcation", notification);
+                await sendNotification.SendNotifcation(userId, null, null,"FOLLOW");
                 return Ok();
             }
             return BadRequest();

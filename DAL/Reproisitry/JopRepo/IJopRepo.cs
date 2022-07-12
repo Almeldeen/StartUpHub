@@ -11,10 +11,11 @@ namespace DAL.Reproisitry.JopRepo
     {
         public Task<JopVM> AddJop(JopVM jop);
         public Task<int> DeleteJop(int id);
-        public Task<List<JopVM>> GetAllJop();
-        public Task<List<InternAppliedCompanyVM>> GetAllAppliedIntern( int internshipid);
+        public Task<ResponseVM<JopVM>> GetAllJop( int page, int pageSize);
+        public Task<ResponseVM<InternAppliedCompanyVM>> GetAllAppliedIntern(int InternShipId, int page, int pageSize);
         public  Task<JopVM> GetJopDetails(int jopId);
         public Task<List<JopVM>> SearchJop(string name);
+        public Task<bool> ChangeState(int InternShipId, string InternId, string State);
 
     }
 }

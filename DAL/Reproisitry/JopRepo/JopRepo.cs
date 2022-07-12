@@ -35,7 +35,8 @@ namespace DAL.Reproisitry.JopRepo
                 var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 var userid = userManager.FindByNameAsync(username).Result.Id;
                 var data = mapper.Map<InternShip>(jop);
-                data.UserId = userid;            
+                data.UserId = userid;
+                data.Createdate = DateTimeOffset.Now;
                 await db.InternShips.AddAsync(data);
                 var res = await db.SaveChangesAsync();
                 if (res <=0)
@@ -100,14 +101,29 @@ namespace DAL.Reproisitry.JopRepo
             
         }
 
-        public async Task<List<InternAppliedCompanyVM>> GetAllAppliedIntern(int intershipid)
+        public async Task<ResponseVM<InternAppliedCompanyVM>> GetAllAppliedIntern(int InternShipId, int page, int pageSize)
         {
             try
             {
                 var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 var userid = userManager.FindByNameAsync(username).Result.Id;
-                var data = await db.InternApplaieds.Where(a => a.InternShip.UserId == userid && a.InternShipId == intershipid).Select(x => new InternAppliedCompanyVM { InternId = x.InternId, FullName = x.Intern.User.FullName, jopTitile = x.Intern.User.jopTitile, Nationality = x.Intern.Nationality, Birthday = x.Intern.Birthday, College = x.Intern.College, CV = x.Intern.CV, Gender = x.Intern.Gender, State = x.State, ProfileImage = x.Intern.User.ProfileImage, availableToWork = x.Intern.availableToWork }).ToListAsync();
-                return data;
+                ResponseVM<InternAppliedCompanyVM> response = new ResponseVM<InternAppliedCompanyVM>();
+                response.Data = await db.InternApplaieds.Where(a => a.InternShip.UserId == userid && a.InternShipId == InternShipId).OrderByDescending(x => x.Createdate).Skip(pageSize * (page - 1)).Take(pageSize)
+                    .Select(x => new InternAppliedCompanyVM { InternId = x.InternId, 
+                        FullName = x.Intern.User.FullName,
+                        jopTitile = x.Intern.User.jopTitile,
+                        Nationality = x.Intern.Nationality,
+                        Birthday = x.Intern.Birthday, 
+                        College = x.Intern.College, 
+                        CV = x.Intern.CV,
+                        Gender = x.Intern.Gender,
+                        State = x.State,
+                        ProfileImage = x.Intern.User.ProfileImage,
+                        availableToWork = x.Intern.availableToWork
+                    }).ToListAsync();
+                response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.InternApplaieds.Where(a => a.InternShip.UserId == userid && a.InternShipId == InternShipId).CountAsync() / pageSize));
+                response.CurrentPage = page;
+                return response;
             }
             catch (Exception ex)
             {
@@ -117,10 +133,28 @@ namespace DAL.Reproisitry.JopRepo
             
         }
 
-        public async Task<List<JopVM>> GetAllJop()
+        public async Task<ResponseVM<JopVM>> GetAllJop( int page, int pageSize)
         {
-            var data = await db.InternShips.Select(a => new JopVM { id = a.InternShipId, title = a.title, startDate = a.StartDate, endDate = a.EndDate, content = a.Content, fieldId = a.Field.FieldId, fieldName = a.Field.FieldName, userId = a.User.Id, skillls = a.Skills.Select(a => new SkillsVM { SkillsId = a.SkillsId, Name = a.Name }).ToList(),questions=a.InternShipQuestions.Select(x=> new InternShipQuestionsVM { QId=x.QId,QContent=x.QContent}).ToList() }).ToListAsync();
-            return data;
+            var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userid = userManager.FindByNameAsync(username).Result.Id;
+            ResponseVM<JopVM> response = new ResponseVM<JopVM>();
+            response.Data = await db.InternShips.Where(x=> x.UserId==userid).OrderByDescending(x => x.Createdate).Skip(pageSize * (page - 1)).Take(pageSize).Select(a => new JopVM
+                {
+                    id = a.InternShipId,
+                    title = a.title,
+                    startDate = a.StartDate,
+                    endDate = a.EndDate,
+                    content = a.Content,
+                    fieldId = a.Field.FieldId,
+                    fieldName = a.Field.FieldName,
+                    userId = a.User.Id,
+                    skillls = a.Skills.Select(a => new SkillsVM { SkillsId = a.SkillsId, Name = a.Name }).ToList(),
+                    questions = a.InternShipQuestions.Select(x => new InternShipQuestionsVM { QId = x.QId, QContent = x.QContent }).ToList()
+                }).ToListAsync();
+            response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.InternShips.Where(x => x.UserId == userid).CountAsync() / pageSize));
+            response.CurrentPage = page;
+            return response;
+
         }
         public async Task<JopVM> GetJopDetails (int jopId)
         {
@@ -150,6 +184,39 @@ namespace DAL.Reproisitry.JopRepo
         public async Task<List<JopVM>> SearchJop(string name)
         {
             var data = await db.InternShips.Where(w => w.title.Contains(name)).Select(w => mapper.Map<JopVM>(w)).ToListAsync();
+            return data;
+        }
+        public async Task<bool> ChangeState(int InternShipId, string InternId, string State)
+        {
+            try
+            {
+                var data = await db.InternApplaieds.Where(x => x.InternShipId == InternShipId && x.InternId == InternId).FirstOrDefaultAsync();
+                data.State = State;
+                int res = await db.SaveChangesAsync();
+                if (res > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
+        }
+        public async Task<internSimpleStatsVM> SimpleStats()
+        {
+            var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await userManager.FindByNameAsync(username);
+            var data = await db.Interns.Where(x => x.UserId == user.Id).Select(x => new internSimpleStatsVM
+            {
+                articleCount = x.User.Posts.Count(),
+                followers = x.User.FollowsReceiver.Count(),
+                following = x.User.FollowsSender.Count(),
+                jobTitle = x.User.jopTitile,
+                internshipRequests = x.InternApplaieds.Count(),
+            }).FirstOrDefaultAsync();
             return data;
         }
     }

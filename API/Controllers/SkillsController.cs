@@ -45,9 +45,9 @@ namespace API.Controllers
         }
         [HttpGet("GetAllSkills")]
 
-        public async Task<IActionResult> GetAllSkillsAsync()
+        public async Task<IActionResult> GetAllSkillsAsync(int? fieldId,int page,int pageSize)
         {
-            return Ok(await service.GetAllSkillsAsync());
+            return Ok(await service.GetAllSkillsAsync(fieldId, page, pageSize));
 
         }
     }

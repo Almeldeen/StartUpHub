@@ -13,6 +13,6 @@ namespace DAL.Reproisitry.SkillsRepos
         public Task<SkillsVM> EditSkillsAsync(SkillsVM skills);
         public Task<int> DeleteSkillsAsync(int id);
         public Task<SkillsVM> GetByIdSkillsAsync(int id);
-        public Task<List<SkillsVM>> GetAllSkillsAsync();
+        public Task<ResponseVM<SkillsVM>> GetAllSkillsAsync(int? feildId, int page, int pageSize);
     }
 }

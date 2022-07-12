@@ -19,5 +19,6 @@ namespace DAL.Models
         public ApplicationUser Reciver { get; set; }
         public string Content { get; set; }
         public bool Read { get; set; }
+        public DateTimeOffset Createdate { get; set; }
     }
 }

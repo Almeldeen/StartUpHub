@@ -174,12 +174,13 @@ namespace DAL.Reproisitry.Followers
                 var user =await userManager.FindByNameAsync(username);
                 List<Follower_VM> users = new List<Follower_VM>();
                 List<Follower_VM> usersPaging = new List<Follower_VM>();
-                var allusers =await userManager.Users.ToListAsync();
+                var allusers =await userManager.Users.Where(x=> x.Id!=user.Id).ToListAsync();
+                var following = await db.Follows.Where(x => x.FollowSenderId == user.Id).ToListAsync();
                 foreach (var item in allusers)
                 {
-                    if (item.FollowsSender!=null)
+                    if (following != null)
                     {
-                        if (!item.FollowsSender.Any(x => x.FollowSenderId == user.Id && x.FollowReceiverId == item.Id))
+                        if (!following.Any(x => x.FollowSenderId == user.Id && x.FollowReceiverId == item.Id))
                         {
                             if (await userManager.IsInRoleAsync(item, "INTERN"))
                             {
@@ -188,8 +189,9 @@ namespace DAL.Reproisitry.Followers
                                     userRole = "INTERN",
                                     id = item.Id,
                                     img = item.ProfileImage,
-                                    jobTitle = item.ProfileImage,
+                                    jobTitle = item.jopTitile,
                                     name = item.FullName,
+                                    followedMe=db.Follows.Any(x=> x.FollowReceiverId==user.Id&&x.FollowSenderId==item.Id),
                                 });
                             }
                             else if (await userManager.IsInRoleAsync(item, "COMPANY"))
@@ -199,8 +201,9 @@ namespace DAL.Reproisitry.Followers
                                     userRole = "COMPANY",
                                     id = item.Id,
                                     img = item.ProfileImage,
-                                    jobTitle = item.ProfileImage,
+                                    jobTitle = item.jopTitile,
                                     name = item.FullName,
+                                    followedMe = db.Follows.Any(x => x.FollowReceiverId == user.Id && x.FollowSenderId == item.Id),
                                 });
                             }
                         }
@@ -214,7 +217,7 @@ namespace DAL.Reproisitry.Followers
                                 userRole = "INTERN",
                                 id = item.Id,
                                 img = item.ProfileImage,
-                                jobTitle = item.ProfileImage,
+                                jobTitle = item.jopTitile,
                                 name = item.FullName,
                             });
                         }
@@ -225,7 +228,7 @@ namespace DAL.Reproisitry.Followers
                                 userRole = "COMPANY",
                                 id = item.Id,
                                 img = item.ProfileImage,
-                                jobTitle = item.ProfileImage,
+                                jobTitle = item.jopTitile,
                                 name = item.FullName,
                             });
                         }

@@ -34,7 +34,9 @@ namespace DAL.Data
         public DbSet<InternApplaied> InternApplaieds { get; set; }
         public DbSet<ImagePosts> ImagePosts { get; set; }
         public DbSet<Chat> Chats { get; set; }
+        public DbSet<ChatMsgs> ChatMsgs { get; set; }
         public DbSet<Notifications> Notifications { get; set; }
+        public DbSet<OnlineUser> OnlineUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -46,6 +48,9 @@ namespace DAL.Data
             builder.Entity<Follow>()
             .HasKey(b => new { b.FollowSenderId, b.FollowReceiverId })
             .HasName("PK_Follow");
+            builder.Entity<OnlineUser>()
+          .HasKey(b => new { b.UserId, b.ConnectionId })
+          .HasName("PK_OnlineUser");
 
             builder.Entity<InternApplaiedQAnswers>()
               .HasKey(b => new { b.QId, b.InternId,b.InternShipId })

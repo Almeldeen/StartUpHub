@@ -97,5 +97,16 @@ namespace BLL.Services.Intern
         {
             return await repo.SimpleStats();
         }
+      
+        public async Task<bool> CancelRequest(int InternShipId)
+        {
+            return await repo.CancelRequest(InternShipId);
+
+        }
+        public async Task<ResponseVM<JopVM>> SearchJobs(int? fieldid, int page, int pageSize)
+        {
+            return await repo.SearchJobs(fieldid, page, pageSize);
+
+        }
     }
 }

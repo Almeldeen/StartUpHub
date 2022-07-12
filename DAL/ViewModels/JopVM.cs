@@ -15,6 +15,7 @@ namespace DAL.ViewModels
         public string title { get; set; }
         public DateTime startDate { get; set; }
         public DateTime endDate { get; set; }
+        public DateTimeOffset Createdate { get; set; }
         public string content { get; set; }
         public string companyName { get; set; }    
         public string companyJobTitle { get; set; }    

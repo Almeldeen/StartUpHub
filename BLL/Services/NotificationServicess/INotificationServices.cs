@@ -5,13 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DAL.Reproisitry.NotificationRepos
+namespace BLL.Services.NotificationServicess
 {
-   public interface INotificationRepo
+    public interface INotificationServices
     {
-        public Task<NotificationVM> AddNotification(NotificationVM notification);
         public Task<List<NotificationVM>> GetAllNotifications(int pagenum, int pagesize);
         public Task<bool> ReadNotifications(int notificationId);
-
     }
 }

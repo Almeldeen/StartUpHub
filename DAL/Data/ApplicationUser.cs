@@ -27,6 +27,7 @@ namespace DAL.Data
         public List<Notifications> ReciverNotifications { get; set; }
         public List<Chat> ChatSender { get; set; }
         public List<Chat> ChatReceiver { get; set; }
+        public List<OnlineUser> OnlineUser { get; set; }
         [ForeignKey("FieldId")]
         public int? FieldId { get; set; }
         public virtual Field Field { get; set; }

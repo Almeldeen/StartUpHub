@@ -27,6 +27,8 @@ namespace BLL.Mapper
             CreateMap<CommentVM, Comment>();
             CreateMap<Notifications, NotificationVM>();
             CreateMap<NotificationVM, Notifications>();
+            CreateMap<MessageVM, Chat>();
+            CreateMap<Chat, MessageVM>();
         }
         
     }

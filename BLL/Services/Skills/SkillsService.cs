@@ -31,14 +31,19 @@ namespace BLL.Services.Skills
             return await repo.EditSkillsAsync(skills);
         }
 
-        public async Task<List<SkillsVM>> GetAllSkillsAsync()
+        public async Task<ResponseVM<SkillsVM>> GetAllSkillsAsync(int? feildId, int page, int pageSize)
         {
-            return await repo.GetAllSkillsAsync();
+            return await repo.GetAllSkillsAsync(feildId, page, pageSize);
         }
 
-        public async Task<SkillsVM> GetByIdSkillsAsync(int id)
+        public Task<SkillsVM> GetByIdSkillsAsync(int id)
         {
-            return await repo.GetByIdSkillsAsync(id);
+            throw new NotImplementedException();
         }
+
+        //public async Task<SkillsVM> GetAllSkillsAsync(int? feildId, int page, int pageSize)
+        //{
+        //    return await repo.GetByIdSkillsAsync(feildId, page, pageSize);
+        //}
     }
 }
