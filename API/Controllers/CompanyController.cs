@@ -4,6 +4,7 @@ using BLL.Services.JopServicess;
 using DAL.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,11 +19,14 @@ namespace API.Controllers
     {
         private readonly IJopServices services;
         private readonly ISendNotification sendNotification;
+      
 
-        public CompanyController(IJopServices services, ISendNotification sendNotification)
+        public CompanyController(IJopServices services, ISendNotification sendNotification
+           )
         {
             this.services = services;
             this.sendNotification = sendNotification;
+          
         }
         [Authorize(Roles = "COMPANY")]
         [HttpPost("add-job")]
@@ -33,7 +37,8 @@ namespace API.Controllers
                 var res =await services.AddJop(jop);
                 if (res!=null)
                 {
-                    await sendNotification.SendNewJopNotifcation(jop.id, jop.fieldId,"NewJop");
+                 
+                    await sendNotification.SendNewJopNotifcation(jop.id, jop.fieldId,"NEWJOB");
                     return Ok(res);
                 }
                 return BadRequest();
@@ -61,13 +66,13 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [Authorize(Roles = "COMPANY")]
+        [Authorize(Roles = "INTERN,COMPANY")]
         [HttpGet("get-jobs")]
-        public async Task<IActionResult> GetAllJop( int page, int pageSize)
+        public async Task<IActionResult> GetAllJop(string companyId, int page, int pageSize)
         {
             try
             {
-                var res = await services.GetAllJop(page,pageSize);
+                var res = await services.GetAllJop(companyId,page, pageSize);
                 if (res != null)
                 {
                     return Ok(res);
@@ -141,6 +146,46 @@ namespace API.Controllers
                 return Ok(result);
             }
             return BadRequest(result);
+        }
+        [Authorize(Roles = "INTERN,COMPANY")]
+        [HttpGet("get-profile")]
+        public async Task<IActionResult> GetProfile(string userId)
+        {
+
+            var result = await services.GetProfile(userId);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+        [Authorize(Roles = "COMPANY")]
+
+        [HttpPost("update-profile")]
+        public async Task<IActionResult> UpdateProfile([FromForm] UpdateInternVM updateIntern)
+        {
+            try
+            {
+                var result = await services.UpdateProfile(updateIntern);
+                if (result)
+                {
+                    return Ok(result);
+                }
+
+                return BadRequest(result);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+
+
         }
     }
 }

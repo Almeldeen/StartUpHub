@@ -35,23 +35,32 @@ namespace BLL.Helper.SendNotifay
         }
         public  async Task SendNotifcation(string ReciverId, int? JopId,int?PostId,string type)
         {
-            var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var user = await userManager.FindByNameAsync(username);
-            NotificationVM notification = new NotificationVM()
+            try
             {
-                Type = type,
-                SenderId = user.Id,
-                ReciverId =PostId!=null?await db.Posts.Where(x=> x.PostId==PostId).Select(x=> x.UserId).FirstOrDefaultAsync():ReciverId,
-                UserName = user.FullName,
-                UserImg = user.ProfileImage,
-                Read = false,
-                JopId = JopId,
-                PostId=PostId,
-                Createdate=DateTimeOffset.Now
-            };
-            
-            await notificationRepo.AddNotification(notification);
-            await hubContext.Clients.User(ReciverId).SendAsync("GetNotifcation", notification);
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var user = await userManager.FindByNameAsync(username);
+                NotificationVM notification = new NotificationVM()
+                {
+                    Type = type,
+                    SenderId = user.Id,
+                    ReciverId = PostId != null ? await db.Posts.Where(x => x.PostId == PostId).Select(x => x.UserId).FirstOrDefaultAsync() : ReciverId,
+                    UserName = user.FullName,
+                    UserImg = user.ProfileImage,
+                    Read = false,
+                    JopId = JopId,
+                    PostId = PostId,
+                    Createdate = DateTimeOffset.Now
+                };
+
+                await notificationRepo.AddNotification(notification);
+                await hubContext.Clients.User(notification.ReciverId).SendAsync("getNotifcation", notification);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+           
             
         }
         public async Task SendNewJopNotifcation(int? JopId,int? feildId, string type)
@@ -75,7 +84,7 @@ namespace BLL.Helper.SendNotifay
                     Createdate = DateTimeOffset.Now
                 };
                 await notificationRepo.AddNotification(notification);
-                await hubContext.Clients.User(item).SendAsync("GetNotifcation", notification);
+                await hubContext.Clients.User(item).SendAsync("getNotifcation", notification);
             }
           
         }
@@ -95,8 +104,8 @@ namespace BLL.Helper.SendNotifay
                 Createdate = message.Createdate
             };
             await notificationRepo.AddNotification(notification);
-            await hubContext.Clients.User(message.ReciverId).SendAsync("ReciveMsg", message);
-            await hubContext.Clients.User(message.ReciverId).SendAsync("GetNotifcation", notification);
+            await hubContext.Clients.User(message.ReciverId).SendAsync("reciveMsg", message);
+            await hubContext.Clients.User(message.ReciverId).SendAsync("getNotifcation", notification);
 
         }
     }

@@ -10,7 +10,7 @@ namespace DAL.Reproisitry.NotificationRepos
    public interface INotificationRepo
     {
         public Task<NotificationVM> AddNotification(NotificationVM notification);
-        public Task<List<NotificationVM>> GetAllNotifications(int pagenum, int pagesize);
+        public Task<ResponseVM<NotificationVM>> GetAllNotifications(int pagenum, int pagesize);
         public Task<bool> ReadNotifications(int notificationId);
 
     }

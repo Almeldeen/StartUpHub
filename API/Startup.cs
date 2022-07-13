@@ -118,9 +118,27 @@ namespace API
                 options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
             }); 
             services.AddHttpContextAccessor();
-            services.AddSignalR();
-            services.AddCors();
-            
+            services.AddSignalR(hubOptions =>
+            {
+                hubOptions.EnableDetailedErrors = true;
+                hubOptions.KeepAliveInterval = TimeSpan.FromMinutes(2);
+                hubOptions.ClientTimeoutInterval = TimeSpan.FromMinutes(2);
+                hubOptions.MaximumReceiveMessageSize = 102400000;
+
+            });/*.AddAzureSignalR("Endpoint=https://startuphub.service.signalr.net;AccessKey=/evy/a0aZQQaQLQYekFqYweEuoNoVC2gub3CHgAw/rQ=;Version=1.0;");*/
+            //.AddNewtonsoftJsonProtocol(opt =>
+            //{
+            //    opt.PayloadSerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            //});
+            //services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy", builder => builder
+                    .WithOrigins("http://localhost:4200", "https://startuphub.vercel.app", "https://startuphup.azurewebsites.net")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            });
             services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
             services.AddSwaggerGen(c =>
@@ -139,21 +157,25 @@ namespace API
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
             }
 
-            app.UseCors(options => options
-           .AllowAnyOrigin()
-           .AllowAnyMethod()
-           .AllowAnyHeader());
+            // app.UseCors(options => options
+            //.AllowAnyOrigin()
+            //.AllowAnyMethod()
+            //.AllowAnyHeader());
+            app.UseCors("CorsPolicy");
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseFileServer();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<RealtimeHub>("/realtimeHub");
+            });
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<RealtimeHub>("/realtimeHub");
+             
             });
         }
     }

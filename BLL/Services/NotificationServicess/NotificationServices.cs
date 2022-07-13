@@ -16,7 +16,7 @@ namespace BLL.Services.NotificationServicess
         {
             this.repo = repo;
         }
-        public async Task<List<NotificationVM>> GetAllNotifications(int pagenum, int pagesize)
+        public async Task<ResponseVM<NotificationVM>> GetAllNotifications(int pagenum, int pagesize)
         {
             return await repo.GetAllNotifications(pagenum, pagesize);
         }

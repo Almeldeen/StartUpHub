@@ -50,13 +50,14 @@ namespace DAL.Reproisitry.NotificationRepos
 
         }
 
-        public async Task<List<NotificationVM>> GetAllNotifications(int pagenum,int pagesize)
+        public async Task<ResponseVM<NotificationVM>> GetAllNotifications(int pagenum,int pagesize)
         {
             try
             {
                 var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 var userid = userMangger.FindByNameAsync(username).Result.Id;
-                var data = await db.Notifications.Where(x => x.ReciverId == userid && x.Read == false).Skip(pagesize * (pagenum - 1)).Take(pagesize).Select(x => new NotificationVM
+                ResponseVM<NotificationVM> response = new ResponseVM<NotificationVM>();
+                response.Data = await db.Notifications.OrderByDescending(x=> x.Createdate).Where(x => x.ReciverId == userid && x.Read == false).Skip(pagesize * (pagenum - 1)).Take(pagesize).Select(x => new NotificationVM
                 {
                     SenderId = x.SenderId,
                     Createdate = x.Createdate,
@@ -70,7 +71,9 @@ namespace DAL.Reproisitry.NotificationRepos
                     UserName = x.Sender.FullName,
 
                 }).ToListAsync();
-                return data;
+                response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.Notifications.Where(x => x.ReciverId == userid && x.Read == false).CountAsync() / pagesize));
+                response.CurrentPage = pagenum;
+                return response;
             }
             catch (Exception ex)
             {

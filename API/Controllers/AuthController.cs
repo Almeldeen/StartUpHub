@@ -51,7 +51,7 @@ namespace API.Controllers
                 byte[] tokenGeneratedBytes = Encoding.UTF8.GetBytes(token);
                 var codeEncoded = WebEncoders.Base64UrlEncode(tokenGeneratedBytes);
                 var confirmationLink = $"<a href='https://startuphub.vercel.app/confirm-email?email={model.Email}&token={codeEncoded}"
-    //+ @Url.Action("ConfirmEmail", "Auth", new { email = model.Email, token = token  })
+    
     + "'style='text-decoration:none;line-height:100%;background:#2195f3;color:white;font-family:Ubuntu,Helvetica,Arial,sans-serif;font-size:15px;font-weight:normal;text-transform:none;margin:0px;'target='_blank'" +
     ">Verify Email</a>";
                 var pathToFile = env.WebRootPath

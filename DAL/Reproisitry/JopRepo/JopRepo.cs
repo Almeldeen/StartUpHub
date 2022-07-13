@@ -84,7 +84,13 @@ namespace DAL.Reproisitry.JopRepo
         {
             try
             {
-                var data = await db.InternShips.FindAsync(id);
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var userid = userManager.FindByNameAsync(username).Result.Id;
+                var internapplay = await db.InternApplaieds.Where(x => x.InternShipId == id && x.InternShip.UserId == userid).ToListAsync();
+                var data = await db.InternShips.Where(x=> x.InternShipId==id&&x.UserId==userid).FirstOrDefaultAsync();
+                var shipSkils = await db.InternShipSkils.Where(x=> x.InternShipId==id&&x.InternShip.UserId==userid).ToListAsync();
+                db.InternApplaieds.RemoveRange(internapplay);
+                db.InternShipSkils.RemoveRange(shipSkils);
                 db.InternShips.Remove(data);
                 var res = await db.SaveChangesAsync();
                 if (res > 0)
@@ -133,12 +139,14 @@ namespace DAL.Reproisitry.JopRepo
             
         }
 
-        public async Task<ResponseVM<JopVM>> GetAllJop( int page, int pageSize)
+        public async Task<ResponseVM<JopVM>> GetAllJop(string companyId, int page, int pageSize)
         {
             var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var userid = userManager.FindByNameAsync(username).Result.Id;
             ResponseVM<JopVM> response = new ResponseVM<JopVM>();
-            response.Data = await db.InternShips.Where(x=> x.UserId==userid).OrderByDescending(x => x.Createdate).Skip(pageSize * (page - 1)).Take(pageSize).Select(a => new JopVM
+            if (companyId==null)
+            {
+                response.Data = await db.InternShips.Where(x => x.UserId == userid).OrderByDescending(x => x.Createdate).Skip(pageSize * (page - 1)).Take(pageSize).Select(a => new JopVM
                 {
                     id = a.InternShipId,
                     title = a.title,
@@ -151,7 +159,28 @@ namespace DAL.Reproisitry.JopRepo
                     skillls = a.Skills.Select(a => new SkillsVM { SkillsId = a.SkillsId, Name = a.Name }).ToList(),
                     questions = a.InternShipQuestions.Select(x => new InternShipQuestionsVM { QId = x.QId, QContent = x.QContent }).ToList()
                 }).ToListAsync();
-            response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.InternShips.Where(x => x.UserId == userid).CountAsync() / pageSize));
+                response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.InternShips.Where(x => x.UserId == userid).CountAsync() / pageSize));
+
+
+            }
+            else
+            {
+                response.Data = await db.InternShips.Where(x => x.UserId == companyId).OrderByDescending(x => x.Createdate).Skip(pageSize * (page - 1)).Take(pageSize).Select(a => new JopVM
+                {
+                    id = a.InternShipId,
+                    title = a.title,
+                    startDate = a.StartDate,
+                    endDate = a.EndDate,
+                    content = a.Content,
+                    fieldId = a.Field.FieldId,
+                    fieldName = a.Field.FieldName,
+                    userId = a.User.Id,
+                    skillls = a.Skills.Select(a => new SkillsVM { SkillsId = a.SkillsId, Name = a.Name }).ToList(),
+                    questions = a.InternShipQuestions.Select(x => new InternShipQuestionsVM { QId = x.QId, QContent = x.QContent }).ToList()
+                }).ToListAsync();
+                response.TotalPages = Convert.ToInt32(Math.Ceiling((double)await db.InternShips.Where(x => x.UserId == companyId).CountAsync() / pageSize));
+
+            }
             response.CurrentPage = page;
             return response;
 
@@ -255,5 +284,98 @@ namespace DAL.Reproisitry.JopRepo
             }
 
         }
+        public async Task<InternProfile_VM> GetProfile(string userId)
+        {
+            try
+            {
+                if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                {
+                    var data = new InternProfile_VM();
+                    var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    var user = await userManager.FindByNameAsync(username);
+                    var role = await userManager.GetRolesAsync(user);
+                    if (userId == null)
+                    {
+                        data = await db.Users.Where(x => x.Id == user.Id).Select(x => new InternProfile_VM
+                        {
+                            InterenId = x.Id,
+                            followersCount = x.FollowsSender.Count(),
+                            followingCount = x.FollowsReceiver.Count(),
+                            about = x.Bio,
+                            address = x.Location,
+                            jobTitle = x.jopTitile,
+                            field = new FieldVM { FieldId = x.FieldId, FieldName = x.Field.FieldName },
+                            mobile = x.PhoneNumber,
+                            FullName = x.FullName,
+                            UserImg = x.ProfileImage,
+                            userRole = role[0],                         
+                            coverImg = x.CoverImage,
+                        }).FirstOrDefaultAsync();
+                    }
+                    else
+                    {
+
+                        data = await db.Users.Where(x => x.Id == userId).Select(x => new InternProfile_VM
+                        {
+                            InterenId = x.Id,
+                            followersCount = x.FollowsSender.Count(),
+                            followingCount = x.FollowsReceiver.Count(),
+                            about = x.Bio,
+                            address = x.Location,
+                            jobTitle = x.jopTitile,
+                            field = new FieldVM { FieldId = x.FieldId, FieldName = x.Field.FieldName },
+                            mobile = x.PhoneNumber,
+                            FullName = x.FullName,
+                            UserImg = x.ProfileImage,
+                            userRole = role[0],
+                            coverImg = x.CoverImage,
+                        }).FirstOrDefaultAsync();
+                    }
+
+                    return data;
+                }
+                return null;
+            }
+
+            catch (Exception ex)
+            {
+
+                return null;
+            }
+
+
+        }
+        public async Task<bool> UpdateProfile(UpdateInternVM updateIntern)
+        {
+            try
+            {
+                if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                {
+                    var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    var user = await userManager.FindByNameAsync(username);
+                    user.Bio = updateIntern.about == null ? user.Bio : updateIntern.about;
+                    user.Location = updateIntern.address;
+                    user.jopTitile = updateIntern.jobTitle;
+                    user.PhoneNumber = updateIntern.mobile;
+                    user.FullName = updateIntern.fullName == null ? user.FullName : updateIntern.fullName;
+                    var result = await userManager.UpdateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        return true;
+                    }
+                    
+                   
+
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
+        }
+
+
     }
 }

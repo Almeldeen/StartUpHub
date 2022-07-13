@@ -1,15 +1,16 @@
 {
   "dependencies": {
-    "mssql1": {
-      "type": "mssql.onprem",
-      "connectionId": "ConnectionStrings:DefaultConnection",
-      "secretStore": "AzureAppSettings"
-    },
     "identityapp1": {
       "type": "identityapp",
       "connectionId": "",
       "suggestion": "true",
       "ignored": "true"
+    },
+    "signalr1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.SignalRService/SignalR/StartUpHub",
+      "type": "signalr.azure",
+      "connectionId": "Azure__SignalR__ConnectionString",
+      "secretStore": "AzureAppSettings"
     }
   }
 }

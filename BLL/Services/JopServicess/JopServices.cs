@@ -27,9 +27,9 @@ namespace BLL.Services.JopServicess
             return await repo.DeleteJop(id);
         }
 
-        public async Task<ResponseVM<JopVM>> GetAllJop( int page, int pageSize)
+        public async Task<ResponseVM<JopVM>> GetAllJop(string companyId, int page, int pageSize)
         {
-            return await repo.GetAllJop(page,pageSize);
+            return await repo.GetAllJop( companyId,page, pageSize);
         }
         public async Task<JopVM> GetJopDetails(int jopId)
         {
@@ -56,6 +56,15 @@ namespace BLL.Services.JopServicess
         public async Task<InternApplaied_VM> GetApllaiedJopById(int internShipId, string internId)
         {
             return await repo.GetApllaiedJopById(internShipId, internId);
+
+        }
+        public async Task<bool> UpdateProfile(UpdateInternVM updateIntern)
+        {           
+            return await repo.UpdateProfile(updateIntern);
+        }
+        public async Task<InternProfile_VM> GetProfile(string userId)
+        {
+            return await repo.GetProfile(userId);
 
         }
     }
