@@ -1,5 +1,5 @@
 ﻿using BLL.Helper;
-using BLL.Helper.SendNotifay;
+using API.HupHelper.SendNotifay;
 using BLL.Hups;
 using BLL.Services.Intern;
 using DAL.Data;

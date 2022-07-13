@@ -1,4 +1,4 @@
-﻿using BLL.Helper.SendNotifay;
+﻿using API.HupHelper.SendNotifay;
 using BLL.Hups;
 using BLL.Services.Followers;
 using DAL.Data;

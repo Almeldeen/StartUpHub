@@ -1,5 +1,5 @@
 ﻿
-using BLL.Helper.SendNotifay;
+using API.HupHelper.SendNotifay;
 using BLL.Services.JopServicess;
 using DAL.ViewModels;
 using Microsoft.AspNetCore.Authorization;

@@ -1,6 +1,6 @@
+using API.HupHelper.SendNotifay;
+using API.Hups;
 using BLL.Helper;
-using BLL.Helper.SendNotifay;
-using BLL.Hups;
 using BLL.Mapper;
 using BLL.Services.Auth;
 using BLL.Services.Field;
@@ -118,18 +118,19 @@ namespace API
                 options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
             }); 
             services.AddHttpContextAccessor();
+            services.AddSignalR();
             services.AddSignalR(hubOptions =>
             {
                 hubOptions.EnableDetailedErrors = true;
                 hubOptions.KeepAliveInterval = TimeSpan.FromMinutes(2);
                 hubOptions.ClientTimeoutInterval = TimeSpan.FromMinutes(2);
-                hubOptions.MaximumReceiveMessageSize = 102400000;
+                hubOptions.MaximumReceiveMessageSize = long.MaxValue;
 
-            });/*.AddAzureSignalR("Endpoint=https://startuphub.service.signalr.net;AccessKey=/evy/a0aZQQaQLQYekFqYweEuoNoVC2gub3CHgAw/rQ=;Version=1.0;");*/
-            //.AddNewtonsoftJsonProtocol(opt =>
-            //{
-            //    opt.PayloadSerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-            //});
+            }).AddAzureSignalR("Endpoint=https://startuphub.service.signalr.net;AccessKey=/evy/a0aZQQaQLQYekFqYweEuoNoVC2gub3CHgAw/rQ=;Version=1.0;")
+            .AddNewtonsoftJsonProtocol(opt =>
+            {
+                opt.PayloadSerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
             //services.AddCors();
             services.AddCors(options =>
             {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BLL.Helper.SendNotifay;
+using API.HupHelper.SendNotifay;
 using BLL.Services.ChatServices;
 using DAL.ViewModels;
 using Microsoft.AspNetCore.Authorization;
