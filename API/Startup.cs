@@ -169,11 +169,11 @@ namespace API
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-           
-            app.UseAzureSignalR(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapHub<RealtimeHub>("/realtimeHub");
+                endpoints.MapHub<RealtimeHub>("/realtimeHub");
             });
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
