@@ -16,20 +16,30 @@ namespace BLL.Services.ChatServices
         {
             this.repo = repo;
         }
-        public Task<ResponseVM<ChatVM>> GetChat(int page, int pageSize)
+        public async Task<ResponseVM<ChatVM>> GetChat(int page, int pageSize)
         {
-            return repo.GetChat(page, pageSize);
+            return await repo.GetChat(page, pageSize);
         }
 
-        public Task<ResponseVM<MessageVM>> GetMsgsChat(int chatId, int page, int pageSize)
+        public async Task<ResponseVM<MessageVM>> GetMsgsChat(int chatId, int page, int pageSize)
         {
-            return repo.GetMsgsChat(chatId,page, pageSize);
+            return await repo.GetMsgsChat(chatId,page, pageSize);
 
         }
 
-        public Task<MessageVM> SendMsg(MessageVM messege)
+        public async Task<MessageVM> SendMsg(MessageVM messege)
         {
-            return repo.SendMsg(messege);
+            return await repo.SendMsg(messege);
+        }
+        public async Task<int> UnReadMsgCount()
+        {
+            return await repo.UnReadMsgCount();
+
+        }
+        public async Task<bool> ReadMsg(int chatId)
+        {
+            return await repo.ReadMsg(chatId);
+
         }
     }
 }

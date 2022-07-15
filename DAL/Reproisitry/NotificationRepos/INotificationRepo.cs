@@ -12,6 +12,8 @@ namespace DAL.Reproisitry.NotificationRepos
         public Task<NotificationVM> AddNotification(NotificationVM notification);
         public Task<ResponseVM<NotificationVM>> GetAllNotifications(int pagenum, int pagesize);
         public Task<bool> ReadNotifications(int notificationId);
+        public  Task<int> UnReadNotificationCount();
+
 
     }
 }

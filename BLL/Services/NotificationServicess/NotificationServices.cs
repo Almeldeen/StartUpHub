@@ -25,5 +25,10 @@ namespace BLL.Services.NotificationServicess
         {
             return await repo.ReadNotifications(notificationId);
         }
+        public async Task<int> UnReadNotificationCount()
+        {
+            return await repo.UnReadNotificationCount();
+
+        }
     }
 }

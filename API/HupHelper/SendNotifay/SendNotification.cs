@@ -51,9 +51,13 @@ namespace API.HupHelper.SendNotifay
                     PostId = PostId,
                     Createdate = DateTimeOffset.Now
                 };
+                notification.SenderRole = userManager.GetRolesAsync(user).Result.FirstOrDefault();
+                if (notification.ReciverId!=notification.SenderId)
+                {
+                    await notificationRepo.AddNotification(notification);
+                    await hubContext.Clients.User(notification.ReciverId).SendAsync("getNotifcation", notification);
+                }
 
-                await notificationRepo.AddNotification(notification);
-                await hubContext.Clients.User(notification.ReciverId).SendAsync("getNotifcation", notification);
             }
             catch (Exception ex)
             {
@@ -83,6 +87,7 @@ namespace API.HupHelper.SendNotifay
                     JopId = JopId,
                     Createdate = DateTimeOffset.Now
                 };
+                notification.SenderRole = userManager.GetRolesAsync(user).Result.FirstOrDefault();
                 await notificationRepo.AddNotification(notification);
                 await hubContext.Clients.User(item).SendAsync("getNotifcation", notification);
             }

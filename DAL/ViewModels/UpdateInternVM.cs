@@ -20,7 +20,7 @@ namespace DAL.ViewModels
         public string fullName { get; set; }
         public IFormFile CV { get; set; }
         public bool availableToWork { get; set; }
-        public int fieldId { get; set; }
+        public int? fieldId { get; set; }
         public DateTime birthdate { get; set; }
     }
 }

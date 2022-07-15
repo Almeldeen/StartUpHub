@@ -1,35 +1,44 @@
-﻿using DAL.Data;
+﻿using BLL.Helper;
+using DAL.Data;
 using DAL.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace API.Hups
 {
-   public class RealtimeHub:Hub
+   [Authorize]
+    public class RealtimeHub:Hub
     {
-        //private readonly ApplicationDbContext db;
-
-        //public RealtimeHub(ApplicationDbContext db)
-        //{
-        //    this.db = db;
-        //}
-      
+       
+     
         public override Task OnConnectedAsync()
         {
-            Context.Items.Add(Context.UserIdentifier, Context.ConnectionId);
-            //db.OnlineUsers.Add(new OnlineUser { UserId = Context.UserIdentifier, ConnectionId = Context.ConnectionId });
-            //db.SaveChanges();
-            return base.OnConnectedAsync();
+            try
+            {
+                
+                Context.Items.Add(Context.UserIdentifier, Context.ConnectionId);
+                return base.OnConnectedAsync();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
         }
-        public override Task OnDisconnectedAsync(Exception exception)
-        {
-            Context.Items.Remove(Context.UserIdentifier);
-            //db.Remove(db.OnlineUsers.Find(Context.UserIdentifier));
-            return base.OnDisconnectedAsync(exception); 
-        }
+    
+        //public override Task OnDisconnectedAsync(Exception exception)
+        //{
+        //    Context.Items.Remove(Context.UserIdentifier);
+        //    return base.OnDisconnectedAsync(exception);
+        //}
     }
 }

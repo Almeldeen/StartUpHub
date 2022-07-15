@@ -47,7 +47,7 @@ namespace API.Controllers
 
         }
         [HttpPost("SendMsg")]
-        public async Task<IActionResult> SendMsg(MessageVM messege)
+        public async Task<IActionResult> SendMsg([FromBody]MessageVM messege)
         {
 
             var res = await services.SendMsg(messege);
@@ -57,6 +57,28 @@ namespace API.Controllers
                 return Ok(res);
             }
             return BadRequest(res);
+        }
+        [HttpGet("UnReadMsgCount")]
+        public async Task<IActionResult> UnReadMsgCount()
+        {
+            var res = await services.UnReadMsgCount();
+            if (res > 0)
+            {
+                return Ok(res);
+            }
+            return BadRequest(res);
+
+        }
+        [HttpPost("ReadMsg")]
+        public async Task<IActionResult> ReadMsg(int chatId)
+        {
+            var res = await services.ReadMsg(chatId);
+            if (res)
+            {
+                return Ok(res);
+            }
+            return BadRequest(res);
+
         }
     }
 }

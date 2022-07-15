@@ -10,9 +10,11 @@ namespace DAL.ViewModels
     {
         public int ChatId { get; set; }
         public string UserId { get; set; }
+        public string UserRole { get; set; }
         public string UserImg{ get; set; }
         public string UserName{ get; set; }
         public string LastMsg{ get; set; }
+        public int unReadMsgCount{ get; set; }
         public DateTimeOffset LastMsgDate{ get; set; }
     }
 }

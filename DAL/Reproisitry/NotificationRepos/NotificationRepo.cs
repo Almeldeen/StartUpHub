@@ -28,14 +28,14 @@ namespace DAL.Reproisitry.NotificationRepos
             this.httpContextAccessor = httpContextAccessor;
             this.userMangger = userMangger;
         }
-        public async Task<NotificationVM> AddNotification( NotificationVM notification)
+        public async Task<NotificationVM> AddNotification(NotificationVM notification)
         {
             try
             {
                 var data = mapper.Map<Notifications>(notification);
                 await db.Notifications.AddAsync(data);
                 int res = await db.SaveChangesAsync();
-                if (res>0)
+                if (res > 0)
                 {
                     return notification;
                 }
@@ -50,14 +50,14 @@ namespace DAL.Reproisitry.NotificationRepos
 
         }
 
-        public async Task<ResponseVM<NotificationVM>> GetAllNotifications(int pagenum,int pagesize)
+        public async Task<ResponseVM<NotificationVM>> GetAllNotifications(int pagenum, int pagesize)
         {
             try
             {
                 var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 var userid = userMangger.FindByNameAsync(username).Result.Id;
                 ResponseVM<NotificationVM> response = new ResponseVM<NotificationVM>();
-                response.Data = await db.Notifications.OrderByDescending(x=> x.Createdate).Where(x => x.ReciverId == userid && x.Read == false).Skip(pagesize * (pagenum - 1)).Take(pagesize).Select(x => new NotificationVM
+                response.Data = await db.Notifications.OrderByDescending(x => x.Createdate).Where(x => x.ReciverId == userid && x.Read == false).Skip(pagesize * (pagenum - 1)).Take(pagesize).Select(x => new NotificationVM
                 {
                     SenderId = x.SenderId,
                     Createdate = x.Createdate,
@@ -80,7 +80,7 @@ namespace DAL.Reproisitry.NotificationRepos
 
                 return null;
             }
-         
+
         }
 
         public async Task<bool> ReadNotifications(int notificationId)
@@ -88,9 +88,9 @@ namespace DAL.Reproisitry.NotificationRepos
             try
             {
                 var data = await db.Notifications.Where(x => x.Id == notificationId).FirstOrDefaultAsync();
-                data.Read = true;
+                db.Notifications.Remove(data);
                 int res = await db.SaveChangesAsync();
-                if (res>0)
+                if (res > 0)
                 {
                     return true;
                 }
@@ -100,6 +100,21 @@ namespace DAL.Reproisitry.NotificationRepos
             {
 
                 return false;
+            }
+        }
+        public async Task<int> UnReadNotificationCount()
+        {
+            try
+            {
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var User = await userMangger.FindByNameAsync(username);
+                var count = await db.Notifications.Where(x => x.ReciverId == User.Id && x.Read == false).CountAsync();
+                return count;
+            }
+            catch (Exception ex)
+            {
+
+                return 0;
             }
         }
     }

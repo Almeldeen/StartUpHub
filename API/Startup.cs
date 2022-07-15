@@ -3,6 +3,7 @@ using API.Hups;
 using BLL.Helper;
 using BLL.Mapper;
 using BLL.Services.Auth;
+using BLL.Services.ChatServices;
 using BLL.Services.Field;
 using BLL.Services.Followers;
 using BLL.Services.Intern;
@@ -11,6 +12,7 @@ using BLL.Services.NotificationServicess;
 using BLL.Services.Post;
 using BLL.Services.Skills;
 using DAL.Data;
+using DAL.Reproisitry.ChatRepos;
 using DAL.Reproisitry.FieldRepos;
 using DAL.Reproisitry.Followers;
 using DAL.Reproisitry.InternRepos;
@@ -86,11 +88,15 @@ namespace API
             services.AddScoped<ISendNotification,SendNotification>();
             services.AddScoped<INotificationRepo, NotificationRepo>();
             services.AddScoped<INotificationServices, NotificationServices>();
+            services.AddScoped<IChatService, ChatService>();
+            services.AddScoped<IChatRepo, ChatRepo>();
+            services.AddScoped<IUserHelper, UserHelper>();
 
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                
             })
                 .AddJwtBearer(o =>
                 {
@@ -118,24 +124,50 @@ namespace API
                 options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
             }); 
             services.AddHttpContextAccessor();
-            services.AddSignalR();
+           
+            //    services.AddSignalR(srConfig => srConfig.EnableDetailedErrors = true)
+            //.AddAzureSignalR(azureConfig =>
+            //{
+            //    azureConfig.ConnectionString = "Endpoint=https://strtuphub.service.signalr.net;AuthType=aad;Version=1.0;";
+            //});
+            //services.AddSignalR(hubOptions =>           
+            //  hubOptions.EnableDetailedErrors = true).AddAzureSignalR(options =>
+            //{
+            //    options.ConnectionString = "Endpoint=https://strtuphub.service.signalr.net;AccessKey=vxX1IaW6SndixlkFEfkYQNW0aQf3nxdk9HeqFHCXDzE=;Version=1.0;";
+            //    options.ConnectionCount = 10;
+            //    options.AccessTokenLifetime = TimeSpan.FromDays(1);
+            //    options.ClaimsProvider = context => context.User.Claims;
+
+            //    options.GracefulShutdown.Mode = GracefulShutdownMode.WaitForClientsClose;
+            //    options.GracefulShutdown.Timeout = TimeSpan.FromSeconds(10);
+            //});
+
             services.AddSignalR(hubOptions =>
             {
                 hubOptions.EnableDetailedErrors = true;
-                hubOptions.KeepAliveInterval = TimeSpan.FromMinutes(2);
-                hubOptions.ClientTimeoutInterval = TimeSpan.FromMinutes(2);
-                hubOptions.MaximumReceiveMessageSize = long.MaxValue;
+                   hubOptions.KeepAliveInterval = TimeSpan.FromDays(1);
+                   hubOptions.ClientTimeoutInterval = TimeSpan.FromDays(2);
+                hubOptions.MaximumReceiveMessageSize = 102400000;
 
-            }).AddAzureSignalR("Endpoint=https://startuphub.service.signalr.net;AccessKey=/evy/a0aZQQaQLQYekFqYweEuoNoVC2gub3CHgAw/rQ=;Version=1.0;")
-            .AddNewtonsoftJsonProtocol(opt =>
-            {
-                opt.PayloadSerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-            });
+            }
+             ) ;
+            //services.AddSignalR(hubOptions =>
+            //{
+            //    hubOptions.EnableDetailedErrors = true;
+            //    hubOptions.KeepAliveInterval = TimeSpan.FromMinutes(2);
+            //    hubOptions.ClientTimeoutInterval = TimeSpan.FromMinutes(2);
+            //    hubOptions.MaximumReceiveMessageSize = long.MaxValue;
+
+            //})/*.AddAzureSignalR("Endpoint=https://startuphub.service.signalr.net;AccessKey=/evy/a0aZQQaQLQYekFqYweEuoNoVC2gub3CHgAw/rQ=;Version=1.0;");*/
+            //.AddNewtonsoftJsonProtocol(opt =>
+            //{
+            //    opt.PayloadSerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            //});
             //services.AddCors();
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy", builder => builder
-                    .WithOrigins("http://localhost:4200", "https://startuphub.vercel.app", "https://startuphup.azurewebsites.net")
+                    .WithOrigins("http://localhost:4200","https://startuphub.vercel.app", "https://startuphup2022.azurewebsites.net", "https://strtuphub.service.signalr.net")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials());
@@ -157,7 +189,7 @@ namespace API
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
             }
-
+            
             // app.UseCors(options => options
             //.AllowAnyOrigin()
             //.AllowAnyMethod()
@@ -169,10 +201,10 @@ namespace API
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-           
-            app.UseAzureSignalR(routes =>
+
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapHub<RealtimeHub>("/realtimeHub");
+                endpoints.MapHub<RealtimeHub>("/realtimeHub");
             });
             app.UseEndpoints(endpoints =>
             {

@@ -10,6 +10,7 @@ namespace DAL.ViewModels
     {
         public int Id { get; set; }     
         public string SenderId { get; set; }   
+        public string SenderRole { get; set; }   
         public string UserImg { get; set; }   
         public string UserName { get; set; }   
         public string ReciverId { get; set; }     

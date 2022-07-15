@@ -11,5 +11,7 @@ namespace BLL.Services.NotificationServicess
     {
         public Task<ResponseVM<NotificationVM>> GetAllNotifications(int pagenum, int pagesize);
         public Task<bool> ReadNotifications(int notificationId);
+        public  Task<int> UnReadNotificationCount();
+
     }
 }

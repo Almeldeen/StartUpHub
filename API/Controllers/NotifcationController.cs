@@ -40,6 +40,17 @@ namespace API.Controllers
             }
             return BadRequest(res);
         }
+        [HttpGet("UnReadNotificationCount")]
+        public async Task<IActionResult> UnReadNotificationCount()
+        {
+            var res = await services.UnReadNotificationCount();
+            if (res>0)
+            {
+                return Ok(res);
+            }
+            return BadRequest(res);
+
+        }
 
     }
 
