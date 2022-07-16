@@ -18,12 +18,10 @@ namespace API.Hups
     public class RealtimeHub:Hub
     {
        
-     
         public override Task OnConnectedAsync()
         {
             try
-            {
-                
+            {                                      
                 Context.Items.Add(Context.UserIdentifier, Context.ConnectionId);
                 return base.OnConnectedAsync();
             }
@@ -34,11 +32,11 @@ namespace API.Hups
             }
 
         }
-    
-        //public override Task OnDisconnectedAsync(Exception exception)
-        //{
-        //    Context.Items.Remove(Context.UserIdentifier);
-        //    return base.OnDisconnectedAsync(exception);
-        //}
+
+        public override Task OnDisconnectedAsync(Exception exception)
+        {          
+            Context.Items.Remove(Context.UserIdentifier);
+            return base.OnDisconnectedAsync(exception);
+        }
     }
 }

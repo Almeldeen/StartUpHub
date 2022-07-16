@@ -1,5 +1,4 @@
-﻿using BLL.Helper.SendNotifay;
-using API.Hups;
+﻿using API.Hups;
 using DAL.Data;
 using DAL.Reproisitry.NotificationRepos;
 using DAL.ViewModels;
@@ -54,8 +53,9 @@ namespace API.HupHelper.SendNotifay
                 notification.SenderRole = userManager.GetRolesAsync(user).Result.FirstOrDefault();
                 if (notification.ReciverId!=notification.SenderId)
                 {
+                    var recivername = await userManager.FindByIdAsync(notification.ReciverId);
                     await notificationRepo.AddNotification(notification);
-                    await hubContext.Clients.User(notification.ReciverId).SendAsync("getNotifcation", notification);
+                    await hubContext.Clients.User(recivername.UserName).SendAsync("getNotifcation", notification);
                 }
 
             }
@@ -88,10 +88,11 @@ namespace API.HupHelper.SendNotifay
                     Createdate = DateTimeOffset.Now
                 };
                 notification.SenderRole = userManager.GetRolesAsync(user).Result.FirstOrDefault();
+                var recivername = await userManager.FindByIdAsync(notification.ReciverId);
                 await notificationRepo.AddNotification(notification);
-                await hubContext.Clients.User(item).SendAsync("getNotifcation", notification);
+                await hubContext.Clients.User(recivername.UserName).SendAsync("getNotifcation", notification);
             }
-          
+
         }
 
         public async Task SendMsg(MessageVM message)
@@ -109,8 +110,9 @@ namespace API.HupHelper.SendNotifay
                 Createdate = message.Createdate
             };
             await notificationRepo.AddNotification(notification);
-            await hubContext.Clients.User(message.ReciverId).SendAsync("reciveMsg", message);
-            await hubContext.Clients.User(message.ReciverId).SendAsync("getNotifcation", notification);
+            var recivername = await userManager.FindByIdAsync(notification.ReciverId);
+            await hubContext.Clients.User(recivername.UserName).SendAsync("reciveMsg", message);
+            await hubContext.Clients.All.SendAsync("getNotifcation", notification);
 
         }
     }

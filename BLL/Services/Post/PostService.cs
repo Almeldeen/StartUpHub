@@ -24,7 +24,7 @@ namespace BLL.Services.Post
         {
             try
             {
-                if (Post.PostImage != null/*|Post.PostImage.Count>0*/)
+                if (Post.PostImage != null)
                 {
                     Post.PostImagePath = new List<string>();
                     foreach (var item in Post.PostImage)
@@ -39,9 +39,7 @@ namespace BLL.Services.Post
             catch (Exception ex)
             {
 
-                var p = new PostVM();
-                //p.error = ex.Message;
-                return p;
+                return null;
             }
 
         }

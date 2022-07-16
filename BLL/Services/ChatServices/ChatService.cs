@@ -41,5 +41,10 @@ namespace BLL.Services.ChatServices
             return await repo.ReadMsg(chatId);
 
         }
+        public async Task<int> GetMsgsChatByUserId(string userId, int page, int pageSize)
+        {
+            return await repo.GetMsgsChatByUserId(userId, page, pageSize);
+
+        }
     }
 }

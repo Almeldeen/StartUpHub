@@ -38,8 +38,8 @@ namespace DAL.Reproisitry.ChatRepos
                 var User = await userMangger.FindByNameAsync(username);
                 ResponseVM<ChatVM> response = new ResponseVM<ChatVM>();
                 List<ChatVM> chats = new List<ChatVM>();
-                chats.AddRange(await db.Chats.Where(x => x.SenderId == User.Id).Select(x => new ChatVM { ChatId = x.Id, UserId = x.ReciverId, UserImg = x.Reciver.ProfileImage, UserName = x.Reciver.UserName,LastMsg=x.Msgs.OrderBy(x=> x.Createdate).Select(x=> x.Content).LastOrDefault(),LastMsgDate=x.Msgs.OrderBy(x => x.Createdate).Select(x=> x.Createdate).LastOrDefault(),unReadMsgCount=x.Msgs.Where(x=> x.Read==false).Count() }).ToListAsync());
-                chats.AddRange(await db.Chats.Where(x => x.ReciverId == User.Id).Select(x => new ChatVM { ChatId = x.Id, UserId = x.SenderId, UserImg = x.Sender.ProfileImage, UserName = x.Sender.UserName, LastMsg = x.Msgs.OrderBy(x => x.Createdate).Select(x => x.Content).LastOrDefault(), LastMsgDate = x.Msgs.OrderBy(x => x.Createdate).Select(x => x.Createdate).LastOrDefault(), unReadMsgCount = x.Msgs.Where(x => x.Read == false).Count() }).ToListAsync());
+                chats.AddRange(await db.Chats.Where(x => x.SenderId == User.Id).Select(x => new ChatVM { ChatId = x.Id, UserId = x.ReciverId, UserImg = x.Reciver.ProfileImage, UserName = x.Reciver.FullName,LastMsg=x.Msgs.OrderBy(x=> x.Createdate).Select(x=> x.Content).LastOrDefault(),LastMsgDate=x.Msgs.OrderBy(x => x.Createdate).Select(x=> x.Createdate).LastOrDefault(),unReadMsgCount=x.Msgs.Where(x=> x.ReciverId==User.Id&& x.Read==false).Count() }).ToListAsync());
+                chats.AddRange(await db.Chats.Where(x => x.ReciverId == User.Id).Select(x => new ChatVM { ChatId = x.Id, UserId = x.SenderId, UserImg = x.Sender.ProfileImage, UserName = x.Sender.FullName, LastMsg = x.Msgs.OrderBy(x => x.Createdate).Select(x => x.Content).LastOrDefault(), LastMsgDate = x.Msgs.OrderBy(x => x.Createdate).Select(x => x.Createdate).LastOrDefault(), unReadMsgCount = x.Msgs.Where(x => x.ReciverId == User.Id && x.Read == false).Count() }).ToListAsync());
                 response.Data = chats.OrderByDescending(x=> x.LastMsgDate).Skip(pageSize * (page - 1)).Take(pageSize);
                 foreach (var item in response.Data)
                 {
@@ -92,6 +92,23 @@ namespace DAL.Reproisitry.ChatRepos
                 return response;
             }
         }
+        public async Task<int> GetMsgsChatByUserId(string userId, int page, int pageSize)
+        {
+            try
+            {
+                var username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var User = await userMangger.FindByNameAsync(username);
+
+                var chatid = await db.Chats.Where(x => (x.SenderId == User.Id || x.ReciverId == User.Id) && (x.SenderId == userId || x.ReciverId == userId)).Select(x=> x.Id).FirstOrDefaultAsync();
+               
+                return chatid;
+            }
+            catch (Exception ex)
+            {
+
+                return 0;
+            }
+        }
 
         public async Task<MessageVM> SendMsg(MessageVM messege)
         {
@@ -101,6 +118,7 @@ namespace DAL.Reproisitry.ChatRepos
                 var User = await userMangger.FindByNameAsync(username);
                 if (messege.ChatId==null)
                 {
+                    
                     var NewChat = new Chat() { SenderId = User.Id, ReciverId = messege.ReciverId };
                     await db.Chats.AddAsync(NewChat);
                     int res1 = await db.SaveChangesAsync();

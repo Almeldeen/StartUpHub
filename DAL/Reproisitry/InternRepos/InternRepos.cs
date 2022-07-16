@@ -60,6 +60,7 @@ namespace DAL.Reproisitry.InternRepos
                 if (res > 0)
                 {
                     internApplaied.InterenId = userid;
+                    internApplaied.userId = await db.InternShips.Where(x => x.InternShipId == internApplaied.InternShipId).Select(x => x.UserId).FirstOrDefaultAsync();
                     return internApplaied;
                 }
                 return null;
@@ -369,8 +370,8 @@ namespace DAL.Reproisitry.InternRepos
             var data = await db.Interns.Where(x => x.UserId == user.Id).Select(x => new internSimpleStatsVM
             {
                 articleCount = x.User.Posts.Count(),
-                followers = x.User.FollowsReceiver.Count(),
-                following = x.User.FollowsSender.Count(),
+                followers = x.User.FollowsSender.Count(),
+                following = x.User.FollowsReceiver.Count(),
                 jobTitle = x.User.jopTitile,
                 internshipRequests = x.InternApplaieds.Count(),
             }).FirstOrDefaultAsync();

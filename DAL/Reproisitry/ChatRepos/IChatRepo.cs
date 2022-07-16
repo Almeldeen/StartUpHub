@@ -14,6 +14,7 @@ namespace DAL.Reproisitry.ChatRepos
         public  Task<ResponseVM<MessageVM>> GetMsgsChat(int chatId, int page, int pageSize);
         public  Task<int> UnReadMsgCount();
         public  Task<bool> ReadMsg(int chatId);
+        public Task<int> GetMsgsChatByUserId(string userId, int page, int pageSize);
 
 
     }

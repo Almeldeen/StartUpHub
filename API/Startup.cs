@@ -149,8 +149,7 @@ namespace API
                    hubOptions.ClientTimeoutInterval = TimeSpan.FromDays(2);
                 hubOptions.MaximumReceiveMessageSize = 102400000;
 
-            }
-             ) ;
+            }) ;
             //services.AddSignalR(hubOptions =>
             //{
             //    hubOptions.EnableDetailedErrors = true;

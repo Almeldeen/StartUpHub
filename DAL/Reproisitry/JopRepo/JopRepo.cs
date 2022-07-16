@@ -241,8 +241,8 @@ namespace DAL.Reproisitry.JopRepo
             var data = await db.Users.Where(x => x.Id == user.Id).Select(x => new CompanySimpleStatsVM
             {
                 articleCount = x.Posts.Count(),
-                followers = x.FollowsReceiver.Count(),
-                following = x.FollowsSender.Count(),
+                followers = x.FollowsSender.Count(),
+                following = x.FollowsReceiver.Count(),
                 jobTitle = x.jopTitile,
                 internshipRequests =  db.InternShips.Where(x => x.UserId == user.Id).Count(),
                 in_ProgressRequests = db.InternApplaieds.Where(x=> x.InternShip.UserId == user.Id && x.State == "IN_PROGRESS").Count(),

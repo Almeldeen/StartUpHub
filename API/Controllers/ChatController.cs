@@ -53,7 +53,7 @@ namespace API.Controllers
             var res = await services.SendMsg(messege);
             if (res != null)
             {
-               await sendNotification.SendMsg(messege);
+               await sendNotification.SendMsg(res);
                 return Ok(res);
             }
             return BadRequest(res);
@@ -62,7 +62,7 @@ namespace API.Controllers
         public async Task<IActionResult> UnReadMsgCount()
         {
             var res = await services.UnReadMsgCount();
-            if (res > 0)
+            if (res >= 0)
             {
                 return Ok(res);
             }
@@ -79,6 +79,16 @@ namespace API.Controllers
             }
             return BadRequest(res);
 
+        }
+        [HttpGet("GetMsgsChatByUserId")]
+        public async Task<IActionResult> GetMsgsChatByUserId(string userId, int page, int pageSize)
+        {
+            var res = await services.GetMsgsChatByUserId(userId, page, pageSize);
+            if (res>0)
+            {
+                return Ok(res);
+            }
+            return BadRequest(res);
         }
     }
 }

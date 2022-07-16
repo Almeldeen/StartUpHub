@@ -1,6 +1,5 @@
 ﻿using BLL.Helper;
 using API.HupHelper.SendNotifay;
-using BLL.Hups;
 using BLL.Services.Intern;
 using DAL.Data;
 using DAL.Reproisitry.NotificationRepos;
@@ -79,6 +78,8 @@ namespace API.Controllers
             var result = await _internService.AddInternApplaied(internApplaied);
             if (result != null)
             {
+
+                
                 await sendNotification.SendNotifcation(internApplaied.userId, internApplaied.InternShipId, null,"APPLAYJOB");
                 return Ok(result);
             }

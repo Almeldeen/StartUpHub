@@ -202,8 +202,9 @@ namespace DAL.Reproisitry.PostRepos
                     listdata.Posts = listdata.Posts.OrderByDescending(x => x.likesCount).Skip(4 * (pagenum - 1)).Take(4).OrderBy(item => rnd.Next()).ToList();
                     int pgsize = 4 - (listdata.Posts.Count() - 1);
                     if (User.FieldId!=null)
-                    {
-                        listdata.Jops = await db.InternShips.Where(x => x.FieldId == User.FieldId).OrderByDescending(x => x.Createdate).Skip(pgsize * (pagenum - pgsize)).Take(pgsize).Select(x => new JopVM
+                    { 
+
+                        listdata.Jops = await db.InternShips.Where(x => x.FieldId == User.FieldId).OrderByDescending(x => x.Createdate).Skip(pgsize * (pagenum - 1)).Take(pgsize).Select(x => new JopVM
                         {
                             content = x.Content,
                             skillls = x.Skills.Select(x => new SkillsVM { Name = x.Name }).ToList(),
@@ -224,7 +225,7 @@ namespace DAL.Reproisitry.PostRepos
                     else
                     {
                        
-                        listdata.Jops = await db.InternShips.OrderByDescending(x => x.Createdate).Skip(pgsize * (pagenum - pgsize)).Take(pgsize).Select(x => new JopVM
+                        listdata.Jops = await db.InternShips.OrderByDescending(x => x.Createdate).Skip(pgsize * (pagenum - 1)).Take(pgsize).Select(x => new JopVM
                         {
                             content = x.Content,
                             skillls = x.Skills.Select(x => new SkillsVM { Name = x.Name }).ToList(),
