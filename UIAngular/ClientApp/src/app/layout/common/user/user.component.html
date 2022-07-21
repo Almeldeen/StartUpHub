@@ -1,0 +1,54 @@
+<!-- Button -->
+<button mat-icon-button [matMenuTriggerFor]="userActions">
+    <span class="relative">
+        <img class="w-7 h-7 border rounded-full" *ngIf="showAvatar && user?.image" [src]="'https://' + user?.image">
+        <mat-icon *ngIf="!showAvatar || !user?.image" [svgIcon]="'heroicons_outline:user-circle'"></mat-icon>
+        <span class="absolute right-0 bottom-0 w-2 h-2 rounded-full" [ngClass]="{'mr-px mb-px': !showAvatar || !user?.image,
+                          'bg-green-500': user?.fullName === 'online',
+                          'bg-amber-500': user?.fullName === 'away',
+                          'bg-red-500': user?.fullName === 'busy',
+                          'bg-gray-400': user?.fullName === 'not-visible'}"></span>
+    </span>
+</button>
+
+<mat-menu [xPosition]="'before'" #userActions="matMenu">
+    <button mat-menu-item class="text-center truncate">
+        <span class="flex flex-col  leading-none">
+            <span class="mt-1.5 text-md font-medium capitalize ">{{user?.fullName}}</span>
+        </span>
+    </button>
+    <mat-divider class="my-2"></mat-divider>
+    <button (click)="goProfile()" mat-menu-item>
+        <mat-icon [svgIcon]="'heroicons_outline:user-circle'"></mat-icon>
+        <span>Profile</span>
+    </button>
+    <button mat-menu-item (click)="goSetting()">
+        <mat-icon [svgIcon]="'heroicons_outline:cog'"></mat-icon>
+        <span>Settings</span>
+    </button>
+
+    <button mat-menu-item [matMenuTriggerFor]="mode">
+        <mat-icon [svgIcon]="'heroicons_outline:adjustments'"></mat-icon>
+        <span>Theme mode</span>
+    </button>
+    <mat-divider class="my-2"></mat-divider>
+    <button mat-menu-item (click)="signOut()">
+        <mat-icon [svgIcon]="'heroicons_outline:logout'"></mat-icon>
+        <span>Sign out</span>
+    </button>
+</mat-menu>
+
+
+
+
+<mat-menu class="user-status-menu" #mode="matMenu">
+    <button mat-menu-item (click)="setScheme('light')" [class.active]="config.scheme === 'light'">
+        <mat-icon svgIcon="heroicons_outline:sun"></mat-icon>
+        <span>Light mode</span>
+    </button>
+    <button mat-menu-item (click)="setScheme('dark')" [class.active]="config.scheme === 'dark'">
+        <mat-icon svgIcon="heroicons_outline:moon"></mat-icon>
+        <span>Dark mode</span>
+    </button>
+
+</mat-menu>

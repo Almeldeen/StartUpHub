@@ -166,7 +166,7 @@ namespace API
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy", builder => builder
-                    .WithOrigins("http://localhost:4200","https://startuphub.vercel.app", "https://startuphup2022.azurewebsites.net", "https://strtuphub.service.signalr.net")
+                    .WithOrigins("https://localhost:44312", "https://startuphub.vercel.app", "https://startuphup2022.azurewebsites.net", "https://strtuphub.service.signalr.net")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials());

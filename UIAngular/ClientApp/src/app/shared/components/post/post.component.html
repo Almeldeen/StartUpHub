@@ -1,0 +1,133 @@
+<ng-container *ngIf="article">
+    <!-- Post card -->
+    <fuse-card class="flex flex-col  w-full mb-4" #expandableCard02="fuseCard">
+        <div class="flex items-center mx-3 sm:mx-4 mt-6 mb-4">
+            <img class="w-10 h-10 cursor-pointer rounded-full mr-4"
+                [routerLink]="['/profile',article?.userRole === 'INTERN'? 'intern' : 'company', article?.userId]"
+                [src]="article?.userImg?'https://' +article?.userImg : 'assets/images/dummy-avatar.jpg'"
+                alt="Card cover image">
+            <div class="flex flex-col">
+                <span [routerLink]="['/profile',article?.userRole === 'INTERN'? 'intern' : 'company', article?.userId]"
+                    class="font-semibold capitalize cursor-pointer hover:underline leading-none">{{article?.userFullName ||
+                    '-'}}</span>
+                <span class="text-sm text-secondary leading-none mt-1">{{article?.createdDate | date: dateFormat ||
+                    ''}}</span>
+            </div>
+            <div *ngIf="article?.fieldName"
+                class="ml-auto py-0.5 px-3 rounded-full text-sm font-medium text-gray-500 bg-gray-100 dark:text-gray-300 dark:bg-gray-700">
+                {{article?.fieldName}}
+            </div>
+            <button class="ml-3 " mat-icon-button [matMenuTriggerFor]="postCardMenu02">
+                <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:dots-vertical'"></mat-icon>
+            </button>
+            <mat-menu #postCardMenu02="matMenu">
+                <button *ngIf="showViewBtn" [routerLink]="['/post', article?.id]" mat-menu-item>
+                    <span class="flex items-center">
+                        <mat-icon class="icon-size-5 mr-3" [svgIcon]="'heroicons_solid:view-list'"></mat-icon>
+                        <span>View details</span>
+                    </span>
+                </button>
+                <button (click)="copyLink(article?.id)"  mat-menu-item>
+                    <span class="flex items-center">
+                        <mat-icon class="icon-size-5 mr-3" [svgIcon]="'mat_outline:content_copy'"></mat-icon>
+                        <span>Copy link</span>
+                    </span>
+                </button>
+
+
+                <mat-divider *ngIf="showViewBtn && (article | userPost)" class="my-2"></mat-divider>
+
+                <button *ngIf="article | userPost" (click)="updateArticle(article)" mat-menu-item class="">
+                    <span class="flex items-center">
+                        <mat-icon class="icon-size-5 mr-3 " [svgIcon]="'mat_outline:edit_note'"></mat-icon>
+                        <span>Edit article</span>
+                    </span>
+                </button>
+                <button *ngIf="article | userPost" (click)="deleteArticle(article)" mat-menu-item class="text-red-600">
+                    <span class="flex items-center">
+                        <mat-icon class="icon-size-5 mr-3 text-red-600" [svgIcon]="'heroicons_outline:trash'">
+                        </mat-icon>
+                        <span>Delete article</span>
+                    </span>
+                </button>
+            </mat-menu>
+        </div>
+        <div #viewContainer [ngClass]="{'html-content-truncate' : article?.content.length > 300 && showViewBtn}"
+            class="mx-3 mb-2 sm:mx-6 ">
+            <quill-view [content]="article?.content" format="html" sanitize="true" theme="snow"></quill-view>
+        </div>
+        <ng-container *ngIf=" article?.content.length > 300 && showViewBtn">
+            <div class="text-left mx-3 sm:mx-6 mt-2 text-blue-500 text-sm cursor-pointer">
+                <a *ngIf="viewContainer.classList.contains('html-content-truncate')"
+                    (click)="viewContainer.classList.toggle('html-content-truncate')">See more ... </a>
+                <a *ngIf="!viewContainer.classList.contains('html-content-truncate')"
+                    (click)="viewContainer.classList.toggle('html-content-truncate')">See less</a>
+            </div>
+        </ng-container>
+
+        <div photoGalleryGroup *ngIf="article?.images" class="flex mx-2.5  photoGalleryGroup sm:mx-5  mb-2">
+
+
+            <div class="cursor-pointer rounded-md overflow-hidden max-h-100  m-1"
+                [attr.data-count]=" 'UP' + (article?.images?.length - 3)" [photoGallery]="'https://'+image"
+                *ngFor="let image of article?.images;index as i"
+                [ngClass]="{'last-image' : article?.images?.length > 3 && i >= 3, 'hidden' : i > 3 }">
+                <img #img (error)="$event.target.parentElement.style.display = 'none'" class="object-cover "
+                    [src]="'https://'+image" alt="post image ">
+            </div>
+
+
+
+
+        </div>
+
+        <hr class="mt-0 mb-4 mx-6 sm:mx-8 border-t-0">
+        <div class="flex flex-col sm:flex-row sm:items-center mx-6 sm:mx-8 mb-4 sm:mb-6">
+            <div class="flex items-center ">
+                <button (click)="dislikeArticle(article)" *ngIf="article?.likedByUser" class="px-3 mr-1" mat-button>
+                    <mat-icon class="icon-size-5 text-red-500 mr-2" [svgIcon]="'heroicons_solid:heart'"></mat-icon>
+                    <span>{{article?.likesCount}}</span>
+                </button>
+                <button (click)="likeArticle(article)" *ngIf="!article?.likedByUser" class="px-3 mr-1" mat-button>
+                    <mat-icon class="icon-size-5  mr-2" [svgIcon]="'heroicons_outline:heart'"></mat-icon>
+                    <span>{{article?.likesCount}}</span>
+                </button>
+                <button (click)="expandableCard02.expanded = !expandableCard02.expanded" class="px-3 mr-1" mat-button>
+                    <mat-icon class="icon-size-5 mr-2" [svgIcon]="'heroicons_solid:chat-alt'"></mat-icon>
+                    <span>{{article?.commentsCount || 0}}</span>
+                </button>
+
+            </div>
+            <div class="hidden sm:flex flex-auto"></div>
+            <div *ngIf="showComments" class="flex items-center mt-4 sm:mt-0">
+
+                <button class="px-3 sm:mr-4" mat-button
+                    (click)=" showComments ? expandableCard02.expanded = !expandableCard02.expanded : null">
+                    <ng-container *ngIf="article?.commentsCount <= 0">
+                        <span class="mr-1">No comments</span>
+                        <mat-icon *ngIf="showComments"
+                            class="icon-size-5 transform transition-transform ease-in-out duration-150 rotate-0"
+                            [ngClass]="{'rotate-180': expandableCard02.expanded}"
+                            [svgIcon]="'heroicons_solid:chevron-down'"></mat-icon>
+                    </ng-container>
+                    <ng-container *ngIf="article?.commentsCount > 0">
+
+                        <span class="mr-1">Comments</span>
+                        <mat-icon *ngIf="showComments"
+                            class="icon-size-5 transform transition-transform ease-in-out duration-150 rotate-0"
+                            [ngClass]="{'rotate-180': expandableCard02.expanded}"
+                            [svgIcon]="'heroicons_solid:chevron-down'"></mat-icon>
+                    </ng-container>
+                </button>
+            </div>
+        </div>
+
+        <ng-container *ngIf="showComments" fuseCardExpansion>
+            <hr class="border-b m-0">
+            <!-- comments management -->
+            <app-comments (deleteCommentEmitter)="deleteComment()" (addCommentEmitter)="addComment()"
+                *ngIf="expandableCard02.expanded" [postId]="article?.id"></app-comments>
+        </ng-container>
+    </fuse-card>
+    <!-- End Post card -->
+</ng-container>

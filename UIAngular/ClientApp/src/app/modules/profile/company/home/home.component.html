@@ -1,0 +1,179 @@
+<!-- Main -->
+<div class=" justify-center w-full max-w-400 gap-4 grid grid-cols-12 mt-4 mx-auto p-6 sm:p-8">
+
+    <!-- Left Column -->
+    <div class="hidden  h-full min-w-80 lg:flex flex-col items-start col-span-12 lg:col-span-3">
+
+        <section *ngIf="!companyProfile" class="w-full  text-center">
+            <fuse-card class="flex flex-col  w-full p-8">
+
+                <mat-progress-spinner [diameter]="24" class="mx-auto" [mode]="'indeterminate'">
+                </mat-progress-spinner>
+            </fuse-card>
+        </section>
+        <ng-container *ngIf="companyProfile">
+            <section class="sticky mb-3 top-28 w-full">
+                <!-- About me -->
+                <fuse-card class="flex  flex-col  w-full p-8">
+                    <ng-container *ngIf="companyProfile?.about">
+                        <div class="text-2xl font-semibold leading-tight">About Me</div>
+                        <div class="mt-4">
+                            {{companyProfile?.about}}
+                        </div>
+                    </ng-container>
+                    <hr *ngIf="companyProfile?.about" class="w-full border-t my-6">
+                    <div class="flex flex-col">
+                        <ng-container *ngIf="companyProfile?.address">
+                            <div class="flex items-center">
+                                <mat-icon class="icon-size-5 mr-3" [svgIcon]="'heroicons_solid:location-marker'">
+                                </mat-icon>
+                                <span class="leading-none">{{companyProfile?.address}}</span>
+                            </div>
+
+                        </ng-container>
+                        <ng-container *ngIf="companyProfile?.jobTitle">
+
+                            <div class="flex items-center mt-4">
+                                <mat-icon class="icon-size-5 mr-3" [svgIcon]="'heroicons_solid:briefcase'"></mat-icon>
+                                <span class="leading-none">{{companyProfile?.jobTitle}}</span>
+                            </div>
+
+                        </ng-container>
+                        <ng-container *ngIf="companyProfile?.mobile">
+
+                            <div class="flex items-center mt-4">
+                                <mat-icon class="icon-size-5 mr-3" [svgIcon]="'heroicons_solid:phone'"></mat-icon>
+                                <span class="leading-none">{{companyProfile?.mobile}}</span>
+                            </div>
+
+                        </ng-container>
+
+
+
+                    </div>
+                    <button *appPublicProfile="false" class="px-6 mt-8" mat-flat-button [color]="'primary'" [routerLink]="['about']">
+                        Edit info
+                    </button>
+                </fuse-card>
+
+                <!-- Followers -->
+                <ng-container *appPublicProfile="false">
+                    <section *ngIf="!followers" class="w-full  text-center">
+                        <fuse-card class="flex flex-col  max-w-80 w-full mt-8 px-8 pt-6 pb-4">
+
+                            <mat-progress-spinner [diameter]="24" class="mx-auto" [mode]="'indeterminate'">
+                            </mat-progress-spinner>
+                        </fuse-card>
+                    </section>
+                    <fuse-card *ngIf="followers" class="flex flex-col  max-w-80 w-full mt-8 px-8 pt-6 pb-4">
+                        <div class="flex items-center justify-between">
+                            <div class="text-2xl font-semibold leading-tight">Followers</div>
+                            <div class="-mr-3">
+                                <button mat-icon-button [matMenuTriggerFor]="listCard08Menu">
+                                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:dots-vertical'"></mat-icon>
+                                </button>
+                                <mat-menu #listCard08Menu="matMenu">
+                                    <button [routerLink]="['/people']" mat-menu-item>Find friends</button>
+                                </mat-menu>
+                            </div>
+                        </div>
+                        <ng-container *ngIf="followers &&  followers.length === 0">
+                            <div class="text-center w-full text-md my-5">
+                                No followers
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="followers && followers.length">
+                            <div class="flex flex-col">
+                                <div class="flex flex-wrap  mt-6">
+                                    <img [routerLink]="['/profile',follower?.userRole === 'INTERN'? 'intern' : 'company', follower?.id]" [matTooltip]="follower?.name || undefined" *ngFor="let follower of followers" class="w-14 h-14 m-1 rounded-full cursor-pointer" [src]="follower?.img? 'https://' + follower?.img : 'assets/images/dummy-avatar.jpg'"
+                                        alt="">
+
+                                </div>
+
+                            </div>
+                            <div class="flex items-center mt-6 -mx-3">
+                                <button class="px-3" mat-button [color]="'primary'" [routerLink]="['followers']">
+                                    See all followers
+                                </button>
+                            </div>
+
+                        </ng-container>
+                    </fuse-card>
+                </ng-container>
+
+
+            </section>
+
+        </ng-container>
+
+
+
+
+
+    </div>
+
+    <!-- Column -->
+
+    <div class="flex flex-col items-start col-span-12 lg:col-span-9 ">
+
+        <section *appPublicProfileCompany="false" class="flex mb-4 justify-between  w-full items-center">
+            <!-- Published Jobs -->
+            <div class="flex flex-col flex-auto ml-2 p-6 bg-card shadow rounded-2xl overflow-hidden ">
+                <div class="flex items-start justify-between">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate mx-auto">Published Jobs</div>
+
+                </div>
+                <div class="flex flex-col items-center ">
+                    <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-blue-500">{{stats?.internshipRequests || 0}}</div>
+
+                </div>
+            </div>
+            <!-- pending recruitment count-->
+            <div class="flex flex-col flex-auto ml-2 p-6 bg-card shadow rounded-2xl overflow-hidden">
+                <div class="flex items-start justify-between">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate mx-auto">Recruitment process</div>
+
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-amber-500">{{stats?.in_ProgressRequests || 0}}</div>
+                </div>
+            </div>
+            <!-- pending recruitment count-->
+            <div class="flex flex-col flex-auto ml-2 p-6 bg-card shadow rounded-2xl overflow-hidden">
+                <div class="flex items-start justify-between">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate mx-auto">New requests</div>
+
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-green-500">{{stats?.pendingRequests || 0}}</div>
+                </div>
+            </div>
+
+        </section>
+        <section class="w-full">
+
+            <!-- articles & jobs -->
+            <section infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50" (scrolled)="onScroll()" class="lg:col-span-6 col-span-12  ">
+                <!-- Note -->
+
+                <div *ngIf="jobs && jobs.length">
+                    <ng-container *ngFor="let post of jobs;index as i">
+                        <app-job [showUserData]="false" class="w-full" [job]="post"></app-job>
+                    </ng-container>
+                </div>
+                <section *ngIf="gettingJobs" class="w-full my-5  text-center">
+                    <mat-progress-spinner [diameter]="24" class="mx-auto" [mode]="'indeterminate'">
+                    </mat-progress-spinner>
+
+                </section>
+                <ng-container *ngIf="!gettingJobs && jobs && jobs.length === 0 ">
+                    <div class="text-center w-full text-md my-5">
+                        No Jobs!
+                    </div>
+                </ng-container>
+            </section>
+        </section>
+
+
+
+    </div>

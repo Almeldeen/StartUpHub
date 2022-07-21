@@ -1,0 +1,2332 @@
+openapi: 3.0.0
+info:
+  title: startuphub
+  version: '1.0'
+  description: ''
+servers:
+  - url: 'https://startuphup.azurewebsites.net'
+paths:
+  /api/auth/Register:
+    post:
+      summary: Registration
+      operationId: register
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  role:
+                    type: string
+                  mobile:
+                    type: string
+                  username:
+                    type: string
+                  message:
+                    type: string
+                  emailConfirmToken:
+                    type: string
+                  isAuthenticated:
+                    type: string
+                  isConfirmed:
+                    type: string
+                  fullName:
+                    type: string
+                  address:
+                    type: string
+                  image:
+                    type: string
+                  expiresOn:
+                    type: string
+                  token:
+                    type: string
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/account'
+    parameters: []
+  /api/auth/ChangePassword:
+    parameters: []
+    post:
+      summary: Update pass
+      operationId: change-password
+      responses:
+        '200':
+          description: OK
+      tags:
+        - auth
+      description: 'update password '
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: newPassword
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: oldPassword
+          required: true
+  /api/auth/account:
+    get:
+      summary: get account
+      tags:
+        - auth
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/account'
+              examples:
+                test:
+                  value:
+                    id: string
+                    fullName: 'magdy '
+                    role: string
+                    email: string
+                    mobile: string
+                    address: string
+                    isConfirmed: true
+                    password: string
+                    username: string
+                    image: string
+      operationId: get-account
+    parameters: []
+  /api/auth/islogged:
+    get:
+      summary: Your GET endpoint
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+      operationId: isLogged
+      tags:
+        - auth
+  /api/auth/login:
+    post:
+      summary: loginn
+      operationId: login
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  message:
+                    type: string
+                  emailConfirmToken:
+                    type: string
+                  isConfirmed:
+                    type: boolean
+                  isAuthenticated:
+                    type: boolean
+                  fullName:
+                    type: string
+                  mobile:
+                    type: string
+                  address:
+                    type: string
+                  image:
+                    type: string
+                  role:
+                    type: string
+                  expiresOn:
+                    type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+            examples:
+              example-1:
+                value:
+                  email: string
+                  password: string
+      tags:
+        - auth
+  /api/posts/EditComment:
+    parameters: []
+    put:
+      summary: Update comment
+      operationId: update-comment
+      responses:
+        '200':
+          description: OK
+      tags:
+        - articles
+      description: ''
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: PostId
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: commentId
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: Cotent
+          required: true
+  /api/posts/DeletComment:
+    parameters: []
+    delete:
+      summary: Delete comment
+      operationId: delete-comment
+      responses:
+        '200':
+          description: OK
+      tags:
+        - articles
+      description: ''
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: PostId
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: commentId
+          required: true
+  /api/posts/RateComment:
+    parameters: []
+    put:
+      summary: Delete comment
+      operationId: rate-comment
+      responses:
+        '200':
+          description: OK
+      tags:
+        - articles
+      description: ''
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: PostId
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: commentId
+          required: true
+        - schema:
+            type: string
+            enum:
+              - UP
+              - DOWN
+              - NONE
+          in: query
+          name: type
+          required: true
+  /api/posts/Comment:
+    parameters: []
+    post:
+      summary: add comment
+      operationId: add-comment
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/comment'
+      tags:
+        - articles
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: Cotent
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: PostId
+          required: true
+  /api/posts/AddPost:
+    parameters: []
+    post:
+      summary: Post article
+      operationId: post-article
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                Content:
+                  type: string
+                PostImage:
+                  format: binary
+                  oneOf:
+                    - type: array
+                      items:
+                        type: string
+                        format: binary
+                    - type: string
+                FieldId:
+                  type: number
+              required:
+                - Content
+                - PostImage
+                - FieldId
+            examples: {}
+        description: ''
+      tags:
+        - articles
+  /api/posts/updatePost:
+    parameters: []
+    put:
+      summary: Update post
+      operationId: update-post
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timelineArticle'
+      tags:
+        - articles
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                Content:
+                  type: string
+                PostImage:
+                  format: binary
+                  oneOf:
+                    - type: array
+                      items:
+                        type: string
+                        format: binary
+                    - type: string
+                      properties: {}
+                FieldId:
+                  type: number
+                postId:
+                  type: number
+              required:
+                - Content
+                - PostImage
+                - FieldId
+                - postId
+            examples: {}
+        description: ''
+  /api/posts/deletePost:
+    parameters: []
+    delete:
+      summary: Delete article
+      operationId: delete-article
+      responses:
+        '200':
+          description: OK
+      tags:
+        - articles
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: id
+          required: true
+  /api/posts/like:
+    parameters: []
+    post:
+      summary: Like article
+      operationId: like-article
+      responses:
+        '200':
+          description: OK
+      description: ''
+      tags:
+        - articles
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: PostId
+          required: true
+          description: article ID
+  /api/posts/DisLike:
+    parameters: []
+    delete:
+      summary: Dislike article
+      operationId: dislike-article
+      responses:
+        '200':
+          description: OK
+      tags:
+        - articles
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: PostId
+          required: true
+  /api/posts/get-user-articles:
+    get:
+      summary: get articles for user
+      tags:
+        - articles
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/timelineArticle'
+                  totalPages:
+                    type: integer
+                  currentPage:
+                    type: integer
+      operationId: get-user-articles
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+          required: true
+        - schema:
+            type: integer
+          in: query
+          name: pageSize
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: userId
+    parameters: []
+  /api/posts/get-post-details:
+    get:
+      summary: get article details
+      tags:
+        - articles
+      operationId: get-article-details
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: postId
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timelineArticle'
+    parameters: []
+  /api/posts/get-comments:
+    get:
+      summary: get comments
+      tags:
+        - articles
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/comment'
+                  totalPages:
+                    type: number
+                  currentPage:
+                    type: number
+      operationId: get-comments
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+          required: true
+        - schema:
+            type: integer
+          in: query
+          name: pageSize
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: PostId
+          required: true
+    parameters: []
+  /api/posts/get-timeline-articles:
+    get:
+      summary: Your GET endpoint
+      tags:
+        - articles
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/timelineArticle'
+                  jops:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/timelineJob'
+                  totalPages:
+                    type: integer
+                  currentPage:
+                    type: string
+      operationId: get-timeline-articles
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+        - schema:
+            type: integer
+          in: query
+          name: pageSize
+    parameters: []
+  /api/fields/GetAllField:
+    get:
+      summary: Your GET endpoint
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/field'
+      operationId: get-fields
+      tags:
+        - fields
+    parameters: []
+  /api/fields/AddField:
+    parameters: []
+    post:
+      summary: ''
+      operationId: post-api-fields-add-fields
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/field'
+      tags:
+        - fields
+  /api/followers/get-followers:
+    get:
+      summary: Your GET endpoint
+      tags:
+        - general
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/follower'
+                  currentPage:
+                    type: number
+                  totalPages:
+                    type: number
+      operationId: get-followers
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: pagenum
+          required: true
+        - schema:
+            type: integer
+          in: query
+          name: pagesize
+          required: true
+    parameters: []
+  /api/followers/SendFollow:
+    parameters: []
+    post:
+      summary: Follow user
+      operationId: send-follow
+      responses:
+        '200':
+          description: OK
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: userId
+      tags:
+        - general
+  /api/followers/UnFollow:
+    parameters: []
+    post:
+      summary: unfollow user
+      operationId: unfollow
+      responses:
+        '200':
+          description: OK
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: userId
+      tags:
+        - general
+  /api/followers/get-following:
+    get:
+      summary: Your GET endpoint
+      tags:
+        - general
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/follower'
+                  totalPages:
+                    type: number
+                  currentPage:
+                    type: number
+      operationId: get-following
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: pagenum
+          required: true
+        - schema:
+            type: integer
+          in: query
+          name: pagesize
+          required: true
+    parameters: []
+  /api/company/get-profile:
+    get:
+      summary: Your GET endpoint
+      tags:
+        - company
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/companyProfile'
+      operationId: get-company-profile
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: userId
+  /api/company/add-job:
+    parameters: []
+    post:
+      summary: ''
+      operationId: add-job
+      responses:
+        '200':
+          description: OK
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      tags:
+        - company
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/addJob'
+  /api/company/get-jobs:
+    get:
+      summary: Get detailed jobs
+      tags:
+        - company
+      operationId: get-jobs
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+          required: true
+        - schema:
+            type: integer
+          in: query
+          name: pageSize
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: companyId
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/job'
+                  totalPages:
+                    type: number
+                  currentPage:
+                    type: number
+    parameters: []
+  /api/company/get-simple-jobs:
+    get:
+      summary: get simple jobs for table
+      tags:
+        - company
+      operationId: get-simple-jobs
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+        - schema:
+            type: integer
+          in: query
+          name: pageSize
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/companySimpleJob'
+    parameters: []
+  /api/company/delete-job:
+    parameters: []
+    delete:
+      summary: ''
+      operationId: delete-job
+      responses:
+        '200':
+          description: OK
+      tags:
+        - company
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: id
+          required: true
+  /api/company/GetJopDetails:
+    parameters: []
+    get:
+      summary: Job details
+      operationId: get-job-details
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timelineJob'
+      tags:
+        - jobs
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: jopId
+          required: true
+  /api/company/simple-stats:
+    get:
+      summary: get-simple-stats
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/companySimpleStats'
+      operationId: company-simple-stats
+      tags:
+        - timeline
+    parameters: []
+  /api/timeline/get-jobs:
+    get:
+      summary: Get all jobs
+      operationId: get-timeline-jobs
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+        - schema:
+            type: integer
+          in: query
+          name: pageSize
+      tags:
+        - timeline
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/timelineJob'
+    parameters: []
+  /api/followers/get-people-to-follow:
+    get:
+      summary: Get people to follow
+      operationId: get-people-to-follow
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: pagenum
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: pagesize
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/user'
+                  totalPages:
+                    type: number
+                  currentPage:
+                    type: number
+      tags:
+        - followers
+    parameters: []
+  /api/fields/GetByIdField:
+    get:
+      summary: Your GET endpoint
+      tags:
+        - fields
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/field'
+      operationId: get-api-fields-GetByIdField
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: Id
+  /api/fields/DeleteField:
+    parameters: []
+    delete:
+      summary: ''
+      operationId: DeleteField
+      responses:
+        '200':
+          description: OK
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: Id
+      tags:
+        - fields
+  /api/fields/EditFeild:
+    put:
+      summary: ''
+      operationId: EditFeild
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/field'
+      tags:
+        - fields
+  /api/skills/EditSkills:
+    put:
+      summary: ''
+      operationId: EditSkills
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/skill'
+      tags:
+        - skills
+  /api/skills/post-skills:
+    parameters: []
+    post:
+      summary: add skills
+      operationId: post-skills
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/skill'
+      tags:
+        - skills
+  /api/skills/DeleteSkill:
+    delete:
+      summary: ''
+      operationId: DeleteSkill
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: Id
+      tags:
+        - skills
+    parameters: []
+  /api/Skills/GetByIdSkill:
+    get:
+      summary: Your GET endpoint
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/skill'
+      operationId: GetByIdSkill
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: Id
+      tags:
+        - skills
+  /api/skills/GetAllSkills:
+    get:
+      summary: Your GET endpoint
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/skill'
+                  totalPages:
+                    type: number
+                  currentPages:
+                    type: number
+      operationId: GetAllSkills
+      tags:
+        - skills
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: page
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: pageSize
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: fieldId
+  /api/intern/update-profile:
+    post:
+      summary: ''
+      operationId: update-intern-profile
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/internUpdateProfile'
+      tags:
+        - intern
+    parameters: []
+  /api/company/update-profile:
+    post:
+      summary: ''
+      operationId: update-company-profile
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/internUpdateProfile'
+      tags:
+        - company
+    parameters: []
+  /api/intern/get-profile:
+    get:
+      summary: Your GET endpoint
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internProfile'
+      operationId: get-intern-profile
+      tags:
+        - intern
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: userId
+    parameters: []
+  /api/intern/applyjop:
+    post:
+      summary: Your GET endpoint
+      tags:
+        - intern
+      responses:
+        '200':
+          description: OK
+          content:
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+      operationId: apply-to-job
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                InternShipId:
+                  type: number
+                answers:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      qId:
+                        type: number
+                      answer:
+                        type: string
+    parameters: []
+  /api/intern/simple-stats:
+    get:
+      summary: get-simple-stats
+      operationId: intern-simple-stats
+      tags:
+        - timeline
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internSimpleStats'
+    parameters: []
+  /api/Intern/ChangePhoto:
+    parameters: []
+    post:
+      summary: Change profile & cover image
+      operationId: change-photos
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+      tags:
+        - photos
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              format: binary
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                type:
+                  type: string
+                  enum:
+                    - Cover
+                    - Profile
+            examples: {}
+        description: form data images
+  /api/auth/ConfirmEmail:
+    post:
+      summary: ''
+      operationId: confirm-email
+      responses:
+        '200':
+          description: OK
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: token
+        - schema:
+            type: string
+          in: query
+          name: email
+      tags:
+        - auth
+  /api/intern/getapllaiedjopbyid:
+    get:
+      summary: get job details
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jobDetails'
+      operationId: get-detailed-application-by-id
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: InternShipId
+          required: true
+      tags:
+        - intern
+    parameters: []
+  /api/company/getapllaiedjopbyid:
+    get:
+      summary: get job details
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jobDetails'
+      operationId: get-detailed-request-for-company
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: InternShipId
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: internId
+          required: true
+      tags:
+        - company
+    parameters: []
+  /api/company/change-state:
+    post:
+      summary: Your GET endpoint
+      responses:
+        '200':
+          description: OK
+      operationId: change-request-state
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: internShipId
+          required: true
+        - schema:
+            type: string
+            enum:
+              - PENDING
+              - ACCEPTED
+              - REJECTED
+              - IN_PROGRESS
+          in: query
+          name: state
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: internId
+          required: true
+      description: ''
+      tags:
+        - company
+    parameters: []
+  /api/intern/cancel-request:
+    post:
+      summary: Apply to job
+      tags:
+        - intern
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      operationId: cancel-request
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: internShipId
+          required: true
+    parameters: []
+  '/api/intern/getapplaiedjops ':
+    get:
+      summary: Apply to job
+      tags:
+        - intern
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    internShipId:
+                      type: number
+                    internId:
+                      type: number
+                    state:
+                      type: string
+                      enum:
+                        - PENDING
+                        - ACCEPTED
+                        - REJECTED
+                        - IN_PROGRESS
+                    title:
+                      type: string
+                    companyName:
+                      type: string
+                    userId:
+                      type: string
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      operationId: get-applied-jobs
+      parameters: []
+    parameters: []
+  /api/company/GetJobApplicants:
+    get:
+      summary: Apply to job
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        jopTitle:
+                          type: string
+                        fullName:
+                          type: string
+                        birthday:
+                          type: string
+                        college:
+                          type: string
+                        cv:
+                          type: string
+                        state:
+                          type: string
+                        profileImage:
+                          type: string
+                        availableToWork:
+                          type: boolean
+                        internId:
+                          type: string
+                  totalPages:
+                    type: number
+                  currentPage:
+                    type: number
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      operationId: get-job-applicants
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: page
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: pageSize
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: InternShipId
+          required: true
+      tags:
+        - company
+    parameters: []
+  /api/intern/SearchJobs:
+    get:
+      summary: Apply to job
+      tags:
+        - intern
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/timelineJob'
+                  totalPages:
+                    type: number
+                  currentPage:
+                    type: number
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      operationId: search-jobs
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: page
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: pageSize
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: fieldId
+    parameters: []
+  /api/Notifcation/GetNotifications:
+    get:
+      summary: Your GET endpoint
+      tags:
+        - notifications
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/notification'
+                  totalPages:
+                    type: number
+                  currentPage:
+                    type: number
+      operationId: get-notifcations
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: pagenum
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: pagesize
+          required: true
+  /api/Notifcation/ReadNotification:
+    post:
+      summary: Read Notif
+      tags:
+        - notifications
+      responses:
+        '200':
+          description: OK
+      operationId: read-notifcation
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: notificationId
+          required: true
+    parameters: []
+  /api/Notifcation/UnReadNotificationCount:
+    get:
+      summary: Read Notif
+      tags:
+        - notifications
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: number
+      operationId: unread-notifcations-count
+      parameters: []
+    parameters: []
+  /api/chat/getchats:
+    get:
+      summary: get chats
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalPages:
+                    type: number
+                  currentPage:
+                    type: number
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/simpleChat'
+      operationId: get-chats
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: page
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: pageSize
+          required: true
+      tags:
+        - chat
+    parameters: []
+  /api/chat/readmsg:
+    post:
+      summary: get chats
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalPages:
+                    type: number
+                  currentPage:
+                    type: number
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/simpleChat'
+      operationId: read-chat
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: chatId
+          required: true
+      tags:
+        - chat
+    parameters: []
+  /api/chat/getmsgschat:
+    get:
+      summary: get chat msgs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/message'
+                  totalPages:
+                    type: number
+                  currentPages:
+                    type: number
+      operationId: get-chat-messages
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: page
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: pageSize
+          required: true
+        - schema:
+            type: number
+          in: query
+          name: chatId
+          required: true
+      tags:
+        - chat
+    parameters: []
+  /api/chat/getmsgschatbyuserid:
+    get:
+      summary: get chat msgs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: number
+      operationId: get-chat-id-by-user-id
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: userId
+          required: true
+      tags:
+        - chat
+    parameters: []
+  /api/chat/sendmsg:
+    post:
+      summary: get chat msgs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message'
+      operationId: send-message
+      parameters: []
+      tags:
+        - chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reciverId:
+                  type: string
+                chatId:
+                  type: number
+                content:
+                  type: string
+              required:
+                - reciverId
+                - content
+    parameters: []
+  /api/chat/UnReadMsgCount:
+    get:
+      summary: get chat msgs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: number
+      operationId: get-unread-msgs-count
+      parameters: []
+      tags:
+        - chat
+    parameters: []
+components:
+  schemas:
+    account:
+      title: account
+      type: object
+      properties:
+        id:
+          type: string
+        fullName:
+          type: string
+        role:
+          type: string
+        email:
+          type: string
+        mobile:
+          type: string
+        address:
+          type: string
+        isConfirmed:
+          type: boolean
+        password:
+          type: string
+        username:
+          type: string
+        image:
+          type: string
+      required:
+        - fullName
+        - email
+    internUpdateProfile:
+      title: internProfile
+      type: object
+      properties:
+        about:
+          type: string
+        fieldId:
+          oneOf:
+            - type: number
+              properties: {}
+            - type: string
+              properties: {}
+        birthdate:
+          type: string
+        skills:
+          oneOf:
+            - type: array
+              items:
+                type: number
+            - type: string
+        jobTitle:
+          type: string
+        availableToWork:
+          type: boolean
+        education:
+          oneOf:
+            - type: array
+              items:
+                type: object
+                properties:
+                  school:
+                    type: string
+                  degree:
+                    type: string
+                  fieldOfStudy:
+                    type: string
+                  startDate:
+                    type: string
+                  endDate:
+                    type: string
+                  studentActivities:
+                    type: string
+            - type: string
+        address:
+          type: string
+        cv:
+          type: string
+          format: binary
+        fullName:
+          type: string
+        mobile:
+          type: string
+    internProfile:
+      title: internProfile
+      type: object
+      properties:
+        followersCount:
+          type: integer
+        followingCount:
+          type: integer
+        about:
+          type: string
+        field:
+          $ref: '#/components/schemas/field'
+        birthdate:
+          type: string
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/skill'
+        jobTitle:
+          type: string
+        availableToWork:
+          type: boolean
+        education:
+          oneOf:
+            - type: array
+              items:
+                type: object
+                properties:
+                  school:
+                    type: string
+                  degree:
+                    type: string
+                  fieldOfStudy:
+                    type: string
+                  startDate:
+                    type: string
+                  endDate:
+                    type: string
+                  studentActivities:
+                    type: string
+            - type: string
+        address:
+          type: string
+        coverImg:
+          type: string
+        cv:
+          type: string
+          format: binary
+        fullName:
+          type: string
+        userImg:
+          type: string
+        role:
+          type: string
+          enum:
+            - COMPANY
+        followedHim:
+          type: boolean
+        followedMe:
+          type: boolean
+        mobile:
+          type: string
+        interenId:
+          type: string
+        userRole:
+          type: string
+    companyProfile:
+      title: companyProfile
+      type: object
+      properties:
+        id:
+          type: string
+        followersCount:
+          type: integer
+        followingCount:
+          type: integer
+        about:
+          type: string
+        address:
+          type: string
+        coverImg:
+          type: string
+        jobTitle:
+          type: string
+        followedMe:
+          type: boolean
+        followedHim:
+          type: boolean
+        mobile:
+          type: string
+        fullName:
+          type: string
+        userImg:
+          type: string
+        interenId:
+          type: string
+        userRole:
+          type: string
+    skill:
+      title: skill
+      type: object
+      properties:
+        skillsId:
+          type: number
+        name:
+          type: string
+    field:
+      title: field
+      type: object
+      properties:
+        fieldId:
+          type: number
+        fieldName:
+          type: string
+    timelineArticle:
+      title: timelineArticle
+      type: object
+      properties:
+        id:
+          type: number
+        content:
+          type: string
+        images:
+          oneOf:
+            - type: array
+              items:
+                type: string
+            - type: string
+        status:
+          type: string
+          enum:
+            - PUBLISHED
+            - SUSPENDED
+        fieldId:
+          type: number
+        fieldName:
+          type: string
+        userId:
+          type: string
+        userFullName:
+          type: string
+        userImg:
+          type: string
+        userJobTitle:
+          type: string
+        createdDate:
+          type: string
+          format: date-time
+        likesCount:
+          type: number
+        commentsCount:
+          type: number
+        likedByUser:
+          type: boolean
+        userRole:
+          type: string
+        postType:
+          type: string
+          enum:
+            - JOB
+            - ARTICLE
+    article:
+      title: article
+      type: object
+      properties:
+        id:
+          type: string
+        content:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum:
+            - PUBLISHED
+            - SUSPENDED
+        fieldId:
+          type: string
+        fieldName:
+          type: string
+    comment:
+      title: comment
+      type: object
+      description: ''
+      properties:
+        id:
+          type: number
+        content:
+          type: string
+        rating:
+          type: integer
+        createDate:
+          type: string
+        ratedByUser:
+          type: string
+          enum:
+            - NONE
+            - UP
+            - DOWN
+        userName:
+          type: string
+        userId:
+          type: string
+        jobTitle:
+          type: string
+        userImg:
+          type: string
+        userRole:
+          type: string
+    follower:
+      title: follower
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        img:
+          type: string
+        jobTitle:
+          type: string
+        userType:
+          type: string
+          enum:
+            - INTERN
+            - COMPANY
+        followedHim:
+          type: boolean
+        followedMe:
+          type: boolean
+    user:
+      title: follower
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        img:
+          type: string
+        jobTitle:
+          type: string
+        userRole:
+          type: string
+        followedMe:
+          type: boolean
+        followedHim:
+          type: boolean
+    job:
+      title: internship model
+      type: object
+      properties:
+        id:
+          type: string
+        startDate:
+          type: string
+        endDate:
+          type: string
+        content:
+          type: string
+        fieldId:
+          type: string
+        fieldName:
+          type: string
+        userId:
+          type: string
+        skillls:
+          type: array
+          items:
+            $ref: '#/components/schemas/skill'
+        title:
+          type: string
+        questions:
+          type: array
+          items:
+            type: object
+            properties:
+              qContent:
+                type: string
+              qId:
+                type: number
+        postType:
+          type: string
+        appliedCount:
+          type: number
+    addJob:
+      title: internship model
+      type: object
+      properties:
+        startDate:
+          type: string
+        endDate:
+          type: string
+        content:
+          type: string
+        fieldId:
+          type: number
+        userId:
+          type: string
+        skillls:
+          type: array
+          items:
+            type: object
+            properties:
+              skillsId:
+                type: number
+        title:
+          type: string
+        questions:
+          type: array
+          items:
+            type: object
+            properties:
+              qContent:
+                type: string
+    appliedJobDetails:
+      title: internship model
+      type: object
+      properties:
+        id:
+          type: string
+        internshipTitle:
+          type: string
+        CV:
+          type: string
+          format: binary
+        status:
+          type: string
+          enum:
+            - PENDING
+            - ON_PROGRESS
+            - REJECTED
+        internName:
+          type: string
+        answers:
+          type: array
+          items:
+            type: object
+            properties:
+              question:
+                type: string
+              answer:
+                type: string
+        internId:
+          type: string
+        internImg:
+          type: string
+    internAppliedJob:
+      title: internship model
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        status:
+          type: string
+          enum:
+            - PENDING
+            - ON_PROGRESS
+            - REJECTED
+    timelineJob:
+      title: internship model
+      type: object
+      properties:
+        id:
+          type: number
+        startDate:
+          type: string
+        endDate:
+          type: string
+        content:
+          type: string
+        fieldId:
+          type: string
+        fieldName:
+          type: string
+        userId:
+          type: string
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/skill'
+        title:
+          type: string
+        questions:
+          type: array
+          items:
+            type: object
+            properties:
+              qContent:
+                type: string
+              qId:
+                type: string
+              internShipId:
+                type: string
+        appliedCount:
+          type: integer
+        companyName:
+          type: string
+        companyJobTitle:
+          type: string
+        companyImg:
+          type: string
+        status:
+          type: string
+          enum:
+            - OPEN
+            - CLOSED
+        appliedByUser:
+          type: boolean
+    jobDetails:
+      title: Job for details
+      type: object
+      properties:
+        internShipId:
+          type: number
+        startDate:
+          type: string
+        endDate:
+          type: string
+        content:
+          type: string
+        fieldId:
+          type: string
+        fieldName:
+          type: string
+        userId:
+          type: string
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/skill'
+        title:
+          type: string
+        answers:
+          type: array
+          items:
+            type: object
+            properties:
+              question:
+                type: string
+              answer:
+                type: string
+        appliedCount:
+          type: integer
+        companyName:
+          type: string
+        companyJobTitle:
+          type: string
+        companyImg:
+          type: string
+        state:
+          type: string
+          enum:
+            - REJECTED
+            - ACCEPTED
+            - IN_PROGRESS
+            - PENDING
+        appliedByUser:
+          type: boolean
+        internName:
+          type: string
+        internId:
+          type: string
+        internEmail:
+          type: string
+    companySimpleStats:
+      title: companySimpleStats
+      type: object
+      properties:
+        in_ProgressRequests:
+          type: integer
+        pendingRequests:
+          type: integer
+        internshipRequests:
+          type: integer
+        followers:
+          type: number
+        following:
+          type: number
+        jobTitle:
+          type: string
+        articleCount:
+          type: number
+    internSimpleStats:
+      title: internSimpleStats
+      type: object
+      properties:
+        articleCount:
+          type: integer
+        internshipRequests:
+          type: integer
+        followers:
+          type: number
+        following:
+          type: number
+        jobTitle:
+          type: string
+    companySimpleJob:
+      title: companySimpleJob
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        pendingRequests:
+          type: integer
+        onProgressRequests:
+          type: integer
+        newTicketsCount:
+          type: integer
+        status:
+          type: string
+          enum:
+            - OPEN
+            - CLOSED
+    notification:
+      title: notification
+      type: object
+      properties:
+        id:
+          type: number
+        senderId:
+          type: string
+        userImg:
+          type: string
+        userName:
+          type: string
+        reciverId:
+          type: string
+        content:
+          type: string
+        type:
+          type: string
+          enum:
+            - NEWMSG
+            - NEWJOB
+            - CHANGSTATE
+            - FOLLOW
+            - APPLAYJOB
+            - LIKE
+            - COMMENT
+            - RATECOMMENT
+        read:
+          type: boolean
+        postId:
+          type: number
+        jopId:
+          type: number
+        createdate:
+          type: string
+        senderRole:
+          type: string
+    simpleChat:
+      title: simpleChat
+      type: object
+      properties:
+        chatId:
+          type: number
+        userId:
+          type: string
+        userImg:
+          type: string
+        userName:
+          type: string
+        lastMsg:
+          type: string
+        lastMsgDate:
+          type: string
+        unReadMsgCount:
+          type: number
+        userRole:
+          type: string
+    message:
+      title: simpleChat
+      type: object
+      properties:
+        chatId:
+          type: number
+        senderId:
+          type: string
+        senderImg:
+          type: string
+        senderName:
+          type: string
+        reciverImg:
+          type: string
+        reciverName:
+          type: string
+        id:
+          type: number
+        reciverId:
+          type: string
+        content:
+          type: string
+        read:
+          type: boolean
+        createdate:
+          type: string

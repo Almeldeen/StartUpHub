@@ -1,0 +1,22 @@
+
+<section *ngIf="article" class="max-w-480 w-full grid  grid-cols-12 mx-auto mt-2 mb-4">
+    <section class="lg:col-span-7 px-2 col-span-12">
+        <app-post class="w-full" [showViewBtn]="false" [showComments]="false" *ngIf="!gettingArticle" [article]="article"></app-post>
+    </section>
+    <section  class="lg:col-span-5 px-2 col-span-12">
+        <fuse-card  class="flex sticky top-24 flex-col  w-full">
+            <app-comments (deleteCommentEmitter)="deleteComment()" (addCommentEmitter)="addComment()"  class="w-full"  [showComments]="true" *ngIf="!gettingArticle"  [postId]="article?.id"></app-comments>
+        </fuse-card>
+    </section>
+</section>
+<ng-container *ngIf="!gettingArticle && !article">
+    <div class="text-center w-full h-full flex justify-center items-center text-md my-5">
+        <mat-icon class="icon-size-20 text-red-400" [svgIcon]="'mat_outline:error_outline'"></mat-icon>
+        <div class="text-lg">Error Has been occurred!</div>
+    </div>
+</ng-container>
+<section *ngIf="gettingArticle" class="w-full h-full flex items-center my-5  text-center">
+    <mat-progress-spinner [diameter]="18" class="mx-auto" [mode]="'indeterminate'">
+    </mat-progress-spinner>
+
+</section>

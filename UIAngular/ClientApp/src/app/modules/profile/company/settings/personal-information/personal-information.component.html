@@ -1,0 +1,85 @@
+<div class="w-full">
+
+    <!-- Form -->
+    <form [formGroup]="informationForm">
+
+        <!-- Section -->
+
+        <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
+            <!-- Name -->
+            <div class="sm:col-span-4">
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Name</mat-label>
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:user'" matPrefix></mat-icon>
+                    <input [formControlName]="'name'" matInput>
+                </mat-form-field>
+            </div>
+
+            <!-- Email -->
+            <div class="sm:col-span-2">
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Email</mat-label>
+                    <mat-icon disabled class="icon-size-5" [svgIcon]="'heroicons_solid:mail'" matPrefix></mat-icon>
+                    <input [formControlName]="'email'" matInput>
+                </mat-form-field>
+            </div>
+            <!-- Phone -->
+            <div class="sm:col-span-2">
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Phone</mat-label>
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:phone'" matPrefix></mat-icon>
+                    <input [formControlName]="'phone'" matInput>
+                </mat-form-field>
+            </div>
+            <!-- address -->
+            <div class="sm:col-span-2">
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Address</mat-label>
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:location-marker'" matPrefix></mat-icon>
+                    <input [formControlName]="'address'" matInput>
+
+
+                </mat-form-field>
+            </div>
+            <!-- jobTitle -->
+            <div class="sm:col-span-2">
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Job title</mat-label>
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:briefcase'" matPrefix></mat-icon>
+                    <input [formControlName]="'jobTitle'" matInput>
+
+
+                </mat-form-field>
+            </div>
+            
+            <!-- About -->
+            <div class="sm:col-span-4">
+                <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+                    <mat-label>About</mat-label>
+                    <textarea matInput [formControlName]="'about'" matTextareaAutosize [matAutosizeMinRows]="5"></textarea>
+                </mat-form-field>
+
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="mt-11 mb-10 border-t"></div>
+
+         <!-- here education  -->
+         
+        <div class="mt-11 mb-10 border-t"></div>
+
+        <!-- Actions -->
+        <div class="flex items-center justify-end">
+
+            <button class="ml-4" [disabled]="saving" (click)="saveUpdates() " mat-flat-button type="button" [color]="'primary'">
+                <span *ngIf="!saving">
+                    Save
+                </span>
+                <mat-progress-spinner *ngIf="saving" [diameter]="24" [mode]="'indeterminate'">
+                </mat-progress-spinner>
+                </button>
+        </div>
+
+    </form>
+</div>

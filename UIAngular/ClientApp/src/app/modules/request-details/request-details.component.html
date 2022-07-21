@@ -1,0 +1,170 @@
+<section *ngIf="!gettingJob && job" class="container my-3  mx-auto">
+    <fuse-card class="flex flex-col md:flex-row justify-between w-full p-8 ">
+        <div class="grid gap-12 grid-cols-12   relative w-full py-8 ">
+
+            <div class=" col-span-8">
+                <div class="text-2xl capitalize font-semibold leading-tight">
+                    <span [routerLink]="['/job-details', job?.internShipId]" class="hover:underline text-blue-900 cursor-pointer">
+                        {{job?.title}}
+                    </span>
+                    <button *ngIf="job?.state === jobStates.PENDING" class="px-3 mr-2 text-white bg-primary-500 outline-primary-500 " mat-flat-button>
+                        New
+                    </button>
+                    <button *ngIf="job?.state === jobStates.IN_PROGRESS" class="px-3 mr-2 text-white bg-yellow-500 outline-yellow-500" mat-flat-button>
+                        In Progress
+                    </button>
+                    <button *ngIf="job?.state === jobStates.ACCEPTED" class="px-3 mr-2 text-white bg-green-500 outline-green-500" mat-flat-button>
+                        Accepted
+                    </button>
+                    <button *ngIf="job?.state === jobStates.REJECTED" class="px-3 mr-2 text-white bg-red-500 outline-red-500" mat-flat-button>
+                        Rejected
+                    </button>
+                    <div matTooltip="Internship period" class="flex items-center my-2">
+                        <span *ngIf="job?.startDate" class="text-md text-secondary">{{job?.startDate |
+                            date: dateFormat ||
+                            ''}}</span>
+                        <span *ngIf="!job?.startDate">
+                            &infin;
+                        </span>
+                        <mat-icon *ngIf="job?.startDate && job?.endDate" class="icon-size-3 mx-1" [svgIcon]="'heroicons_outline:arrow-narrow-right'"></mat-icon>
+                        <span *ngIf="job?.endDate" class="text-md text-secondary">{{job?.endDate | date:
+                            dateFormat ||
+                            ''}}</span>
+                        <span *ngIf="!job?.endDate">
+                            &infin;
+                        </span>
+                    </div>
+                </div>
+
+
+                <div class=" w-full my-3">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="font-medium tracking-tight text-secondary mr-3">Intern name</span>
+                                </td>
+                                <td>
+                                    <span [routerLink]="['/profile', 'intern', job?.internId]" class="font-medium text-blue-600 capitalize cursor-pointer hover:underline"> {{job?.internName}}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="font-medium tracking-tight text-secondary  mr-3 ">Intern email</span>
+                                </td>
+                                <td>
+                                    <span class="font-medium">
+                                        {{job?.internEmail}}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr *ngIf="job?.cv">
+                                <td>
+                                    <span class="font-medium tracking-tight text-secondary  mr-3 ">Intern CV</span>
+                                </td>
+                                <td>
+                                    <a [href]="'https://' + job?.cv" target="_blank" class="text-blue-600 hover:underline" rel="noopener noreferrer">
+                                        Open CV
+                                    </a>
+                                   
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="font-medium tracking-tight text-secondary  mr-3">Internship field</span>
+                                </td>
+                                <td>
+                                    <span class="font-medium">
+                                        {{job?.fieldName}}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+
+
+
+                </div>
+                <div *ngIf="job?.answers && job?.answers.length" class="mb-4"> <span class="font-semibold text-xl tracking-tight mr-3 ">Answers</span></div>
+                <div>
+                    <mat-accordion  [multi]="true" class="max-w-4xl mt-8">
+                        <mat-expansion-panel [expanded]="true" style="border-width: 1px;" class="border-solid border-gray-400" *ngFor="let que of job?.answers">
+                            <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                                <mat-panel-title class="">{{que.question}}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <p class="text-2xl">
+                                {{que.answer}}
+                            </p>
+                        </mat-expansion-panel>
+
+                    </mat-accordion>
+                </div>
+
+            </div>
+
+
+            <div class="col-span-4  md:mb-4  text-right ">
+                
+                <ng-container  *appHasAnyAuthority="roles.INTERN">
+                    <button (click)="cancelRequest()" [disabled]="changingState" *ngIf="job?.state !== jobStates.ACCEPTED" class="px-3 mr-2 text-white bg-red-500 outline-red-500" mat-flat-button>
+                        Cancel request
+                    </button>
+                </ng-container>
+                <button  *appHasAnyAuthority="roles.COMPANY" class="px-3 mr-2 text-white bg-gray-500 outline-gray-500" mat-flat-button [matMenuTriggerFor]="menu">
+                    Status
+                    <mat-icon class=" icon-size-5" [svgIcon]="'mat_solid:arrow_drop_down'"></mat-icon>
+
+                </button>
+                <mat-menu  #menu="matMenu">
+                    <button [disabled]="changingState" *ngIf="job?.state !== jobStates.ACCEPTED" (click)="changeState(jobStates.ACCEPTED)" mat-menu-item>
+                        <mat-icon  class=" icon-size-3 mr-1 text-green-500"  svgIcon="mat_solid:circle"></mat-icon><span>Accept intern</span>
+                    </button>
+                    <button [disabled]="changingState" *ngIf="job?.state !== jobStates.IN_PROGRESS" (click)="changeState(jobStates.IN_PROGRESS)" mat-menu-item>
+                        <mat-icon  class=" icon-size-3 mr-1 text-yellow-500" svgIcon="mat_solid:circle"></mat-icon><span>Mark as in progress</span>
+                    </button>
+                    <button [disabled]="changingState" *ngIf="job?.state !== jobStates.REJECTED" (click)="changeState(jobStates.REJECTED)" mat-menu-item>
+                        <mat-icon  class=" icon-size-3 mr-1 text-red-500" svgIcon="mat_solid:circle"></mat-icon><span>Reject intern</span>
+                    </button>
+                 
+                </mat-menu>
+
+                <ng-container *appHasAnyAuthority="roles.COMPANY">
+                    <h3 class="mt-4 text-green-600 text-left " *ngIf="job?.state === jobStates.IN_PROGRESS">
+                        You can now chat with intern to give him tasks and complete job process
+                    </h3>
+                    <h3 class="mt-4 text-green-600 text-left " *ngIf="job?.state === jobStates.ACCEPTED">
+                        This intern works with you now, Congratulations !
+                    </h3>
+                    <h3 class="mt-4 text-green-600 text-left " *ngIf="job?.state === jobStates.REJECTED">
+                        Be kind and give intern a feedback about his skills and how to develop himself !
+                    </h3>
+                </ng-container>
+                <ng-container *appHasAnyAuthority="roles.INTERN">
+                    <h3 class="mt-4 text-green-600 text-left " *ngIf="job?.state === jobStates.ACCEPTED">
+                       You are accepted now, but remember that success is the result of perfection, hard work, learning from failure, loyalty, and persistence
+                    </h3>
+                    <h3 class="mt-4 text-green-600 text-left " *ngIf="job?.state === jobStates.REJECTED">
+                        Success is not final; failure is not fatal: It is the courage to continue that counts. !
+                    </h3>
+                </ng-container>
+
+
+
+            </div>
+        </div>
+    </fuse-card>
+</section>
+
+<ng-container *ngIf="!gettingJob && !job">
+    <div class="text-center w-full h-full flex justify-center items-center text-md my-5">
+        <mat-icon class="icon-size-20 text-red-400" [svgIcon]="'mat_outline:error_outline'"></mat-icon>
+        <div class="text-lg">Error Has been occurred!</div>
+    </div>
+</ng-container>
+<section *ngIf="gettingJob" class="w-full h-full flex items-center my-5  text-center">
+    <mat-progress-spinner [diameter]="18" class="mx-auto" [mode]="'indeterminate'">
+    </mat-progress-spinner>
+
+</section>

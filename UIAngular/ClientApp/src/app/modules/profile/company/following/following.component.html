@@ -1,0 +1,61 @@
+<section class="w-full">
+    <section *ngIf="followers && followers.length" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50" (scrolled)="onScroll()" class="container my-3  mx-auto ">
+        <section class="grid gap-4 grid-cols-12 grid-rows-1  relative flex-wrap">
+    
+    
+    
+    
+    
+            <section class="col-span-12 block">
+                <div class="sticky top-5">
+    
+                    <!-- People follow -->
+                    <div class="flex mb-3 flex-col  w-full  px-8  py-6">
+    
+                        <!-- item -->
+                        <div class=" grid grid-cols-12 text-center  gap-6">
+                            <div *ngFor="let user of followers;index as i" class=" bg-white  dark:bg-gray-700 items-center justify-center md:col-span-4 xl:col-span-3 col-span-12 p-8 pb-6 filter-info border-2 rounded-md">
+                                <img [routerLink]="['/profile', user?.userRole === 'INTERN' ? 'intern' : 'company', user?.id]" class="w-32 h-32 cursor-pointer rounded-full mx-auto" [src]="user?.img? 'https://'+user?.img : 'assets/images/dummy-avatar.jpg' " alt="Card cover image">
+                                <div class="text-center flex">
+                                    <div *ngIf="user?.userRole !== 'INTERN'"
+                                        class="mx-auto mt-3 py-0.5 px-3 rounded-full w-auto text-sm font-medium text-white bg-green-600">
+                                        Company
+                                    </div>
+                                    <div *ngIf="user?.userRole === 'INTERN'"
+                                        class="mx-auto mt-3 py-0.5 px-3 rounded-full w-auto text-sm font-medium text-gray-600 bg-blue-200 dark:text-gray-300 dark:bg-gray-700">
+                                        Intern
+                                    </div>
+                                </div>
+                                <div [routerLink]="['/profile', user?.userRole === 'INTERN' ? 'intern' : 'company', user?.id]" class="text-2xl truncate hover:underline cursor-pointer font-semibold leading-tight text-center my-4">{{user?.name}}</div>
+                                <div class="text-secondary  truncate leading-tight text-center  ">{{user?.jobTitle || '-'}}</div>
+                                <button *ngIf="user?.followedHim" (click)="unFollow($event, user)" class="px-6 mt-4 w-full" mat-raised-button [color]="'warn'" [routerLink]="['./']">
+                                    Unfollow
+                                </button>
+                                <button *ngIf="!user?.followedHim" (click)="follow($event, user)" class="px-6 mt-4 w-full" mat-raised-button [color]="'primary'" [routerLink]="['./']">
+                                    follow
+                                </button>
+                            </div>
+                        </div>
+    
+                    </div>
+    
+    
+    
+    
+    
+                </div>
+            </section>
+        </section>
+    </section>
+    
+    <section *ngIf="gettingFollowers" class="w-full my-5  text-center">
+        <mat-progress-spinner [diameter]="24" class="mx-auto" [mode]="'indeterminate'">
+        </mat-progress-spinner>
+    
+    </section>
+    <ng-container *ngIf="!gettingFollowers && followers && followers.length === 0">
+        <div class="text-center w-full text-md my-5">
+            No following Yet!
+        </div>
+    </ng-container>
+</section>

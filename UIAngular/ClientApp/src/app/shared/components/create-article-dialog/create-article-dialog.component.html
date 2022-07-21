@@ -1,0 +1,50 @@
+<h3 mat-dialog-title class="border-b-2 mb-0 pb-1">
+    <ng-container *ngIf="mode === 'NEW'">Post article</ng-container>
+    <ng-container *ngIf="mode === 'UPDATE'">Edit article</ng-container>
+</h3>
+<form [formGroup]="articleForm" mat-dialog-content class="flex flex-col  my-2   rounded-2xl ">
+    <mat-form-field style="max-width: 300px;" >
+        <input 
+        type="text"
+        placeholder="Field"
+        matInput
+        formControlName="field"
+        (input)="filter($event)"
+        [matAutocomplete]="autoComplete"
+        [autofocus]="false"
+        >
+        <mat-autocomplete  [displayWith]="displayFn"  #autoComplete="matAutocomplete">
+            <mat-option *ngFor="let field of filteredOptions "  [value]="field">
+              {{field?.fieldName}}
+            </mat-option>
+          </mat-autocomplete>
+       
+    </mat-form-field>
+
+
+    <div class="flex flex-col gt-xs:flex-row">
+        <quill-editor  class="mt-2 " [required]="true" [placeholder]="'Content'" formControlName="content" [styles]="{minHeight: '280px'}" [modules]="quillModules"></quill-editor>
+    </div>
+       <!-- Image -->
+       <div class="sm:col-span-12 mt-3 "> 
+        <mat-label>Images</mat-label>
+        <ngx-dropzone [maxFileSize]="1048576" [expandable]="true" accept="image/*" class="mt-2"  [multiple]="true"
+            (change)="onSelect($event)">
+            <ngx-dropzone-label>Drop it!</ngx-dropzone-label>
+            <ngx-dropzone-image-preview (removed)="onRemove($event)" *ngFor="let image of images" [removable]="true" ngProjectAs="ngx-dropzone-preview"  [file]="image">
+              </ngx-dropzone-image-preview>
+        </ngx-dropzone>
+
+
+    </div>
+
+</form>
+<div  mat-dialog-actions class="py-3 border-t-2 flex flex-row-reverse space-x-4 space-x-reverse">
+    <div><button [disabled]="saving" mat-raised-button [color]="'primary'" (click)="mode === 'NEW' ? publishPost() : updatePost()  ">
+        <mat-progress-spinner  [diameter]="24" *ngIf="saving" class="mx-auto" [mode]="'indeterminate'">
+        </mat-progress-spinner>
+        <span *ngIf="!saving && mode === 'NEW'">Publish</span>
+        <span *ngIf="!saving && mode !== 'NEW'">Update</span>
+    </button></div>
+    <div><button class="" mat-raised-button [color]="'default'" (click)="onNoClick()">Cancel</button></div>
+</div>

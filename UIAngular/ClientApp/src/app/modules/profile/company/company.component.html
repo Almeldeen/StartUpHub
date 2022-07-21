@@ -1,0 +1,126 @@
+<div *ngIf="profile && !gettingProfile" class="flex relative flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div class="flex flex-col shadow bg-card">
+
+        <!-- Cover image -->
+        <div class="relative">
+            <img class="h-40 lg:h-80 object-cover" [src]="profile?.coverImg? 'https://' +profile?.coverImg : 'assets/images/default-cover.jpeg'" alt="Cover image">
+            <div *appPublicProfileCompany="false" (click)="fileUploadCover.click()" class="p-image top-2 bottom-auto">
+                <mat-icon *ngIf="!uploadingImageCover" [ngClass]="'text-white icon-size-5'" [svgIcon]="'feather:camera'"></mat-icon> 
+                <mat-progress-spinner [ngClass]="'text-white icon-size-5'" *ngIf="uploadingImageCover"  [diameter]="24" [mode]="'indeterminate'">
+                </mat-progress-spinner>
+                <input  (change)="uploadImageCover($event.target.files[0])" #fileUploadCover class="file-upload" type="file" accept="image/*" />
+
+            </div>
+        </div>
+
+        <!-- User info -->
+        <div class="flex flex-col flex-0 lg:flex-row items-center max-w-5xl w-full mx-auto px-8 lg:h-18 bg-card">
+
+            <!-- Avatar -->
+        
+            <div class="relative -mt-26 lg:-mt-22 rounded-full">
+                <img class="w-32 h-32 profile-pic rounded-full bg-white ring-4 ring-bg-card" [src]="profile?.userImg?'https://' +profile?.userImg : 'assets/images/dummy-avatar-co.jpg'" alt="User avatar">
+                <div  *appPublicProfileCompany="false" (click)="fileUpload.click()" class="p-image">
+                    <mat-icon *ngIf="!uploadingImage" [ngClass]="'text-white icon-size-5'" [svgIcon]="'feather:camera'"></mat-icon> 
+                    <mat-progress-spinner *ngIf="uploadingImage" [ngClass]="'text-white icon-size-5'" [diameter]="24" [mode]="'indeterminate'">
+                    </mat-progress-spinner>
+                    <input multiple="no" (change)="uploadImageProfile($event.target.files[0])" #fileUpload class="file-upload" type="file" accept="image/*" />
+
+                </div>
+            </div>
+
+            <!-- Details -->
+            <div class="flex flex-col items-center lg:items-start mt-4 lg:mt-0 lg:ml-8">
+                <div class="text-lg font-bold  leading-none  capitalize">{{profile?.fullName}}</div>
+                <div class="text-secondary truncate max-w-48">{{profile?.jobTitle}}</div>
+            </div>
+
+            <!-- Separator -->
+            <div class="hidden lg:flex h-8 mx-3 border-l-2"></div>
+
+            <!-- Stats -->
+            <div *appPublicProfileCompany="false" class="flex items-center mt-6 lg:mt-0 space-x-6">
+                <div [routerLink]="['followers']" class="flex cursor-pointer flex-col items-center">
+                    <span class="font-bold">{{profile?.followersCount || 0}}</span>
+                    <span class="text-sm font-medium text-secondary">FOLLOWERS</span>
+                </div>
+                <div [routerLink]="['following']" class="flex cursor-pointer flex-col items-center">
+                    <span class="font-bold">{{profile?.followingCount || 0}}</span>
+                    <span class="text-sm font-medium text-secondary">FOLLOWING</span>
+                </div>
+            </div>
+            <!-- public Stats -->
+            <div *appPublicProfileCompany="true" class="flex items-center mt-6 lg:mt-0 space-x-6">
+                <div  class="flex  flex-col items-center">
+                    <span class="font-bold">{{profile?.followersCount || 0}}</span>
+                    <span class="text-sm font-medium text-secondary">FOLLOWERS</span>
+                </div>
+                <div class="flex  flex-col items-center">
+                    <span class="font-bold">{{profile?.followingCount || 0}}</span>
+                    <span class="text-sm font-medium text-secondary">FOLLOWING</span>
+                </div>
+            </div>
+            <!-- Separator -->
+            <div class="hidden lg:flex h-8 mx-3 border-l-2"></div>
+          
+
+            <!-- Menu -->
+            <div class="flex items-center mt-8 mb-4 lg:m-0 lg:ml-3 space-x-6">
+                <a class="font-medium hover:text-secondary text-gray-500 link" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" [routerLink]="['./']">
+                    Home
+                </a>
+                <a *appPublicProfileCompany="false" class="font-medium hover:text-secondary text-gray-500 link" routerLinkActive="active-link" [routerLink]="['about']">
+                    Setting
+                </a>
+            </div>
+
+            <div *appPublicProfileCompany="true"  class=" ml-auto">
+                <button  [routerLink]="['/chat']" [queryParams]="
+                {
+                    userId: profile?.interenId,
+                    userRole: 'COMPANY'
+                }" class="px-3 mr-2 bg-green-600 text-white" mat-flat-button  [color]="'default'" >
+                    <mat-icon class="icon-size-4.5" [svgIcon]="'heroicons_outline:chat'"></mat-icon>
+                    <span>Message</span>
+                </button>
+                <button (click)="follow($event)" *ngIf="!profile?.followedHim && !profile?.followedMe" class="px-3" mat-flat-button [color]="'primary'" >
+                    <mat-icon class="icon-size-4.5" [svgIcon]="'heroicons_solid:user-add'"></mat-icon>
+                    <span>Follow</span>
+                </button>
+                <button (click)="follow($event)" *ngIf="!profile?.followedHim && profile?.followedMe" class="px-3" mat-flat-button [color]="'primary'" >
+                    <mat-icon class="icon-size-4.5" [svgIcon]="'heroicons_solid:user-add'"></mat-icon>
+                    <span>Follow back</span>
+                </button>
+                <button (click)="unFollow($event)" 
+                (mouseleave)="followBtnContent.textContent ='Followed';followBtnIcon.svgIcon = 'mat_outline:check'"
+                 (mouseover)="followBtnContent.textContent ='Unfollow';followBtnIcon.svgIcon = 'heroicons_outline:user-remove'"
+                   *ngIf="profile?.followedHim" 
+                  class="px-3 bg-gray-200 hover:bg-red-700 hover:text-white" mat-flat-button  >
+                    <mat-icon #followBtnIcon class="icon-size-4 mr-1" [svgIcon]="'mat_outline:check'"></mat-icon>
+                    <span #followBtnContent>Followed</span>
+                </button>
+            </div>
+
+
+        </div>
+
+    </div>
+
+   <router-outlet *ngIf="profile"></router-outlet>
+
+</div>
+<section *ngIf="!profile && !gettingProfile" class="h-full w-full flex items-center justify-center">
+    <!-- Title -->
+    <div class=" text-2xl font-extrabold text-center tracking-tight leading-tight">
+        <mat-icon class="icon-size-20 text-red-400" [svgIcon]="'mat_outline:error_outline'"></mat-icon>
+        <p class="mt-4">An error has been occurred
+        </p>
+    </div>
+</section>
+<section *ngIf="gettingProfile" class="w-full h-full flex justify-center items-center text-center">
+    <mat-progress-spinner [diameter]="30" class="mx-auto" [mode]="'indeterminate'">
+    </mat-progress-spinner>
+   
+</section>

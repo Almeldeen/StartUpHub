@@ -1,0 +1,32 @@
+<div class="flex flex-col flex-auto h-full bg-card dark:bg-default">
+
+    <!-- Header -->
+    <div class="flex flex-0 items-center h-18 px-4 border-b bg-gray-50 dark:bg-transparent">
+        <button
+            mat-icon-button
+            (click)="drawer.close()">
+            <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+        <div class="ml-2 text-lg font-medium">Contact info</div>
+    </div>
+
+    <div class="overflow-y-auto">
+        <!-- Contact avatar & info -->
+        <div  [routerLink]="chat?.userRole? ['/profile', chat?.userRole === 'INTERN' ? 'intern' : 'company', chat?.userId] : null" class="flex flex-col items-center mt-8">
+            <div class="w-40 h-40 rounded-full">
+                <ng-container *ngIf="chat?.userImg">
+                    <img class="object-cover cursor-pointer w-full h-full rounded-full " [src]="chat?.userImg ? 'https://' + chat?.userImg :  'assets/images/dummy-avatar.jpg' " alt="avatar" />
+                </ng-container>
+                <ng-container *ngIf="!chat?.userImg">
+                    <div class="flex cursor-pointer hover:underline items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                        {{chat?.userName.charAt(0)}}
+                    </div>
+                </ng-container>
+            </div>
+            <div class="mt-4 text-lg font-medium">{{chat?.userName}}</div>
+        </div>
+
+      
+    </div>
+
+</div>

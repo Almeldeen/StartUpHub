@@ -1,0 +1,17 @@
+<ng-container *ngIf="!gettingJob && !job">
+    <div class="text-center w-full h-full flex justify-center items-center text-md my-5">
+        <mat-icon class="icon-size-20 text-red-400" [svgIcon]="'mat_outline:error_outline'"></mat-icon>
+        <div class="text-lg">Error Has been occurred!</div>
+    </div>
+</ng-container>
+<section *ngIf="job" class="max-w-320 w-full  mx-auto mt-2 mb-4">
+    <section class="w-full mx-auto px-2 ">
+        <app-job class="w-full" [showViewBtn]="false"  *ngIf="!gettingJob" [job]="job"></app-job>
+    </section>
+    
+</section>
+<section *ngIf="gettingJob" class="w-full h-full flex items-center my-5  text-center">
+    <mat-progress-spinner [diameter]="18" class="mx-auto" [mode]="'indeterminate'">
+    </mat-progress-spinner>
+
+</section>

@@ -1,0 +1,155 @@
+<form class="p-3 bg-card lg:min-w-160 my-3 mx-auto rounded overflow-hidden" [formGroup]="horizontalStepperForm">
+    <mat-horizontal-stepper [linear]="true" #horizontalStepper>
+        <mat-step [formGroupName]="'step1'" [stepControl]="horizontalStepperForm.get('step1')" #horizontalStepperStep1>
+            <ng-template matStepLabel>InternShip Details</ng-template>
+            <p class="my-6 font-medium">
+                Fill this Internship form to let intern know your preferences
+            </p>
+            <div class="flex">
+                <mat-form-field class="flex-auto">
+                    <input matInput [formControlName]="'title'" placeholder="internship title" required>
+                    <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:briefcase'"></mat-icon>
+                    <mat-error>
+                        Please enter internship title
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <!-- Field -->
+            <div class="mb-2 ">
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:puzzle'" matPrefix></mat-icon>
+                    <input type="text" required placeholder="Job field" matInput formControlName="field"
+                        (input)="filter($event)" [matAutocomplete]="fieldAutoComplete" [autofocus]="false">
+                    <mat-autocomplete (optionSelected)="selectField($event)" [displayWith]="displayFn"
+                        #fieldAutoComplete="matAutocomplete">
+                        <mat-option *ngFor="let field of filteredOptions" [value]="field">
+                            {{field?.fieldName}}
+                        </mat-option>
+                    </mat-autocomplete>
+
+                </mat-form-field>
+
+            </div>
+            <!-- Skills -->
+            <div class="mb-2">
+                <div class="my-2 text-center" *ngIf="gettingSkills">
+                    <mat-progress-spinner [diameter]="24" [mode]="'indeterminate'">
+                    </mat-progress-spinner>
+                </div>
+                <mat-form-field *ngIf="!gettingSkills && allSkills && allSkills.length" class="fuse-mat-no-subscript w-full">
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:clipboard-check'" matPrefix></mat-icon>
+                    <mat-chip-list class="py-2" #chipList aria-label="Skills selection">
+                        <mat-chip *ngFor="let skill of selectedSkills" (removed)="remove(skill?.skillsId)">
+                            {{skill?.name}}
+                            <button class="align-middle" matChipRemove>
+                                <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:x-circle'"></mat-icon>
+                            </button>
+                        </mat-chip>
+                        <input required (input)="filterSkills($event)" placeholder="Required skills" #skillsInput
+                            [matAutocomplete]="auto" [matChipInputFor]="chipList"
+                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes">
+                    </mat-chip-list>
+                    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFnSkills"
+                        (optionSelected)="selectSkill($event)">
+                        <mat-option *ngFor="let skill of filteredSkills" [value]="skill">
+                            {{skill?.name}}
+                        </mat-option>
+                    </mat-autocomplete>
+
+
+                </mat-form-field>
+
+            </div>
+            <h3 class="my-2">Internship period <small>(optional)</small></h3>
+            <div class="flex flex-wrap lg:flex-row">
+                <mat-form-field class="flex-auto">
+
+                    <input placeholder="Start date" matInput readonly="true"
+                        [formControl]="horizontalStepperForm.get('step1').get('startDate')"
+                        [matDatepickerFilter]="myFilter" (dateChange)="birthdateChange($event)"
+                        [matDatepicker]="picker1">
+                    <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                    <mat-datepicker #picker1></mat-datepicker>
+
+                </mat-form-field>
+                &nbsp;
+                <mat-form-field class="flex-auto">
+
+                    <input placeholder="End date" matInput readonly="true"
+                        [formControl]="horizontalStepperForm.get('step1').get('endDate')"
+                        [matDatepickerFilter]="myFilter" (dateChange)="birthdateChange($event)"
+                        [matDatepicker]="picker2">
+                    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                    <mat-datepicker #picker2></mat-datepicker>
+
+                </mat-form-field>
+            </div>
+
+            <div class="flex flex-col gt-xs:flex-row">
+
+                <quill-editor class="mt-2 " [required]="true" [placeholder]="'Content'" formControlName="description"
+                    [styles]="{minHeight: '280px'}" [modules]="quillModules">
+                </quill-editor>
+
+            </div>
+
+            <div class="flex mt-4 justify-end">
+                <button class="px-8 mr-2" mat-flat-button [color]="'warn'" type="button" matStepperPrevious>
+                    cancel
+                </button>
+                <button class="px-8" mat-flat-button [color]="'primary'"
+                    [disabled]="horizontalStepperStep1.stepControl.pristine || horizontalStepperStep1.stepControl.invalid"
+                    type="button" matStepperNext>
+                    Next
+                </button>
+            </div>
+        </mat-step>
+
+        <mat-step [formGroupName]="'step2'" [stepControl]="horizontalStepperForm.get('step2')" #horizontalStepperStep2>
+            <ng-template matStepLabel>Questions</ng-template>
+            <div class="h-full flex flex-col justify-between">
+                <div>
+                    <div class="flex flex-wrap justify-start">
+                        <div class="w-full">
+                            *If you want to add some question for applicant
+                        </div>
+                        <button class="p-4 mt-4 mb-6" mat-flat-button [color]="'default'" type="button"
+                            (click)="addQuestion()">
+                            Add Question <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:plus'">
+                            </mat-icon>
+                        </button>
+                    </div>
+                    <div class="flex-auto">
+                        <ng-container formArrayName="questions">
+                            <ng-container *ngFor="let ques of questions.controls; let i = index">
+                                <div [formGroup]="ques">
+                                    <mat-form-field class="w-full" appearance="fill">
+                                        <input matInput formControlName="question" placeholder="question">
+                                        <mat-icon class="delete-btn cursor-pointer" (click)="deleteQuestion(i)"> delete_forever
+                                        </mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+
+
+
+                    </div>
+                </div>
+
+                <hr />
+                <div class="flex  justify-end">
+                    <button class="px-8 mr-2" mat-flat-button [color]="'accent'" type="button" matStepperPrevious>
+                        Back
+                    </button>
+                    <button (click)="publishJob()" class="px-8" mat-flat-button [color]="'primary'"
+                        [disabled]="horizontalStepperStep2.stepControl.invalid || publishing" type="button" matStepperNext>
+                        <mat-progress-spinner *ngIf="publishing" [diameter]="24" class="mx-auto" [mode]="'indeterminate'">
+                        </mat-progress-spinner>
+                        Publish internship
+                    </button>
+                </div>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+</form>

@@ -1,0 +1,119 @@
+<div class="flex flex-col mx-4 sm:mx-8 mt-6 mb-3">
+    <div class="flex items-start">
+        <img class="w-12 h-12 rounded-full mr-5" [src]="acc?.image?'https://' +acc?.image : 'assets/images/dummy-avatar.jpg'"
+            alt="Card cover image">
+        <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+            <textarea #commentField matInput [placeholder]="'Write a comment...'" [rows]="3" matTextareaAutosize></textarea>
+        </mat-form-field>
+    </div>
+
+    <div class="flex items-center mt-3 ml-auto">
+
+        <button *ngIf="commentMode === 'UPDATE'" class="mr-2" (click)="cancelUpdate()" color="default" mat-flat-button>
+            <ng-container >
+                <span>Cancel</span>
+              
+            </ng-container>
+           
+        </button>
+        <button [disabled]="sending || !commentField.value" (click)="commentMode === 'ADD'? addComment(commentField.value): updateComment(commentField.value)" color="primary" mat-flat-button>
+            <ng-container *ngIf="!sending && commentMode === 'ADD'">
+                <span>Comment</span>
+                &nbsp;
+                <mat-icon class="icon-size-4" [svgIcon]="'send'"></mat-icon>
+            </ng-container>
+            <ng-container *ngIf="!sending && commentMode === 'UPDATE'">
+                <span>Update</span>
+                &nbsp;
+                <mat-icon class="icon-size-4" [svgIcon]="'mat_outline:edit'"></mat-icon>
+            </ng-container>
+            <ng-container *ngIf="sending">
+                <span >
+                    Sending...
+                </span>
+                &nbsp;
+                <mat-progress-spinner  [diameter]="15" [mode]="'indeterminate'">
+                </mat-progress-spinner>
+            </ng-container>
+        </button>
+    </div>
+</div>
+<hr *ngIf="showComments" class="border-b mx-4 sm:mx-8 my-0">
+<div *ngIf="showComments" #commentsWrapper  infiniteScroll
+[infiniteScrollDistance]="2"
+[infiniteScrollThrottle]="50"
+[scrollWindow]="false"
+(scrolled)="onScroll()" class="max-h-120 overflow-y-auto">
+    <section *ngIf="!comments" class="w-full my-5  text-center">
+        <mat-progress-spinner  [diameter]="24" class="mx-auto" [mode]="'indeterminate'">
+        </mat-progress-spinner>
+
+    </section>
+    <ng-container *ngIf="comments && comments && comments.length === 0">
+        <div class="text-center w-full text-md my-5">
+            No comments yet! 
+        </div>
+    </ng-container>
+    <ng-container *ngFor="let comment of comments">
+        <!-- ===== comment =======  -->
+        <div class="relative flex flex-col mx-4 sm:mx-8 my-6">
+            <section class="flex flex-row items-start">
+                <div class="mr-3">
+                    <div class="flex items-center justify-center align-middle flex-col">
+                        <mat-icon [ngClass]="{'selected' : comment?.ratedByUser === 'UP'}" (click)="rateComment(comment, 'UP')" class="icon-size-7 rate_icon cursor-pointer border-gray-600 rounded-full border-solid transform transition-transform ease-in-out duration-150"
+                            [svgIcon]="'heroicons_solid:chevron-up'"></mat-icon>
+                        <span class="font-bold my-1">{{comment?.rating}}</span>
+                        <mat-icon [ngClass]="{'selected' : comment?.ratedByUser === 'DOWN'}" (click)="rateComment(comment, 'DOWN')"  class="icon-size-7 rate_icon cursor-pointer border-gray-600 rounded-full border-solid transform transition-transform ease-in-out duration-150"
+                            [svgIcon]="'heroicons_solid:chevron-down'"></mat-icon>
+                    </div>
+                </div>
+                <div class="flex-grow">
+                    <div class="flex items-start mb-3 mt-3">
+                        <img [routerLink]="['/profile',comment?.userRole === 'INTERN'? 'intern' : 'company', comment?.userId]" class="w-8 h-8 cursor-pointer rounded-full mr-3" [src]="comment?.userImg? ('https://'+comment?.userImg) : 'assets/images/dummy-avatar.jpg'"
+                            alt="user">
+                        <div class="flex flex-col justify-between flex-1">
+                            <span class="flex justify-between">
+                                <a [routerLink]="['/profile',comment?.userRole === 'INTERN'? 'intern' : 'company', comment?.userId]" class="capitalize cursor-pointer hover:underline ">
+                                <b>
+                                    {{comment?.userName}}
+                                </b>
+                                </a>
+                               
+                                <div class="flex">
+                                    <span class="text-sm text-secondary">{{comment?.createDate | date: dateFormat}}</span>
+                                   <ng-container *ngIf="comment | userComment">
+                                    &nbsp;
+                                    &nbsp;
+                                    <mat-icon  (click)="editMode(comment)" class="icon-size-4.5 mr-1 rate_icon cursor-pointer transform transition-transform ease-in-out duration-150"
+                                    [svgIcon]="'mat_outline:edit'"></mat-icon>
+                                    
+                                    <mat-icon  (click)="deleteComment(comment)" class="icon-size-4.5 rate_icon text-red-600 cursor-pointer transform transition-transform ease-in-out duration-150"
+                                    [svgIcon]="'mat_outline:delete'"></mat-icon>
+                                   </ng-container>
+                                   
+                                </div>
+                                
+                            </span>
+                            <div class="text-secondary text-sm">
+                                {{comment?.jobTitle}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pl-2">
+                        <p>
+                           {{comment?.content}}
+                        </p>
+                    </div>
+    
+                </div>
+            </section>
+            
+        </div>
+        <!-- ===== comment =======  -->
+        <section *ngIf="gettingComments" class="w-full my-5  text-center">
+            <mat-progress-spinner  [diameter]="18" class="mx-auto" [mode]="'indeterminate'">
+            </mat-progress-spinner>
+           
+        </section>
+    </ng-container>
+</div>

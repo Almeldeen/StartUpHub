@@ -1,0 +1,148 @@
+<div class="w-full">
+    <!-- Form -->
+    <form [formGroup]="informationForm">
+
+        <!-- Section -->
+
+        <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
+            <!-- Name -->
+            <div class="sm:col-span-4">
+                <mat-form-field class=" w-full">
+                    <mat-label>Name</mat-label>
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:user'" matPrefix></mat-icon>
+                    <input [formControlName]="'name'" matInput>
+                </mat-form-field>
+            </div>
+
+            <!-- Email -->
+            <div class="sm:col-span-2">
+                <mat-form-field class=" w-full">
+                    <mat-label>Email</mat-label>
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:mail'" matPrefix></mat-icon>
+                    <input [formControlName]="'email'" matInput>
+                </mat-form-field>
+            </div>
+            <!-- Phone -->
+            <div class="sm:col-span-2">
+                <mat-form-field class=" w-full">
+                    <mat-label>Phone</mat-label>
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:phone'" matPrefix></mat-icon>
+                    <input [formControlName]="'phone'" matInput>
+                </mat-form-field>
+            </div>
+            <!-- address -->
+            <div class="sm:col-span-2">
+                <mat-form-field class=" w-full">
+                    <mat-label>Address</mat-label>
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:location-marker'" matPrefix></mat-icon>
+                    <input [formControlName]="'address'" matInput>
+
+
+                </mat-form-field>
+            </div>
+            <!-- Birthdate  -->
+            <div class="sm:col-span-2">
+                <mat-form-field class=" w-full">
+                    <mat-label>Birthdate</mat-label>
+                    <input matInput readonly="true" [formControl]="informationForm.get('birthdate')" [matDatepickerFilter]="myFilter" (dateChange)="birthdateChange($event)" [matDatepicker]="picker1">
+                    <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                    <mat-datepicker #picker1></mat-datepicker>
+                </mat-form-field>
+
+            </div>
+            <!-- About -->
+            <div class="sm:col-span-4">
+                <mat-form-field class="fuse-mat-textarea  w-full">
+                    <mat-label>About</mat-label>
+                    <textarea matInput [formControlName]="'about'" matTextareaAutosize [matAutosizeMinRows]="5"></textarea>
+                </mat-form-field>
+
+            </div>
+        </div>
+
+
+        <!-- Divider -->
+        <div class="mt-11 mb-10 border-t"></div>
+
+        <form [formGroupName]="'education'">
+            <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
+                <h3 class="mb-3">Education</h3>
+                <!-- School -->
+                <div class="sm:col-span-4">
+                    <mat-form-field class=" w-full">
+                        <mat-label>School</mat-label>
+                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:academic-cap'" matPrefix></mat-icon>
+                        <input [formControlName]="'school'" matInput>
+                    </mat-form-field>
+                </div>
+                <!-- Degree-->
+                <div class="sm:col-span-2">
+                    <mat-form-field class=" w-full">
+                        <mat-label>Degree</mat-label>
+                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:library'" matPrefix></mat-icon>
+                        <input [formControlName]="'degree'" matInput>
+                    </mat-form-field>
+                </div>
+                <!-- Study Field -->
+                <div class="sm:col-span-2">
+                    <mat-form-field class=" w-full">
+                        <mat-label>Study Field</mat-label>
+                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:puzzle'" matPrefix>
+                        </mat-icon>
+                        <input [formControlName]="'fieldOfStudy'" matInput>
+
+
+                    </mat-form-field>
+                </div>
+                <!-- Start date  -->
+                <div class="sm:col-span-2">
+                    <mat-form-field class=" w-full">
+                        <mat-label>Start Date</mat-label>
+                        <input matInput readonly="true" [formControl]="informationForm.get('education').get('startDate')" [matDatepickerFilter]="myFilter" (dateChange)="birthdateChange($event)" [matDatepicker]="picker2">
+                        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                        <mat-datepicker #picker2></mat-datepicker>
+                    </mat-form-field>
+
+                </div>
+
+
+                <!-- End date  -->
+                <div class="sm:col-span-2">
+                    <mat-form-field class=" w-full">
+                        <mat-label>End Date</mat-label>
+                        <input matInput readonly="true" [formControl]="informationForm.get('education').get('endDate')" (dateChange)="birthdateChange($event)" [matDatepicker]="picker3">
+                        <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                        <mat-datepicker #picker3></mat-datepicker>
+                    </mat-form-field>
+
+                </div>
+                <!-- Student Activity -->
+                <div class="sm:col-span-2">
+                    <mat-form-field class=" w-full">
+                        <mat-label>Student Activity</mat-label>
+                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:briefcase'" matPrefix>
+                        </mat-icon>
+                        <input [formControlName]="'studentActivities'" matInput>
+
+
+                    </mat-form-field>
+                </div>
+
+            </div>
+        </form>
+
+        <!-- Actions -->
+        <div class="flex items-center justify-end">
+
+            <button class="ml-4" [disabled]="saving" (click)="saveUpdates() " mat-flat-button type="button" [color]="'primary'">
+                <span *ngIf="!saving">
+                    Save
+                </span>
+                <mat-progress-spinner *ngIf="saving" [diameter]="24" [mode]="'indeterminate'">
+                </mat-progress-spinner>
+            </button>
+        </div>
+    </form>
+
+
+</div>

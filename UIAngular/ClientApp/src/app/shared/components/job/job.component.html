@@ -1,0 +1,103 @@
+<ng-container *ngIf="job">
+    <!-- Post card -->
+    <fuse-card class="flex flex-col mb-4 w-full" #expandableCard02="fuseCard">
+        <div class="flex items-center mx-3 sm:mx-4 mt-6 mb-4">
+            <img *ngIf="showUserData" class="w-10 h-10 cursor-pointer rounded-full mr-4" [routerLink]="['/profile','company', job?.userId]" [src]="job?.companyImg?'https://' +job?.companyImg : 'assets/images/dummy-avatar.jpg'" alt="Card cover image">
+            <div *ngIf="showUserData" class="flex flex-col">
+                <span [routerLink]="['/profile', 'company', job?.userId]" class="font-semibold capitalize cursor-pointer hover:underline leading-none">{{job?.companyName ||
+                    '-'}}</span>
+                <span *ngIf="job?.companyJobTitle" class="text-sm text-secondary leading-none mt-1">{{job?.companyJobTitle ||
+                    'Company'}}</span>
+
+            </div>
+            <!-- top right -->
+            <div [ngClass]="{'ml-auto' : showUserData}" class=" flex flex-wrap items-center">
+                <div *ngIf="job?.fieldName" class="py-0.5 px-3 rounded-full text-sm font-medium text-gray-500 bg-gray-100 dark:text-gray-300 dark:bg-gray-700">
+                    {{job?.fieldName}}
+                </div>
+                <div class="ml-2 py-0.5 px-3 rounded-full text-sm font-medium text-white bg-green-500 ">
+                    Internship
+                </div>
+                <button *ngIf="showUserData" class="ml-2 " mat-icon-button [matMenuTriggerFor]="postCardMenu02">
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:dots-vertical'"></mat-icon>
+                </button>
+            </div>
+            <button *ngIf="!showUserData" class="ml-auto " mat-icon-button [matMenuTriggerFor]="postCardMenu02">
+                <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:dots-vertical'"></mat-icon>
+            </button>
+            <!-- top right -->
+            <mat-menu #postCardMenu02="matMenu">
+
+                <button (click)="copyLink(job?.id)" mat-menu-item>
+                    <span class="flex items-center">
+                        <mat-icon class="icon-size-5 mr-3" [svgIcon]="'mat_outline:content_copy'"></mat-icon>
+                        <span>Copy link</span>
+                    </span>
+                </button>
+            </mat-menu>
+        </div>
+        <div class="mx-3 mb-2 sm:mx-6" *ngIf="job?.title">
+           <h2 class="text-2xl"> {{job?.title}}</h2>
+        </div>
+        <div #viewContainer [ngClass]="{'html-content-truncate' : job?.content.length > 300  && showViewBtn}" class="mx-3 mb-2 sm:mx-6 ">
+            <quill-view [content]="job?.content" format="html" sanitize="true" theme="snow"></quill-view>
+        </div>
+        <ng-container *ngIf=" job?.content.length > 300 && showViewBtn">
+            <div class="text-left mx-3 sm:mx-6 mt-2 text-blue-500 text-sm cursor-pointer">
+                <a *ngIf="viewContainer.classList.contains('html-content-truncate')" (click)="viewContainer.classList.toggle('html-content-truncate')">See more ... </a>
+                <a *ngIf="!viewContainer.classList.contains('html-content-truncate')" (click)="viewContainer.classList.toggle('html-content-truncate')">See less</a>
+            </div>
+        </ng-container>
+
+
+        <div class="flex mx-3 my-2 sm:mx-6 flex-wrap " *ngIf="job?.skillls">
+            <div *ngFor="let skill of job?.skillls" class="m-1 py-0.5 px-3 rounded-full text-sm font-medium text-gray-800 bg-blue-200 dark:text-gray-300 dark:bg-gray-700">
+                {{skill?.name}}
+            </div>
+        </div>
+        <hr class="mt-0 mb-2 mx-6 sm:mx-8 border-t-0">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mx-2 mb-3 sm:mx-4">
+            <div class="flex items-center ">
+
+                <button *ngIf="showViewBtn" [routerLink]="['/job-details', job?.id]" color="secondary" mat-button>
+                    <span class="flex items-center">
+                        <mat-icon class="icon-size-5 mr-1" [svgIcon]="'heroicons_solid:view-list'"></mat-icon>
+                        <span>View job details</span>
+                    </span>
+                </button>
+                <ng-container *appHasAnyAuthority="['INTERN']">
+                    <button *ngIf="!showViewBtn && !job.appliedByUser" color="primary" mat-flat-button (click)="openDialog()">
+                        <span class="flex items-center">
+                            <mat-icon class="icon-size-5 mr-1" [svgIcon]="'heroicons_solid:view-list'"></mat-icon>
+                            <span >Apply to job</span>
+                        </span>
+                    </button>
+                    <button *ngIf="!showViewBtn &&job.appliedByUser" [routerLink]="['/job-request', job?.id]"  mat-raised-button class="bg-green-600 text-white" [color]="'default'" >
+                        <span >Applied (Go to details)</span>
+                    </button>
+                </ng-container>
+
+
+            </div>
+            <div matTooltip="Internship period" class="flex items-center my-2">
+                <span *ngIf="job?.startDate" class="text-sm text-secondary leading-none ">{{job?.startDate |
+                    date: dateFormat ||
+                    ''}}</span>
+                <span *ngIf="!job?.startDate">
+                    &infin;
+                </span>
+                <mat-icon *ngIf="job?.startDate && job?.endDate" class="icon-size-3 mx-1" [svgIcon]="'heroicons_outline:arrow-narrow-right'"></mat-icon>
+                <span *ngIf="job?.endDate" class="text-sm text-secondary leading-none ">{{job?.endDate | date:
+                    dateFormat ||
+                    ''}}</span>
+                <span *ngIf="!job?.endDate">
+                    &infin;
+                </span>
+            </div>
+
+        </div>
+
+
+    </fuse-card>
+    <!-- End Post card -->
+</ng-container>

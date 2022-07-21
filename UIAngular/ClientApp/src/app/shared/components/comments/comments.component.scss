@@ -1,0 +1,19 @@
+.rate_icon:focus,
+.rate_icon:focus-within,
+.rate_icon:hover,
+.rate_icon.selected
+
+{
+
+    border-color: #2195f3 !important;
+    color: #2195f3;
+    // border-width: 1px;
+}
+
+.rate_icon{
+    transition: all .5s;
+    -webkit-transition: all .5s;
+    -moz-transition: all .5s;
+    -ms-transition: all .5s;
+    -o-transition: all .5s;
+}

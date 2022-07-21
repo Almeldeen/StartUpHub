@@ -1,0 +1,13 @@
+<!-- Create Post -->
+<fuse-card class="flex flex-col w-full md:p-5 mb-4 p-3 ">
+    <div class="flex  flex-row items-start">
+        <div *ngIf="withImage" class="flex items-center ">
+            <img class="w-12  min-w-12 h-12 rounded-full mr-4" [src]="acc?.image? 'https://' + acc?.image :'assets/images/dummy-avatar.jpg'" alt="Card cover image">
+        </div>
+        <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+            <input matInput  class="rounded-3xl" (click)="openDialog()" [placeholder]="'Be productive and publish new article'" />
+        </mat-form-field>
+      
+    </div>
+    
+</fuse-card>

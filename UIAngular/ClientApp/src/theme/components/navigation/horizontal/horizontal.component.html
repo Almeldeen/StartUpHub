@@ -1,0 +1,22 @@
+<div class="fuse-horizontal-navigation-wrapper">
+
+    <ng-container *ngFor="let item of navigation; trackBy: trackByFn">
+        <!-- Skip items for roles -->
+        <ng-container *appHasAnyAuthority="item.roles">
+            <!-- Skip the hidden items -->
+            <ng-container *ngIf="(item.hidden && !item.hidden(item)) || !item.hidden">
+
+                <!-- Basic -->
+                <ng-container *ngIf="item.type === 'basic'">
+                    <fuse-horizontal-navigation-basic-item class="fuse-horizontal-navigation-menu-item" [item]="item"
+                        [name]="name"></fuse-horizontal-navigation-basic-item>
+                </ng-container>
+
+
+            </ng-container>
+        </ng-container>
+
+
+    </ng-container>
+
+</div>

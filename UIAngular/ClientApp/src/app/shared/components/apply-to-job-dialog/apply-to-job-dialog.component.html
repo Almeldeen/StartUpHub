@@ -1,0 +1,35 @@
+<h2 mat-dialog-title>Apply to job</h2>
+<form [formGroup]="jobForm" mat-dialog-content class="flex flex-col  my-2   rounded-2xl ">
+    
+    <h2 *ngIf="questionControls.controls && questionControls.controls.length" mat-dialog-title class="mb-3">Questions</h2>
+    <div formArrayName="questions">
+
+        <ng-container *ngFor="let q of questionControls.controls;index as i">
+            <mat-form-field [formGroupName]="i + ''" class=" w-full">
+                <mat-label>{{q?.value?.question?.qContent}}</mat-label>
+                <input required [formControlName]="'answer'" matInput type="text" placeholder="answer">
+                <mat-error>
+                    You must write answer
+                </mat-error>
+            </mat-form-field>
+        </ng-container>
+    </div>
+    <div>
+        *Note: Be sure that you uploaded a CV to your profile ( <span (click)="_matDialogRef.close(false)" [routerLink]="['/profile', 'intern', acc?.id, 'cv']" class="text-blue-600 cursor-pointer hover:underline">
+            go to setting
+        </span> )
+    </div>
+</form>
+<div mat-dialog-actions class="py-3 border-t-2 flex flex-row-reverse space-x-4 space-x-reverse">
+    <div>
+        <button *ngIf="!job.appliedByUser" [disabled]="saving" mat-raised-button [color]="'primary'" (click)="applyToJob()">
+            <mat-progress-spinner [diameter]="15" *ngIf="saving" class="mx-auto" [mode]="'indeterminate'">
+            </mat-progress-spinner>
+            <span >Apply to job</span>
+        </button>
+        <button *ngIf="job.appliedByUser"  mat-raised-button [disabled]="true" [color]="'default'" >
+            <span >Applied</span>
+        </button>
+    </div>
+    <div><button class="" mat-raised-button [color]="'default'" (click)="onNoClick()">Cancel</button></div>
+</div>

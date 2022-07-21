@@ -1,0 +1,171 @@
+<section class="container my-3  mx-auto ">
+    <section class="grid gap-4 grid-cols-12 grid-rows-1  relative flex-wrap">
+
+        <!-- left card -->
+        <section class="col-span-3  hidden lg:block ">
+
+            <fuse-card class="flex sticky top-90-px flex-col  w-full  px-8 pt-6 pb-4">
+                <div class="flex flex-col items-center w-full p-4 ng-tns-c49-1">
+                    <div *appHasAnyAuthority="ROLES.INTERN" class="relative w-24 h-24"><img alt="User avatar"
+                            class="w-full h-full rounded-full ng-star-inserted"
+                            [src]="acc?.image ? 'https://' + acc?.image :'assets/images/dummy-avatar.jpg'">
+                        <!---->
+                        <!---->
+                    </div>
+                    <div *appHasAnyAuthority="ROLES.COMPANY" class="relative w-24 h-24"><img alt="User avatar"
+                            class="w-full h-full rounded-full ng-star-inserted"
+                            [src]="acc?.image ? 'https://' + acc?.image :'assets/images/dummy-avatar-co.jpg'">
+                        <!---->
+                        <!---->
+                    </div>
+                    <div class="flex flex-col items-center justify-center w-full mt-6">
+                        <div
+                            class="w-full whitespace-nowrap text-ellipsis overflow-hidden text-center leading-normal font-medium">
+                            {{acc?.fullName}}
+                        </div>
+                        <div *ngIf="acc?.email"
+                            class="w-full my-1 whitespace-nowrap text-ellipsis overflow-hidden text-center text-md leading-normal font-medium text-secondary">
+                            {{acc?.email}}
+                        </div>
+                        <div *ngIf="stats?.jobTitle"
+                            class="w-full max-w-50 my-1 whitespace-nowrap truncate overflow-hidden text-center text-md leading-normal font-medium text-secondary">
+                            {{stats?.jobTitle}}
+                        </div>
+
+
+                        <div class="py-4 border-t-2 w-full">
+                            <div *appHasAnyAuthority="ROLES.INTERN" class="flex w-full justify-between">
+                                <span>
+                                    Articles
+                                </span>
+                                <span class="text-primary">
+                                    {{stats?.articleCount || 0}}
+                                </span>
+                            </div>
+                            <div *appHasAnyAuthority="ROLES.INTERN" class="flex mt-1 w-full justify-between">
+                                <span>
+                                    Requested internships
+                                </span>
+                                <span class="text-primary">
+                                    {{stats?.internshipRequests || 0}}
+                                </span>
+                            </div>
+                            <div *appHasAnyAuthority="ROLES.COMPANY" class="flex mt-1 w-full justify-between">
+                                <span>
+                                    Internships
+                                </span>
+                                <span class="text-primary">
+                                    1
+                                </span>
+                            </div>
+                            <div *appHasAnyAuthority="ROLES.COMPANY" class="flex mt-1 w-full justify-between">
+                                <span>
+                                    In progress internships
+                                </span>
+                                <span class="text-primary">
+                                    1
+                                </span>
+                            </div>
+                            <div *appHasAnyAuthority="ROLES.COMPANY" class="flex mt-1 w-full justify-between">
+                                <span>
+                                    New internship requests
+                                </span>
+                                <span class="text-primary">
+                                    1
+                                </span>
+                            </div>
+                            <!-- Followers & following -->
+                            <div class="flex mt-4 w-full justify-between">
+                                <span>
+                                    Followers
+                                </span>
+                                <span class="text-primary">
+                                    {{stats?.followers || 0}}
+                                </span>
+                            </div>
+                            <div class="flex mt-1 w-full justify-between">
+                                <span>
+                                    Following
+                                </span>
+                                <span class="text-primary">
+                                    {{stats?.following || 0}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fuse-card>
+        </section>
+
+
+        <section  infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50" (scrolled)="onScroll()" class="lg:col-span-9 col-span-12 block">
+            <div >
+
+                <!-- People follow -->
+                <fuse-card *ngIf="peopleToFollow && peopleToFollow.length !== 0 "
+                    class="flex mb-3 flex-col  w-full  px-8  py-6">
+                    <div class="flex mb-3 items-center justify-between">
+                        <div class="text-2xl font-semibold leading-tight">People & companies you can follow</div>
+                        <div class="-mr-3">
+
+                        </div>
+                    </div> <!-- item -->
+                    <div class=" grid grid-cols-12 gap-6">
+                        <div *ngFor="let user of peopleToFollow;index as i"
+                            class=" items-center justify-center md:col-span-4 xl:col-span-3 col-span-12 p-8 pb-6 filter-info border-2 rounded-md">
+
+                            <img [routerLink]="['/profile', user?.userRole === 'INTERN' ? 'intern' : 'company', user?.id]"
+                                class="w-32 h-32 cursor-pointer rounded-full mx-auto"
+                                [src]="user?.img? 'https://' + user?.img : 'assets/images/dummy-avatar.jpg'"
+                                alt="Card cover image">
+                            <div class="text-center flex">
+                                <div *ngIf="user?.userRole !== 'INTERN'"
+                                    class="mx-auto mt-3 py-0.5 px-3 rounded-full w-auto text-sm font-medium text-white bg-green-600">
+                                    Company
+                                </div>
+                                <div *ngIf="user?.userRole === 'INTERN'"
+                                    class="mx-auto mt-3 py-0.5 px-3 rounded-full w-auto text-sm font-medium text-gray-600 bg-blue-200 dark:text-gray-300 dark:bg-gray-700">
+                                    Intern
+                                </div>
+                            </div>
+                            <div [routerLink]="['/profile', user?.userRole === 'INTERN' ? 'intern' : 'company', user?.id]"
+                                class="text-2xl cursor-pointer font-semibold leading-tight hover:underline text-center transform my-4">
+                                {{user?.name}}</div>
+                            <div class="text-secondary leading-tight text-center  truncate">{{user?.jobTitle || '-'}}
+                            </div>
+                            <button *ngIf="!user?.followedHim" (click)="follow($event,user)" class="px-4 mt-4 w-full"
+                                mat-raised-button [color]="'primary'" [routerLink]="['./']">
+                                follow
+                            </button>
+                            <button (click)="unFollow($event, user)"
+                                (mouseleave)="followBtnContent.textContent ='Followed';followBtnIcon.svgIcon = 'mat_outline:check'"
+                                (mouseover)="followBtnContent.textContent ='Unfollow';followBtnIcon.svgIcon = 'heroicons_outline:user-remove'"
+                                *ngIf="user?.followedHim"
+                                class="px-4 mt-4 w-full bg-gray-200 hover:bg-red-700 hover:text-white" mat-flat-button>
+                                <mat-icon #followBtnIcon class="icon-size-4 mr-1" [svgIcon]="'mat_outline:check'">
+                                </mat-icon>
+                                <span #followBtnContent>Followed</span>
+                            </button>
+
+                        </div>
+                    </div>
+
+                </fuse-card>
+
+                <section *ngIf="getting" class="w-full my-5  text-center">
+                    <mat-progress-spinner [diameter]="24" class="mx-auto" [mode]="'indeterminate'">
+                    </mat-progress-spinner>
+
+                </section>
+                <ng-container *ngIf="!getting && peopleToFollow && peopleToFollow.length === 0 ">
+                    <div class="text-center w-full text-md my-5">
+                        <h3> No people to follow</h3>
+                    </div>
+                </ng-container>
+
+
+
+            </div>
+        </section>
+    </section>
+</section>

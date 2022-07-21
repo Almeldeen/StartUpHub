@@ -1,0 +1,219 @@
+<section class="container my-3  mx-auto ">
+    <section class="grid gap-4 grid-cols-12 grid-rows-1  relative flex-wrap">
+
+        <!-- left card -->
+        <section class="col-span-3  hidden lg:block ">
+
+            <fuse-card class="flex sticky top-90-px flex-col  w-full  px-8 pt-6 pb-4">
+                <div class="flex flex-col items-center w-full p-4 ng-tns-c49-1">
+                    <div  [routerLink]="['/profile', acc?.role === 'INTERN' ? 'intern' : 'company', acc?.id]" *appHasAnyAuthority="ROLES.INTERN" class="relative cursor-pointer w-24 h-24"><img alt="User avatar"
+                            class="w-full h-full rounded-full ng-star-inserted"
+                            [src]="acc?.image ? 'https://' + acc?.image :'assets/images/dummy-avatar.jpg'">
+                        <!---->
+                        <!---->
+                    </div>
+                    
+                    <div [routerLink]="['/profile', acc?.role === 'INTERN' ? 'intern' : 'company', acc?.id]" *appHasAnyAuthority="ROLES.COMPANY" class="relative cursor-pointer w-24 h-24"><img alt="User avatar"
+                            class="w-full h-full rounded-full ng-star-inserted"
+                            [src]="acc?.image ? 'https://' + acc?.image :'assets/images/dummy-avatar-co.jpg'">
+                        <!---->
+                        <!---->
+                    </div>
+                    <div class="flex flex-col items-center justify-center w-full mt-6">
+                        <div
+                        [routerLink]="['/profile', acc?.role === 'INTERN' ? 'intern' : 'company', acc?.id]"
+                            class="w-full capitalize hover:underline cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden text-center leading-normal font-medium">
+                            {{acc?.fullName}}
+                        </div>
+                        <div *ngIf="acc?.email"
+                            class="w-full my-1 whitespace-nowrap text-ellipsis overflow-hidden text-center text-md leading-normal font-medium text-secondary">
+                            {{acc?.email}}
+                        </div>
+                        <div *ngIf="stats?.jobTitle"
+                            class="w-full max-w-50 my-1 whitespace-nowrap truncate overflow-hidden text-center text-md leading-normal font-medium text-secondary">
+                            {{stats?.jobTitle}}
+                        </div>
+
+
+                        <div class="py-4 border-t-2 w-full">
+                            <div *appHasAnyAuthority="ROLES.INTERN" class="flex w-full justify-between">
+                                <span>
+                                    Articles
+                                </span>
+                                <span class="text-primary">
+                                    {{stats?.articleCount || 0}}
+                                </span>
+                            </div>
+                            <div *appHasAnyAuthority="ROLES.INTERN" class="flex mt-1 w-full justify-between">
+                                <span>
+                                    Requested internships
+                                </span>
+                                <span class="text-primary">
+                                    {{stats?.internshipRequests || 0}}
+                                </span>
+                            </div>
+                            <div *appHasAnyAuthority="ROLES.COMPANY" class="flex mt-1 w-full justify-between">
+                                <span>
+                                    Internships
+                                </span>
+                                <span class="text-green-500">
+                                    {{stats?.internshipRequests}}
+                                </span>
+                            </div>
+                            <div *appHasAnyAuthority="ROLES.COMPANY" class="flex mt-1 w-full justify-between">
+                                <span>
+                                    In progress requests
+                                </span>
+                                <span class="text-yellow-500">
+                                    {{stats?.in_ProgressRequests}}
+                                </span>
+                            </div>
+                            <div *appHasAnyAuthority="ROLES.COMPANY" class="flex mt-1 w-full justify-between">
+                                <span>
+                                    New requests
+                                </span>
+                                <span class="text-blue-500">
+                                    {{stats?.pendingRequests}}
+                                </span>
+                            </div>
+                            <!-- Followers & following -->
+                            <div class="flex mt-4 w-full justify-between">
+                                <span>
+                                    Followers
+                                </span>
+                                <span class="text-primary">
+                                    {{stats?.followers || 0}}
+                                </span>
+                            </div>
+                            <div class="flex mt-1 w-full justify-between">
+                                <span>
+                                    Following
+                                </span>
+                                <span class="text-primary">
+                                    {{stats?.following || 0}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fuse-card>
+        </section>
+
+        <!-- articles & jobs -->
+        <section infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50" (scrolled)="onScroll()"
+            class="lg:col-span-6 col-span-12  " >
+            <!-- Note -->
+            <div *appHasAnyAuthority="ROLES.INTERN" class="mb-4">
+                <app-create-article></app-create-article>
+            </div>
+            <div *ngIf="articles && articles.length">
+                <ng-container *ngFor="let post of articles;index as i">
+                    <ng-container *ngIf="post.postType === 'ARTICLE'">
+                        <app-post class="w-full" [article]="post"></app-post>
+
+                    </ng-container>
+                    <ng-container *ngIf="post.postType === 'JOP'">
+                        <app-job class="w-full" [job]="post"></app-job>
+
+                    </ng-container>
+
+                </ng-container>
+            </div>
+            <section *ngIf="gettingArticles" class="w-full my-5  text-center">
+                <mat-progress-spinner [diameter]="24" class="mx-auto" [mode]="'indeterminate'">
+                </mat-progress-spinner>
+
+            </section>
+            <ng-container *ngIf="!gettingArticles && articles && articles.length === 0 ">
+                <div class="text-center w-full text-md my-5">
+                    No Articles Yet!
+                </div>
+            </ng-container>
+        </section>
+
+
+
+        <!-- right card -->
+        <section class="col-span-3  hidden lg:block">
+
+            <div class="sticky top-90-px">
+                <!-- Followers -->
+                <fuse-card class="flex  flex-col  w-full  px-8 pt-6 pb-4">
+                    <div class="flex mb-3 items-center justify-between">
+                        <div class="text-2xl font-semibold leading-tight">Follow people</div>
+                        <div class="-mr-3">
+                            <button mat-icon-button [matMenuTriggerFor]="listCard08Menu">
+                                <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:dots-vertical'"></mat-icon>
+                            </button>
+                            <mat-menu #listCard08Menu="matMenu">
+                                <button [routerLink]="['/people']" mat-menu-item>Find people</button>
+                            </mat-menu>
+                        </div>
+                    </div>
+                    <!-- item -->
+                    <div *ngFor="let user of peopleToFollow;index as i" class="flex mb-3 flex-nowrap flex-col">
+                        <div class="flex items-center">
+                            <img [routerLink]="['/profile', user?.userRole === 'INTERN' ? 'intern' : 'company', user?.id]"  [src]="user?.img? 'https://' + user?.img : 'assets/images/dummy-avatar.jpg'" alt=""
+                                class="w-10 cursor-pointer h-10 mr-1 rounded-full">
+                            <div class="flex flex-col flex-1  min-w-0">
+                                <div [routerLink]="['/profile', user?.userRole === 'INTERN' ? 'intern' : 'company', user?.id]"  class="font-medium cursor-pointer hover:underline leading-none truncate"> {{user?.name}}</div>
+                                <div class="text-md truncate leading-none text-secondary mt-1">
+                                    {{user?.jobTitle || '-'}}
+                                </div>
+                            </div>
+                            <button (click)="follow($event,user)" *ngIf="!user?.followedHim" class=" "
+                                mat-stroked-button [color]="'primary'" [routerLink]="['./']">
+                                Follow
+                            </button>
+                            <span class="">
+
+                                <span *ngIf="user?.followedHim"
+                                    class="text-green-400 align-middle px-2 items-center flex-row flex">
+                                    Followed <mat-icon class="icon-size-3 text-green-400"
+                                        [svgIcon]="'heroicons_solid:check'"></mat-icon>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-center my-5" *ngIf="!peopleToFollow || !peopleToFollow?.length">
+                        No people
+                    </div>
+                    <div class="flex items-center mt-6 ">
+                        <button class="px-3" mat-button [color]="'primary'" [routerLink]="['/people']">
+                            See all
+                        </button>
+                    </div>
+                </fuse-card>
+                <!-- quick links -->
+                <fuse-card class="flex  flex-col  w-full mt-3  px-8 pt-6 pb-4">
+                    <div class="flex mb-3 items-center ">
+                        <div class="text-2xl font-semibold leading-tight">Quick links</div>
+
+                    </div>
+                    <!-- link -->
+                    <div class="flex mb-3 flex-nowrap flex-col">
+                        <div class="flex flex-col min-w-0">
+                            <div class="">
+
+                                <a href="" class="text-primary hover:text-secondary">Contact us</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- link -->
+                    <div class="flex mb-3 flex-nowrap flex-col">
+                        <div class="flex flex-col min-w-0">
+                            <div class="">
+
+                                <a href="" class="text-primary hover:text-secondary">Start hub on facebook</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </fuse-card>
+
+            </div>
+        </section>
+
+    </section>
+
+</section>
